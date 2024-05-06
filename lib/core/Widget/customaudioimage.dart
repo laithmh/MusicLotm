@@ -1,46 +1,45 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:musiclotm/core/Widget/neubox.dart';
 
-
-
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class Customaudioimage extends StatelessWidget {
-  final int id;
-  final String musicname;
-  final String artestname;
-  
-
-  const Customaudioimage(
-      {super.key,
-      required this.id,
-      required this.musicname,
-      required this.artestname,
-      });
+  final String artist;
+  final String title;
+  final Uri? artUri;
+  const Customaudioimage({
+    super.key,
+    required this.artist,
+    required this.title,
+    required this.artUri,
+  });
 
   @override
   Widget build(BuildContext context) {
-  
-
     return Neubox(
         borderRadius: BorderRadius.circular(10),
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: QueryArtworkWidget(
-                artworkBorder: BorderRadius.circular(10),
-                artworkHeight: 950.w,
-                artworkWidth: 350,
-                id: id,
-                type: ArtworkType.AUDIO,
-                nullArtworkWidget: Icon(
-                  Icons.music_note,
-                  size: 950.w,
-                ),
-              ),
+              child: artUri == null
+                  ? Icon(
+                      Icons.music_note,
+                      size: 1000.w,
+                    )
+                  : FadeInImage(
+                      height: 1000.w,
+                      width: 350,
+                      // Use FileImage for the FadeInImage widget
+                      image: FileImage(File.fromUri(artUri!)),
+                      placeholder: MemoryImage(kTransparentImage),
+
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(
               height: 20,
@@ -54,7 +53,7 @@ class Customaudioimage extends StatelessWidget {
                       width: 700.w,
                       height: 100.h,
                       child: Text(
-                        musicname,
+                        title,
                         style: const TextStyle(
                           overflow: TextOverflow.ellipsis,
                           fontWeight: FontWeight.bold,
@@ -62,22 +61,16 @@ class Customaudioimage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      artestname,
+                      artist,
                     ),
                   ],
                 ),
-                 IconButton(
-                          onPressed: () {
-                           
-                          },
-                          icon: const Icon(
-                                      Icons.favorite,
-                                      color: Colors.red,
-                                    )
-                                  
-                             )
-                     
-                
+                IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.favorite,
+                      color: Colors.red,
+                    ))
               ],
             ),
           ],

@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/services/request_song_permission.dart';
 import 'package:musiclotm/core/services/song_to_media_item.dart';
+import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Songscontroller extends GetxController {
@@ -15,10 +16,8 @@ class Songscontroller extends GetxController {
       StreamController<RxList<MediaItem>>();
 
   Stream<RxList<MediaItem>> get myStream => myStreamController.stream;
-  SongHandler songHandler = SongHandler();
 
   RxList<MediaItem> songs = <MediaItem>[].obs;
-
 
   bool _isLoading = true;
 
@@ -27,8 +26,6 @@ class Songscontroller extends GetxController {
   Future<RxList<MediaItem>> getSongs() async {
     try {
       await requestSongPermission();
-
-      
 
       final OnAudioQuery onAudioQuery = OnAudioQuery();
 

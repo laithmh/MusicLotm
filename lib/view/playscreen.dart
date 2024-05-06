@@ -1,14 +1,12 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:get/get.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 import 'package:musiclotm/core/Widget/customaudioimage.dart';
 import 'package:musiclotm/core/Widget/customplaybutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/addplaylistbutton.dart';
 import 'package:musiclotm/core/Widget/waveformwidget.dart';
-
-
+import 'package:musiclotm/main.dart';
 
 class Playscreen extends StatelessWidget {
   const Playscreen({
@@ -17,15 +15,14 @@ class Playscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   
-
-    return FutureBuilder(
-        future: Future.wait([
-          
-        ]),
+    return StreamBuilder<MediaItem?>(
+        stream: songHandler.mediaItem.stream,
         builder: (context, snapshot) {
+          MediaItem? song = snapshot.data;
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.data == null) {
+            return Text('Error: ${snapshot.error}');
           } else {
             return Scaffold(
                 appBar: AppBar(
@@ -38,36 +35,29 @@ class Playscreen extends StatelessWidget {
                   centerTitle: true,
                 ),
                 backgroundColor: Theme.of(context).colorScheme.background,
-                body: GetBuilder<Songscontroller>(
-                  builder: (controller) {
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          left: 25, right: 25, bottom: 25, top: 10),
-                      child: Column(
-                        children: [
-                         const Customaudioimage(
-                                id: 1,
-                                artestname: "",
-                                musicname: "",
-                                 ),
-                          
-                          SizedBox(
-                            height: 25.h,
-                          ),
-                          const Addtoplaylistbutton(),
-                          const PolygonWaveformcustom(
-                            max: 12,
-                            value: 1,
-                            
-                          ),
-                          SizedBox(
-                            height: 50.h,
-                          ),
-                          const Customplaybutton(),
-                        ],
+                body: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 25, right: 25, bottom: 25, top: 10),
+                  child: Column(
+                    children: [
+                      Customaudioimage(
+                        artist: song!.artist!,
+                        title: song.title,
+                        artUri: song.artUri,
                       ),
-                    );
-                  },
+                      SizedBox(
+                        height: 25.h,
+                      ),
+                      const Addtoplaylistbutton(),
+                      PolygonWaveformcustom(
+                        maxDuration: song.duration,
+                      ),
+                      SizedBox(
+                        height: 50.h,
+                      ),
+                      const Customplaybutton(),
+                    ],
+                  ),
                 ));
           }
         });

@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 
@@ -11,15 +12,11 @@ import 'package:musiclotm/utils/theme/themes.dart';
 
 import 'package:get/get.dart';
 
-// Create a singleton instance of SongHandler
-SongHandler songHandler = SongHandler();
+late SongHandler songHandler;
 
-// Entry point of the application
 Future<void> main() async {
-  // Ensure that the Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize AudioService with the custom SongHandler
+SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   songHandler = await AudioService.init(
     builder: () => SongHandler(),
     config: const AudioServiceConfig(
@@ -30,14 +27,9 @@ Future<void> main() async {
     ),
   );
 
-  // Run the application
   runApp(
-    // Use the MainApp widget as the root of the application
     const MyApp(),
   );
-
-  // Set preferred orientations for the app
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 }
 
 class MyApp extends StatelessWidget {

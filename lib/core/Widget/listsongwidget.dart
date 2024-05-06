@@ -4,8 +4,11 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+
 import 'package:musiclotm/core/Widget/neubox.dart';
+import 'package:musiclotm/main.dart';
 
 import 'package:transparent_image/transparent_image.dart';
 
@@ -14,7 +17,9 @@ class Songlistwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Navigatorcontroller navigator = Get.put(Navigatorcontroller());
     Songscontroller controller = Get.put(Songscontroller());
+
     return StreamBuilder<RxList<MediaItem>>(
       stream: controller.myStream,
       initialData: <MediaItem>[].obs,
@@ -85,7 +90,10 @@ class Songlistwidget extends StatelessWidget {
 
                                     fit: BoxFit.cover,
                                   ),
-                            onTap: () {},
+                            onTap: () async {
+                              await songHandler.skipToQueueItem(index);
+                              navigator.changepage(2);
+                            },
                           ),
                         ),
                       );
