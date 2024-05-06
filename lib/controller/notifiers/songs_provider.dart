@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/services/request_song_permission.dart';
 import 'package:musiclotm/core/services/song_to_media_item.dart';
@@ -18,10 +19,25 @@ class Songscontroller extends GetxController {
   Stream<RxList<MediaItem>> get myStream => myStreamController.stream;
 
   RxList<MediaItem> songs = <MediaItem>[].obs;
-
+RxInt currentSongPlayingIndex=0.obs;
   bool _isLoading = true;
 
   bool get isLoading => _isLoading;
+
+  void findCurrentSongPlayingIndex(String songId) {
+    var index = 0;
+    for (var e in songs) {
+      if (e.id == songId) {
+        
+        currentSongPlayingIndex.value = index;
+        
+      }
+
+      index++;
+    }
+
+    
+  }
 
   Future<RxList<MediaItem>> getSongs() async {
     try {

@@ -13,7 +13,6 @@ import 'package:musiclotm/utils/theme/themes.dart';
 import 'package:get/get.dart';
 
 late SongHandler songHandler;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
