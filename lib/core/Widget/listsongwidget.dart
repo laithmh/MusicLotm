@@ -19,7 +19,6 @@ class Songlistwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Navigatorcontroller navigator = Get.put(Navigatorcontroller());
     Songscontroller controller = Get.put(Songscontroller());
-
     return StreamBuilder<RxList<MediaItem>>(
       stream: controller.myStream,
       initialData: <MediaItem>[].obs,
@@ -83,14 +82,14 @@ class Songlistwidget extends StatelessWidget {
                                 : FadeInImage(
                                     height: 45,
                                     width: 45,
-                                    // Use FileImage for the FadeInImage widget
+                                    filterQuality: FilterQuality.high,
                                     image: FileImage(
                                         File.fromUri(music[index].artUri!)),
                                     placeholder: MemoryImage(kTransparentImage),
-
                                     fit: BoxFit.cover,
                                   ),
                             onTap: () async {
+                              await controller.handelallsongs();
                               await songHandler.skipToQueueItem(index);
                               navigator.changepage(2);
                             },

@@ -5,13 +5,9 @@ import 'package:just_audio/just_audio.dart';
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final AudioPlayer audioPlayer = AudioPlayer();
 
-  
   UriAudioSource _createAudioSource(MediaItem item) {
     return ProgressiveAudioSource(Uri.parse(item.id));
   }
-
-  
-
 
   void _listenForCurrentSongIndexChanges() {
     audioPlayer.currentIndexStream.listen((index) {
@@ -61,7 +57,7 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     queue.add(queue.value);
 
     _listenForCurrentSongIndexChanges();
-   
+
     audioPlayer.processingStateStream.listen((state) {
       if (state == ProcessingState.completed) skipToNext();
     });

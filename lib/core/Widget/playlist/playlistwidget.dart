@@ -3,8 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 import 'package:musiclotm/controller/navigatorcontroller.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+
+import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
+import 'package:musiclotm/core/const/routesname.dart';
 
 class Playlistwidget extends StatelessWidget {
   const Playlistwidget({super.key});
@@ -12,7 +14,7 @@ class Playlistwidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Navigatorcontroller navigatorcontroller = Get.put(Navigatorcontroller());
-
+    Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
     return Padding(
       padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
       child: Column(
@@ -72,25 +74,37 @@ class Playlistwidget extends StatelessWidget {
             child: SizedBox(
               height: 400.h,
               child: FutureBuilder(
-                future: null,
+                future: playlistcontroller.loadplaylist(),
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  return GetBuilder<Songscontroller>(
+                  return GetBuilder<Playlistcontroller>(
                     builder: (controller) => ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount: null,
+                      itemCount: controller.playlists.length,
                       itemBuilder: (BuildContext context, index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 7),
                           child: Neubox(
                             borderRadius: BorderRadius.circular(12),
                             child: ListTile(
-                              onTap: () {},
+                              onTap: () {
+                                
+                                Get.toNamed(
+                                  Approutes.playlistscreen,
+                                );
+                                controller.playlistindex = index;
+                                controller.playlistId =
+                                    controller.playlists[index].id;
+                              },
                               leading: const Icon(Icons.playlist_play),
-                              title: const Text(""),
+                              title: Text(controller.playlists[index].playlist
+                                  .toUpperCase()),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete),
-                                onPressed: () {},
+                                onPressed: () {
+                                  controller.deleteplaylist(
+                                      index, controller.playlists[index].id);
+                                },
                               ),
                             ),
                           ),

@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+import 'package:musiclotm/controller/playlistcontroller.dart';
 
 import 'package:musiclotm/core/Widget/timeandshufell.dart';
 import 'package:musiclotm/main.dart';
@@ -12,6 +16,8 @@ class Addtoplaylistbutton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
+    Songscontroller songscontroller = Get.put(Songscontroller());
     return StreamBuilder<Duration>(
         stream: AudioService.position,
         builder: (context, snapshot) {
@@ -31,27 +37,34 @@ class Addtoplaylistbutton extends StatelessWidget {
                                 child: ListView.builder(
                                   scrollDirection: Axis.vertical,
                                   shrinkWrap: true,
-                                  itemCount: null,
+                                  itemCount:
+                                      playlistcontroller.playlists.length,
                                   itemBuilder: (BuildContext context, index) {
                                     final RxList<bool> checkedItems =
                                         List.generate(
                                                 index + 1, (index) => false,
                                                 growable: false)
                                             .obs;
-                                    return CheckboxListTile(
-                                      title: const Text(""),
-                                      checkColor: Colors.white,
-                                      activeColor: Colors.blueGrey,
-                                      controlAffinity:
-                                          ListTileControlAffinity.leading,
-                                      checkboxShape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      value: checkedItems[index],
-                                      onChanged: (value) {
-                                        checkedItems[index] = value!;
-                                        if (value = true) {}
-                                      },
+                                    return Obx(
+                                      () => CheckboxListTile(
+                                        title: Text(playlistcontroller
+                                            .playlists[index].playlist),
+                                        checkColor: Colors.white,
+                                        activeColor: Colors.blueGrey,
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        checkboxShape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        value: checkedItems[index],
+                                        onChanged: (value) {
+                                          checkedItems[index] = value!;
+                                          if (value = true) {
+                                            playlistcontroller.playlistindex =
+                                                index;
+                                          }
+                                        },
+                                      ),
                                     );
                                   },
                                 ),
@@ -60,7 +73,17 @@ class Addtoplaylistbutton extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   MaterialButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      playlistcontroller.addSongsToPlaylist(
+                                          songscontroller.songModels[
+                                              songscontroller
+                                                  .currentSongPlayingIndex
+                                                  .value]);
+
+                                      log("===========${playlistcontroller.loadsongplaylist(playlistcontroller.playlistId)}");
+
+                                      Get.back();
+                                    },
                                     child: const Text("save"),
                                   ),
                                   MaterialButton(

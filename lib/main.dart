@@ -8,11 +8,13 @@ import 'package:musiclotm/controller/settingscontroller.dart';
 
 import 'package:musiclotm/core/routes/routes.dart';
 import 'package:musiclotm/controller/song_handler.dart';
-import 'package:musiclotm/utils/theme/themes.dart';
+
 
 import 'package:get/get.dart';
+import 'package:musiclotm/core/theme/themes.dart';
 
 late SongHandler songHandler;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);

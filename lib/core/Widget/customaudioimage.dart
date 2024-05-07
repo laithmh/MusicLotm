@@ -34,10 +34,9 @@ class Customaudioimage extends StatelessWidget {
                   : FadeInImage(
                       height: 1000.w,
                       width: 350,
-                      // Use FileImage for the FadeInImage widget
+                      filterQuality: FilterQuality.high,
                       image: FileImage(File.fromUri(artUri!)),
                       placeholder: MemoryImage(kTransparentImage),
-
                       fit: BoxFit.cover,
                     ),
             ),

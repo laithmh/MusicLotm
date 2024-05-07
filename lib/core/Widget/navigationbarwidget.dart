@@ -62,6 +62,9 @@ class Navigationbarwidget extends StatelessWidget {
           ),
         ],
         onTap: (index) {
+          if (index==0) {
+            
+          }
           navigatorcontroller.changepage(index);
 
           log(navigatorcontroller.currentindex);

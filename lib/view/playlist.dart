@@ -3,8 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:musiclotm/core/Widget/playlist/floatingbuttonwidget.dart';
 import 'package:musiclotm/core/Widget/playlist/playlistwidget.dart';
 
-
-
 class Playlistscreen extends StatelessWidget {
   const Playlistscreen({super.key});
 
