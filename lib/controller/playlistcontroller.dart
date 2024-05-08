@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 
-
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 
@@ -19,11 +18,12 @@ class Playlistcontroller extends GetxController {
 
   Stream<RxList<MediaItem>> get myplaylistStream => myStreamController.stream;
 
-  
   final controller = TextEditingController();
 
   final OnAudioQuery audioQuery = OnAudioQuery();
   RxList<MediaItem> mediasongs = <MediaItem>[].obs;
+  RxList<MediaItem> favoritelist = <MediaItem>[].obs;
+  Map<String, bool> isfavorite = {};
   late List<PlaylistModel> playlists = [];
   late PlaylistModel? myPlaylist;
   late List<SongModel> playlistsongs = [];
@@ -98,6 +98,30 @@ class Playlistcontroller extends GetxController {
     playlists.removeAt(index);
     await audioQuery.removePlaylist(playlistid);
     update();
+  }
+
+  addfavorite(MediaItem song) {
+    favoritelist.add(song);
+    isfavorite[song.id] = true;
+    update();
+  }
+
+  removefavorite(MediaItem song) {
+    favoritelist.remove(song);
+    isfavorite.update(song.id, (value) => false);
+    update();
+  }
+
+  favoritetoggel(MediaItem song) {
+    if (favoritelist.contains(song)) {
+      removefavorite(song);
+    } else {
+      addfavorite(song);
+    }
+  }
+
+  handelfavorite() async {
+    await songHandler.initSongs(songs: favoritelist);
   }
 
   @override

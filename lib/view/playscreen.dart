@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 
-
 import 'package:musiclotm/core/Widget/customaudioimage.dart';
 import 'package:musiclotm/core/Widget/customplaybutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/addplaylistbutton.dart';
@@ -24,12 +23,13 @@ class Playscreen extends StatelessWidget {
         stream: songHandler.mediaItem.stream,
         builder: (context, snapshot) {
           MediaItem? song = snapshot.data;
-          songscontroller.findCurrentSongPlayingIndex(song!.id);
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.data == null) {
             return Text('Error: ${snapshot.error}');
           } else {
+            songscontroller.findCurrentSongPlayingIndex(song!.id);
             return Scaffold(
                 appBar: AppBar(
                   backgroundColor: Theme.of(context).colorScheme.background,
@@ -50,6 +50,7 @@ class Playscreen extends StatelessWidget {
                         artist: song.artist!,
                         title: song.title,
                         artUri: song.artUri,
+                        song: song,
                       ),
                       SizedBox(
                         height: 25.h,

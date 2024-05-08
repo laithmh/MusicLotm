@@ -46,7 +46,11 @@ class Playlistwidget extends StatelessWidget {
               "F A V O R I T E",
               style: TextStyle(fontSize: 70.sp),
             ),
-            onTap: () {},
+            onTap: () {
+               Get.toNamed(
+                                  Approutes.favorite,
+                                );
+            },
           ),
           SizedBox(
             height: 20.h,

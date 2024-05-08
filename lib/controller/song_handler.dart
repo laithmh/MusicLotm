@@ -75,8 +75,11 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   @override
   Future<void> skipToQueueItem(int index) async {
     await audioPlayer.seek(Duration.zero, index: index);
+   
+
     play();
   }
+  
 
   @override
   Future<void> skipToNext() => audioPlayer.seekToNext();
