@@ -18,6 +18,7 @@ late SongHandler songHandler;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   songHandler = await AudioService.init(
     builder: () => SongHandler(),
     config: const AudioServiceConfig(

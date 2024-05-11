@@ -45,6 +45,8 @@ dependencies:
   flutter_audio_waveforms: ^1.2.1+8
   curved_labeled_navigation_bar: ^2.0.2
   hive: ^2.2.3
+  flutter_timer_countdown: ^1.0.7
+
 
 
 dev_dependencies:

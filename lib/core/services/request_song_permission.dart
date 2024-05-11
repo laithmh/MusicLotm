@@ -14,6 +14,7 @@ Future<void> requestSongPermission() async {
       final Map<Permission, PermissionStatus> statuses = await [
         Permission.audio,
         Permission.storage,
+        Permission.scheduleExactAlarm
       ].request();
 
       // If permissions are permanently denied, open app settings
