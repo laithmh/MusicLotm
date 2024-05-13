@@ -23,56 +23,56 @@ class Customplaybutton extends StatelessWidget {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Expanded(
-                child: GestureDetector(
-                    onTap: () {
-                      songHandler.handlePlayBackPrevious();
-                      generateRandomNumbers.generateRandomNumbers(60);
-                    },
-                    child: Neubox(
+              GestureDetector(
+                  onTap: () {
+                    songHandler.handlePlayBackPrevious();
+                    generateRandomNumbers.generateRandomNumbers(60);
+                  },
+                  child: Neubox(
+                    borderRadius: BorderRadius.circular(12),
+                    child: const Icon(
+                      Icons.skip_previous,
+                      size: 35,
+                    ),
+                  )),
+              const SizedBox(
+                width: 20,
+              ),
+              GestureDetector(
+                  onTap: () {
+                    if (playing) {
+                      songHandler.pause();
+                    } else {
+                      songHandler.play();
+                    }
+                  },
+                  child: Neubox(
+                    borderRadius: BorderRadius.circular(500),
+                    child: playing
+                        ? const Icon(
+                            Icons.pause_rounded,
+                            size: 50,
+                          )
+                        : const Icon(
+                            Icons.play_arrow_rounded,
+                            size: 50,
+                          ),
+                  )),
+              const SizedBox(
+                width: 20,
+              ),
+              GestureDetector(
+                  onTap: () {
+                    generateRandomNumbers.generateRandomNumbers(60);
+
+                    songHandler.handlePlayBackNext();
+                  },
+                  child: Neubox(
                       borderRadius: BorderRadius.circular(12),
                       child: const Icon(
-                        Icons.skip_previous,
-                      ),
-                    )),
-              ),
-              const SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                  flex: 2,
-                  child: GestureDetector(
-                      onTap: () {
-                        if (playing) {
-                          songHandler.pause();
-                        } else {
-                          songHandler.play();
-                        }
-                      },
-                      child: Neubox(
-                        borderRadius: BorderRadius.circular(50),
-                        child: playing
-                            ? const Icon(
-                                Icons.pause_rounded,
-                              )
-                            : const Icon(
-                                Icons.play_arrow_rounded,
-                              ),
+                        Icons.skip_next,
+                        size: 35,
                       ))),
-              const SizedBox(
-                width: 20,
-              ),
-              Expanded(
-                child: GestureDetector(
-                    onTap: () {
-                      generateRandomNumbers.generateRandomNumbers(60);
-
-                      songHandler.handlePlayBackNext();
-                    },
-                    child: Neubox(
-                        borderRadius: BorderRadius.circular(12),
-                        child: const Icon(Icons.skip_next))),
-              ),
             ],
           );
         });

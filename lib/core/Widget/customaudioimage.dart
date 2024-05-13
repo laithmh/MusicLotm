@@ -8,7 +8,7 @@ import 'package:musiclotm/controller/playlistcontroller.dart';
 
 import 'package:musiclotm/core/Widget/neubox.dart';
 
-import 'package:transparent_image/transparent_image.dart';
+
 
 class Customaudioimage extends StatelessWidget {
   final String artist;
@@ -25,77 +25,78 @@ class Customaudioimage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Neubox(
-        borderRadius: BorderRadius.circular(10),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+    return Column(
+      children: [
+        Neubox(
+          borderRadius: BorderRadius.circular(500),
+          child: Padding(
+              padding: const EdgeInsets.all(10),
               child: artUri == null
                   ? Icon(
                       Icons.music_note,
                       size: 1000.w,
                     )
-                  : FadeInImage(
-                      height: 1000.w,
-                      width: 350,
-                      filterQuality: FilterQuality.high,
-                      image: FileImage(File.fromUri(artUri!)),
-                      placeholder: MemoryImage(kTransparentImage),
-                      fit: BoxFit.cover,
-                    ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(500),
+                      child: Image.file(
+                        File.fromUri(artUri!),
+                        height: 1000.w,
+                        fit: BoxFit.cover,
+                      ),
+                    )),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(
+              
               children: [
-                Column(
-                  children: [
-                    SizedBox(
-                      width: 700.w,
-                      height: 100.h,
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                SizedBox(
+                  width: 700.w,
+                  height: 100.h,
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Text(
-                      artist,
-                      style: const TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-                GetBuilder<Playlistcontroller>(
-                  builder: (controller) => IconButton(
-                      onPressed: () {
-                        controller.favoritetoggel(song);
-                      },
-                      icon: controller.isfavorite.containsKey(song.id)
-                          ? controller.isfavorite[song.id]!
-                              ? const Icon(
-                                  Icons.favorite,
-                                  color: Colors.red,
-                                )
-                              : const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                )
+                Text(
+                  artist,
+                  style: const TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            GetBuilder<Playlistcontroller>(
+              builder: (controller) => IconButton(
+                  onPressed: () {
+                    controller.favoritetoggel(song);
+                  },
+                  icon: controller.isfavorite.containsKey(song.id)
+                      ? controller.isfavorite[song.id]!
+                          ? const Icon(
+                              Icons.favorite,
+                              color: Colors.red,
+                            )
                           : const Icon(
                               Icons.favorite_border,
                               color: Colors.red,
-                            )),
-                )
-              ],
-            ),
+                            )
+                      : const Icon(
+                          Icons.favorite_border,
+                          color: Colors.red,
+                        )),
+            )
           ],
-        ));
+        ),
+      ],
+    );
   }
 }
