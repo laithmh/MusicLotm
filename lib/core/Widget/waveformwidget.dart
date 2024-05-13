@@ -9,7 +9,7 @@ import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/main.dart';
 
 class PolygonWaveformcustom extends StatelessWidget {
-  final Duration? maxDuration;
+  final int? maxDuration;
   const PolygonWaveformcustom({
     super.key,
     this.maxDuration,
@@ -34,7 +34,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                     samples: generateRandomNumbers.samples,
                     height: 150.h,
                     width: MediaQuery.of(context).size.width - 100,
-                    maxDuration: maxDuration ?? const Duration(seconds: 0),
+                    maxDuration: Duration(seconds: maxDuration??0) ,
                     elapsedDuration: position ?? const Duration(seconds: 0),
                     inactiveColor: Theme.of(context).colorScheme.primary,
                     activeColor: Theme.of(context).colorScheme.inversePrimary,
@@ -46,10 +46,11 @@ class PolygonWaveformcustom extends StatelessWidget {
                         Theme.of(context).colorScheme.background,
                   ),
                   RectangleWaveform(
+                    
                     samples: generateRandomNumbers.samples,
                     height: 150.h,
                     width: MediaQuery.of(context).size.width - 100,
-                    maxDuration: maxDuration ?? const Duration(seconds: 0),
+                    maxDuration: Duration(seconds: maxDuration??0) ,
                     elapsedDuration: position ?? const Duration(seconds: 0),
                     inactiveColor: Theme.of(context).colorScheme.background,
                     activeColor: Theme.of(context).colorScheme.primary,
@@ -70,7 +71,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                     trackShape: const RoundedRectSliderTrackShape()),
                 child: Slider(
                   min: const Duration(seconds: 0).inSeconds.toDouble(),
-                  max: maxDuration!.inSeconds.toDouble(),
+                  max: maxDuration!.toDouble(),
                   value: position!.inSeconds.toDouble(),
                   onChanged: (position) {
                     songHandler.seek(position.seconds);

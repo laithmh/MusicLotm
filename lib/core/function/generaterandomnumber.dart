@@ -1,34 +1,25 @@
 import 'dart:math';
 
 import 'package:get/get.dart';
-class GenerateRandomNumbers extends GetxController{
-  
-late List<double> samples ;
 
-  
- generateRandomNumbers(int count) {
-  final random = Random();
-  List<double> randomNumbers = [];
+class GenerateRandomNumbers extends GetxController {
+  late List<double> samples;
 
-  for (int i = 0; i < count; i++) {
-    double randomNumber = random.nextDouble() *
-        150; 
-    randomNumbers.add(randomNumber);
+  generateRandomNumbers(int count) {
+    final random = Random();
+    List<double> randomNumbers = [];
+
+    for (int i = 0; i < count; i++) {
+      double randomNumber = random.nextDouble() * 150;
+      randomNumbers.add(randomNumber);
+    }
+
+    samples = randomNumbers;
   }
 
- samples = randomNumbers;
-  
-}
-
-
-@override
+  @override
   void onInit() {
-    
     super.onInit();
-     generateRandomNumbers(60);
-    
-    
+    generateRandomNumbers(60);
   }
-
-
 }

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/core/Widget/settingsdialog.dart';
 
+
 class Srttings extends StatelessWidget {
   const Srttings({super.key});
 
@@ -92,7 +93,8 @@ class Srttings extends StatelessWidget {
                         context: context,
                         builder: (context) => const Settingsdialog());
                   },
-                ))
+                )),
+            
           ],
         ),
       ),

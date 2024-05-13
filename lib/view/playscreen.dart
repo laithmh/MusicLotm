@@ -57,7 +57,7 @@ class Playscreen extends StatelessWidget {
                       ),
                       const Addtoplaylistbutton(),
                       PolygonWaveformcustom(
-                        maxDuration: song.duration,
+                        maxDuration: song.duration!.inSeconds + 1,
                       ),
                       SizedBox(
                         height: 50.h,
