@@ -1,10 +1,13 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
+import 'package:get/state_manager.dart';
 import 'package:just_audio/just_audio.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   final AudioPlayer audioPlayer = AudioPlayer();
-
+  RxBool isloop = false.obs;
+  late List<UriAudioSource> song;
   UriAudioSource _createAudioSource(MediaItem item) {
     return ProgressiveAudioSource(Uri.parse(item.id));
   }
@@ -47,8 +50,8 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   Future<void> initSongs({required RxList<MediaItem> songs}) async {
     audioPlayer.playbackEventStream.listen(_broadcastState);
 
-    final audioSource = songs.map(_createAudioSource).toList();
-
+    List<UriAudioSource> audioSource = songs.map(_createAudioSource).toList();
+    song = audioSource;
     await audioPlayer
         .setAudioSource(ConcatenatingAudioSource(children: audioSource));
 
@@ -75,11 +78,57 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   @override
   Future<void> skipToQueueItem(int index) async {
     await audioPlayer.seek(Duration.zero, index: index);
-   
 
     play();
   }
-  
+
+  @override
+  Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
+    super.setRepeatMode(repeatMode);
+    switch (repeatMode) {
+      case AudioServiceRepeatMode.all:
+        audioPlayer.setLoopMode(LoopMode.all);
+        break;
+      case AudioServiceRepeatMode.none:
+        audioPlayer.setLoopMode(LoopMode.off);
+        break;
+      case AudioServiceRepeatMode.one:
+        audioPlayer.setLoopMode(LoopMode.one);
+        break;
+      case AudioServiceRepeatMode.group:
+        audioPlayer.setLoopMode(LoopMode.all);
+        break;
+    }
+  }
+
+  Future<void> looping() async {
+    if (isloop.isTrue) {
+      setRepeatMode(AudioServiceRepeatMode.one);
+    } else {
+      setRepeatMode(AudioServiceRepeatMode.all);
+    }
+  }
+
+  handlePlayBackNext() {
+    if (isloop.isTrue) {
+      int index = (audioPlayer.currentIndex! + 1) % song.length;
+      skipToQueueItem(index);
+    } else {
+      skipToNext();
+    }
+  }
+
+  handlePlayBackPrevious() {
+    if (isloop.isTrue) {
+      if (audioPlayer.currentIndex == 0) {
+        skipToQueueItem(song.length - 1);
+      } else {
+        skipToQueueItem(audioPlayer.currentIndex! - 1);
+      }
+    } else {
+      skipToPrevious();
+    }
+  }
 
   @override
   Future<void> skipToNext() => audioPlayer.seekToNext();

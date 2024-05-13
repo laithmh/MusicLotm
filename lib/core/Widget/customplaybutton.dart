@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-
 import 'package:musiclotm/core/Widget/neubox.dart';
 
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
@@ -16,7 +15,7 @@ class Customplaybutton extends StatelessWidget {
   Widget build(BuildContext context) {
     GenerateRandomNumbers generateRandomNumbers =
         Get.put(GenerateRandomNumbers());
-    
+
     return StreamBuilder<PlaybackState>(
         stream: songHandler.playbackState.stream,
         builder: (context, snapshot) {
@@ -27,9 +26,8 @@ class Customplaybutton extends StatelessWidget {
               Expanded(
                 child: GestureDetector(
                     onTap: () {
-                      songHandler.skipToPrevious();
+                      songHandler.handlePlayBackPrevious();
                       generateRandomNumbers.generateRandomNumbers(60);
-                      
                     },
                     child: Neubox(
                       borderRadius: BorderRadius.circular(12),
@@ -68,8 +66,8 @@ class Customplaybutton extends StatelessWidget {
                 child: GestureDetector(
                     onTap: () {
                       generateRandomNumbers.generateRandomNumbers(60);
-                      songHandler.skipToNext();
-                      
+
+                      songHandler.handlePlayBackNext();
                     },
                     child: Neubox(
                         borderRadius: BorderRadius.circular(12),

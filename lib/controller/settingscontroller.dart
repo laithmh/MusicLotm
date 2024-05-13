@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
+import 'package:musiclotm/main.dart';
 
 class Settingscontroller extends GetxController {
   RxBool isDarkMode = false.obs;
   RxBool timerset = false.obs;
-  late int time=settimer();
+  late int time = settimer();
   TextEditingController hcontroller = TextEditingController();
   TextEditingController mcontroller = TextEditingController();
 
@@ -22,9 +23,11 @@ class Settingscontroller extends GetxController {
     int hour = h * 60;
     int time = hour + m;
     return time;
+    
   }
 
   void exitAppWithDelay() {
+    songHandler.stop();
     SystemNavigator.pop();
   }
 }
