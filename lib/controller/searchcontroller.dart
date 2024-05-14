@@ -11,8 +11,8 @@ class Searchcontroller extends GetxController {
 
   void filterData(String songname) {
     filteredData = songscontroller.songs
-        .where((item) =>
-            item.title.toLowerCase().startsWith(songname.toLowerCase()))
+        .where(
+            (item) => item.title.toLowerCase().contains(songname.toLowerCase()))
         .toList();
     update();
   }

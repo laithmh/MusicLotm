@@ -34,7 +34,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                     samples: generateRandomNumbers.samples,
                     height: 150.h,
                     width: MediaQuery.of(context).size.width - 100,
-                    maxDuration: Duration(seconds: maxDuration??0) ,
+                    maxDuration: Duration(seconds: maxDuration ?? 0),
                     elapsedDuration: position ?? const Duration(seconds: 0),
                     inactiveColor: Theme.of(context).colorScheme.primary,
                     activeColor: Theme.of(context).colorScheme.inversePrimary,
@@ -46,11 +46,10 @@ class PolygonWaveformcustom extends StatelessWidget {
                         Theme.of(context).colorScheme.background,
                   ),
                   RectangleWaveform(
-                    
                     samples: generateRandomNumbers.samples,
                     height: 150.h,
                     width: MediaQuery.of(context).size.width - 100,
-                    maxDuration: Duration(seconds: maxDuration??0) ,
+                    maxDuration: Duration(seconds: maxDuration ?? 0),
                     elapsedDuration: position ?? const Duration(seconds: 0),
                     inactiveColor: Theme.of(context).colorScheme.background,
                     activeColor: Theme.of(context).colorScheme.primary,
@@ -72,7 +71,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                 child: Slider(
                   min: const Duration(seconds: 0).inSeconds.toDouble(),
                   max: maxDuration!.toDouble(),
-                  value: position!.inSeconds.toDouble(),
+                  value: position?.inSeconds.toDouble() ?? 0,
                   onChanged: (position) {
                     songHandler.seek(position.seconds);
                   },
