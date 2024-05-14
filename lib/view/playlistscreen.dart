@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
@@ -41,42 +42,57 @@ class Playlistpage extends StatelessWidget {
               backgroundColor: Theme.of(context).colorScheme.background,
               centerTitle: true,
             ),
-            body: ListView.builder(
-              itemCount: audio.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.all(7),
-                  child: Neubox(
-                    borderRadius: BorderRadius.circular(12),
-                    child: ListTile(
-                      title: Text(
-                        audio[index].title,
-                        style: const TextStyle(overflow: TextOverflow.ellipsis),
+            body: GetBuilder<Playlistcontroller>(
+              builder: (controller) {
+                return ReorderableListView.builder(
+                  itemCount: audio.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      key: Key(audio[index].id),
+                      padding: const EdgeInsets.all(7),
+                      child: Neubox(
+                        borderRadius: BorderRadius.circular(12),
+                        child: ListTile(
+                          trailing: ReorderableDragStartListener(
+                            enabled: true,
+                            index: index,
+                            child: const Icon(Icons.reorder),
+                          ),
+                          title: Text(
+                            audio[index].title,
+                            style: const TextStyle(
+                                overflow: TextOverflow.ellipsis),
+                          ),
+                          subtitle: Text(audio[index].artist!,
+                              style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis)),
+                          leading: audio[index].artUri == null
+                              ? const Icon(
+                                  Icons.music_note,
+                                )
+                              : FadeInImage(
+                                  height: 45,
+                                  width: 45,
+                                  filterQuality: FilterQuality.high,
+                                  image: FileImage(
+                                      File.fromUri(audio[index].artUri!)),
+                                  placeholder: MemoryImage(kTransparentImage),
+                                  fit: BoxFit.cover,
+                                ),
+                          onTap: () async {
+                            await playlistcontroller.handelplaylists();
+                            songHandler.skipToQueueItem(index);
+                            Get.back();
+                            navigator.changepage(2);
+                          },
+                        ),
                       ),
-                      subtitle: Text(audio[index].artist!,
-                          style:
-                              const TextStyle(overflow: TextOverflow.ellipsis)),
-                      leading: audio[index].artUri == null
-                          ? const Icon(
-                              Icons.music_note,
-                            )
-                          : FadeInImage(
-                              height: 45,
-                              width: 45,
-                              filterQuality: FilterQuality.high,
-                              image:
-                                  FileImage(File.fromUri(audio[index].artUri!)),
-                              placeholder: MemoryImage(kTransparentImage),
-                              fit: BoxFit.cover,
-                            ),
-                      onTap: () async {
-                        await playlistcontroller.handelplaylists();
-                        songHandler.skipToQueueItem(index);
-                        Get.back();
-                        navigator.changepage(2);
-                      },
-                    ),
-                  ),
+                    );
+                  },
+                  onReorder: (int oldIndex, int newIndex) {
+                    audio = controller.reOrder(newIndex, oldIndex, audio);
+                    log("$oldIndex=====$newIndex");
+                  },
                 );
               },
             ));

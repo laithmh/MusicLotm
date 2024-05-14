@@ -124,6 +124,17 @@ class Playlistcontroller extends GetxController {
     await songHandler.initSongs(songs: favoritelist);
   }
 
+  List<MediaItem> reOrder(int newIndex, int oldIndex, List<MediaItem> list) {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final MediaItem item = list.removeAt(oldIndex);
+    list.insert(newIndex, item);
+
+    update();
+    return list;
+  }
+
   @override
   void onInit() async {
     await loadplaylist();

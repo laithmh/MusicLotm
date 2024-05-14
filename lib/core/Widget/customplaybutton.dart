@@ -19,7 +19,7 @@ class Customplaybutton extends StatelessWidget {
     return StreamBuilder<PlaybackState>(
         stream: songHandler.playbackState.stream,
         builder: (context, snapshot) {
-          bool playing = snapshot.data!.playing;
+          bool playing = snapshot.data?.playing ?? false;
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
