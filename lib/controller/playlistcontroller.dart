@@ -5,10 +5,8 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
-
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
-
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Playlistcontroller extends GetxController {
@@ -94,9 +92,14 @@ class Playlistcontroller extends GetxController {
     playlists = await audioQuery.queryPlaylists();
   }
 
-  deleteplaylist(int index, int playlistid) async {
+  Future<void> deleteplaylist(int index, int playlistid) async {
     playlists.removeAt(index);
     await audioQuery.removePlaylist(playlistid);
+    update();
+  }
+
+  Future<void> removeSongFromPlaylist(int playlistId, int audioId) async {
+    await audioQuery.removeFromPlaylist(playlistId, audioId);
     update();
   }
 

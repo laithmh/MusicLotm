@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
-
 import 'package:musiclotm/controller/navigatorcontroller.dart';
-
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/core/const/routesname.dart';
@@ -47,9 +46,9 @@ class Playlistwidget extends StatelessWidget {
               style: TextStyle(fontSize: 70.sp),
             ),
             onTap: () {
-               Get.toNamed(
-                                  Approutes.favorite,
-                                );
+              Get.toNamed(
+                Approutes.favorite,
+              );
             },
           ),
           SizedBox(
@@ -90,25 +89,35 @@ class Playlistwidget extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 7),
                           child: Neubox(
                             borderRadius: BorderRadius.circular(12),
-                            child: ListTile(
-                              onTap: () {
-                                
-                                Get.toNamed(
-                                  Approutes.playlistscreen,
-                                );
-                                controller.playlistindex = index;
-                                controller.playlistId =
-                                    controller.playlists[index].id;
-                              },
-                              leading: const Icon(Icons.playlist_play),
-                              title: Text(controller.playlists[index].playlist
-                                  .toUpperCase()),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () {
-                                  controller.deleteplaylist(
-                                      index, controller.playlists[index].id);
+                            child: Slidable(
+                              endActionPane: ActionPane(
+                                  motion: const StretchMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      onPressed: (context) {
+                                        controller.deleteplaylist(
+                                        index, controller.playlists[index].id);
+                                      },
+                                      borderRadius: BorderRadius.circular(12),
+                                      icon: Icons.delete,
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .inversePrimary,
+                                    )
+                                  ]),
+                              child: ListTile(
+                                onTap: () {
+                                  Get.toNamed(
+                                    Approutes.playlistscreen,
+                                  );
+                                  controller.playlistindex = index;
+                                  controller.playlistId =
+                                      controller.playlists[index].id;
                                 },
+                                leading: const Icon(Icons.playlist_play),
+                                title: Text(controller.playlists[index].playlist
+                                    .toUpperCase()),
+                               
                               ),
                             ),
                           ),

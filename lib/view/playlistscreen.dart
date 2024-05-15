@@ -4,14 +4,13 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
-
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
-
 import 'package:transparent_image/transparent_image.dart';
 
 class Playlistpage extends StatelessWidget {
@@ -21,6 +20,7 @@ class Playlistpage extends StatelessWidget {
   Widget build(BuildContext context) {
     Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
     Navigatorcontroller navigator = Get.put(Navigatorcontroller());
+
     return FutureBuilder<List<MediaItem>>(
       future:
           playlistcontroller.loadsongplaylist(playlistcontroller.playlistId),
@@ -45,6 +45,7 @@ class Playlistpage extends StatelessWidget {
             body: GetBuilder<Playlistcontroller>(
               builder: (controller) {
                 return ReorderableListView.builder(
+                  buildDefaultDragHandles: false,
                   itemCount: audio.length,
                   itemBuilder: (BuildContext context, int index) {
                     return Padding(
@@ -52,39 +53,58 @@ class Playlistpage extends StatelessWidget {
                       padding: const EdgeInsets.all(7),
                       child: Neubox(
                         borderRadius: BorderRadius.circular(12),
-                        child: ListTile(
-                          trailing: ReorderableDragStartListener(
-                            enabled: true,
-                            index: index,
-                            child: const Icon(Icons.reorder),
-                          ),
-                          title: Text(
-                            audio[index].title,
-                            style: const TextStyle(
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                          subtitle: Text(audio[index].artist!,
-                              style: const TextStyle(
-                                  overflow: TextOverflow.ellipsis)),
-                          leading: audio[index].artUri == null
-                              ? const Icon(
-                                  Icons.music_note,
+                        child: Slidable(
+                          endActionPane: ActionPane(
+                              motion: const StretchMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (context) {
+                                    controller.removeSongFromPlaylist(
+                                        controller.playlistId,
+                                        playlistcontroller
+                                            .playlistsongs[index].id);
+                                  },
+                                  borderRadius: BorderRadius.circular(12),
+                                  icon: Icons.delete,
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .inversePrimary,
                                 )
-                              : FadeInImage(
-                                  height: 45,
-                                  width: 45,
-                                  filterQuality: FilterQuality.high,
-                                  image: FileImage(
-                                      File.fromUri(audio[index].artUri!)),
-                                  placeholder: MemoryImage(kTransparentImage),
-                                  fit: BoxFit.cover,
-                                ),
-                          onTap: () async {
-                            await playlistcontroller.handelplaylists();
-                            songHandler.skipToQueueItem(index);
-                            Get.back();
-                            navigator.changepage(2);
-                          },
+                              ]),
+                          child: ListTile(
+                            trailing: ReorderableDragStartListener(
+                              enabled: true,
+                              index: index,
+                              child: const Icon(Icons.reorder),
+                            ),
+                            title: Text(
+                              audio[index].title,
+                              style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                            subtitle: Text(audio[index].artist!,
+                                style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis)),
+                            leading: audio[index].artUri == null
+                                ? const Icon(
+                                    Icons.music_note,
+                                  )
+                                : FadeInImage(
+                                    height: 45,
+                                    width: 45,
+                                    filterQuality: FilterQuality.high,
+                                    image: FileImage(
+                                        File.fromUri(audio[index].artUri!)),
+                                    placeholder: MemoryImage(kTransparentImage),
+                                    fit: BoxFit.cover,
+                                  ),
+                            onTap: () async {
+                              await playlistcontroller.handelplaylists();
+                              songHandler.skipToQueueItem(index);
+                              Get.back();
+                              navigator.changepage(2);
+                            },
+                          ),
                         ),
                       ),
                     );

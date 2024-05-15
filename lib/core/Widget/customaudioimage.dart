@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
-
 import 'package:musiclotm/core/Widget/neubox.dart';
-
-
 
 class Customaudioimage extends StatelessWidget {
   final String artist;
@@ -52,7 +49,6 @@ class Customaudioimage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Column(
-              
               children: [
                 SizedBox(
                   width: 700.w,

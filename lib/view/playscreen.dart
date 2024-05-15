@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
-
 import 'package:musiclotm/core/Widget/customaudioimage.dart';
 import 'package:musiclotm/core/Widget/customplaybutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/addplaylistbutton.dart';
 import 'package:musiclotm/core/Widget/waveformwidget.dart';
-
 import 'package:musiclotm/main.dart';
 
 class Playscreen extends StatelessWidget {

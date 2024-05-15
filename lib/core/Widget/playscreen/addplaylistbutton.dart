@@ -2,10 +2,10 @@ import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
-
 import 'package:musiclotm/core/Widget/timeandshufell.dart';
 import 'package:musiclotm/main.dart';
 
@@ -29,8 +29,8 @@ class Addtoplaylistbutton extends StatelessWidget {
                   builder: (context) => AlertDialog(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         content: SizedBox(
-                          height: 400,
-                          width: 400,
+                          height: 900.h,
+                          width: 400.w,
                           child: Column(
                             children: [
                               Expanded(
@@ -48,7 +48,8 @@ class Addtoplaylistbutton extends StatelessWidget {
                                     return Obx(
                                       () => CheckboxListTile(
                                         title: Text(playlistcontroller
-                                            .playlists[index].playlist),
+                                            .playlists[index].playlist
+                                            .toUpperCase()),
                                         checkColor: Colors.white,
                                         activeColor: Colors.blueGrey,
                                         controlAffinity:
@@ -70,8 +71,17 @@ class Addtoplaylistbutton extends StatelessWidget {
                                 ),
                               ),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
+                                  MaterialButton(
+                                    onPressed: () {
+                                      Get.back();
+                                    },
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    child: const Text("cancel"),
+                                  ),
                                   MaterialButton(
                                     onPressed: () {
                                       playlistcontroller.addSongsToPlaylist(
@@ -84,14 +94,10 @@ class Addtoplaylistbutton extends StatelessWidget {
 
                                       Get.back();
                                     },
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                     child: const Text("save"),
                                   ),
-                                  MaterialButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: const Text("cancel"),
-                                  )
                                 ],
                               )
                             ],
