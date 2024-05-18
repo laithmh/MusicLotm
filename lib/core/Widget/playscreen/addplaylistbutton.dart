@@ -16,8 +16,8 @@ class Addtoplaylistbutton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
-    Songscontroller songscontroller = Get.put(Songscontroller());
+    Playlistcontroller playlistcontroller = Get.find();
+    Songscontroller songscontroller = Get.find();
     return StreamBuilder<Duration>(
         stream: AudioService.position,
         builder: (context, snapshot) {

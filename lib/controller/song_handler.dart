@@ -12,6 +12,7 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     return ProgressiveAudioSource(Uri.parse(item.id));
   }
 
+
   void _listenForCurrentSongIndexChanges() {
     audioPlayer.currentIndexStream.listen((index) {
       final playlist = queue.value;
@@ -56,7 +57,7 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
         .setAudioSource(ConcatenatingAudioSource(children: audioSource));
 
     queue.value.clear();
-    queue.value.addAll(songs);
+    queue.value.addAll (songs);
     queue.add(queue.value);
 
     _listenForCurrentSongIndexChanges();

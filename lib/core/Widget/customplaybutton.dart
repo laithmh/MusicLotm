@@ -14,7 +14,7 @@ class Customplaybutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GenerateRandomNumbers generateRandomNumbers =
-        Get.put(GenerateRandomNumbers());
+        Get.find();
 
     return StreamBuilder<PlaybackState>(
         stream: songHandler.playbackState.stream,

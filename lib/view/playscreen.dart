@@ -16,7 +16,7 @@ class Playscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Songscontroller songscontroller = Get.put(Songscontroller());
+    Songscontroller songscontroller = Get.find();
     return StreamBuilder<MediaItem?>(
         stream: songHandler.mediaItem.stream,
         builder: (context, snapshot) {

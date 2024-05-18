@@ -13,9 +13,9 @@ class Search extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Searchcontroller searchcontroller = Get.put(Searchcontroller());
-    Songscontroller songscontroller = Get.put(Songscontroller());
-    Navigatorcontroller navigator = Get.put(Navigatorcontroller());
+    Searchcontroller searchcontroller = Get.find();
+    Songscontroller songscontroller = Get.find();
+    Navigatorcontroller navigator = Get.find();
 
     return SafeArea(
       child: Padding(

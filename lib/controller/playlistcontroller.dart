@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -70,9 +71,11 @@ class Playlistcontroller extends GetxController {
   Future<List<MediaItem>> loadsongplaylist(int playlistid) async {
     RxList<MediaItem> songs = <MediaItem>[].obs;
     try {
-      playlistsongs = await audioQuery.queryAudiosFrom(
-          AudiosFromType.PLAYLIST, playlistid,
-          orderType: OrderType.ASC_OR_SMALLER);
+      
+        playlistsongs = await audioQuery.queryAudiosFrom(
+            AudiosFromType.PLAYLIST, playlistid,
+            orderType: OrderType.ASC_OR_SMALLER);
+      
 
       for (final SongModel songModel in playlistsongs) {
         final MediaItem song = await songToMediaItem(
@@ -89,7 +92,7 @@ class Playlistcontroller extends GetxController {
   }
 
   Future<void> loadplaylist() async {
-    playlists = await audioQuery.queryPlaylists();
+     playlists = await audioQuery.queryPlaylists();
   }
 
   Future<void> deleteplaylist(int index, int playlistid) async {
@@ -138,13 +141,7 @@ class Playlistcontroller extends GetxController {
     return list;
   }
 
-  @override
-  void onInit() async {
-    await loadplaylist();
-
-    super.onInit();
-  }
-
+ 
   @override
   void onClose() {
     myStreamController.close();

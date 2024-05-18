@@ -17,8 +17,8 @@ class Songlistwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Navigatorcontroller navigator = Get.put(Navigatorcontroller());
-    Songscontroller controller = Get.put(Songscontroller());
+    Navigatorcontroller navigator = Get.find();
+    Songscontroller controller = Get.find();
     return StreamBuilder<RxList<MediaItem>>(
       stream: controller.myStream,
       initialData: <MediaItem>[].obs,

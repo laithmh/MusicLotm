@@ -18,8 +18,8 @@ class Favorite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
-    Navigatorcontroller navigator = Get.put(Navigatorcontroller());
+    Playlistcontroller playlistcontroller = Get.find();
+    Navigatorcontroller navigator = Get.find();
 
     return Scaffold(
       bottomNavigationBar: const Navigationbarwidget(),

@@ -15,7 +15,7 @@ class Srttings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Settingscontroller settingscontroller = Get.put(Settingscontroller());
+    Settingscontroller settingscontroller = Get.find();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),

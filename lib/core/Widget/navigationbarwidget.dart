@@ -13,7 +13,7 @@ class Navigationbarwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(Navigatorcontroller());
+   
 
     return GetBuilder<Navigatorcontroller>(builder: (navigatorcontroller) {
       return SingleChildScrollView(

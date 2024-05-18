@@ -13,7 +13,7 @@ class Navigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(Navigatorcontroller());
+    
     return GetBuilder<Navigatorcontroller>(
       builder: (controller) => Scaffold(
         bottomNavigationBar: const Navigationbarwidget(),

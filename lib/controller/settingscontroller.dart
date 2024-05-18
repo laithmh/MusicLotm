@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:musiclotm/main.dart';
 
 class Settingscontroller extends GetxController {
+  var box = Hive.box("music");
   RxBool isDarkMode = false.obs;
   RxBool timerset = false.obs;
   late int time = settimer();
@@ -13,7 +14,7 @@ class Settingscontroller extends GetxController {
 
   void toggleTheme() {
     isDarkMode(!isDarkMode.value);
-
+    box.put("darkmode", isDarkMode.value);
     Get.changeThemeMode(isDarkMode.value ? ThemeMode.dark : ThemeMode.light);
   }
 
@@ -23,11 +24,17 @@ class Settingscontroller extends GetxController {
     int hour = h * 60;
     int time = hour + m;
     return time;
-    
   }
 
   void exitAppWithDelay() {
     songHandler.stop();
     SystemNavigator.pop();
+  }
+
+  @override
+  void onInit() {
+    
+    super.onInit();
+    isDarkMode.value = box.get("darkmode") ?? false;
   }
 }

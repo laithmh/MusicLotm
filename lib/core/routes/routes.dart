@@ -8,10 +8,15 @@ import 'package:musiclotm/view/playlistscreen.dart';
 import 'package:musiclotm/view/playscreen.dart';
 import 'package:musiclotm/view/search.dart';
 import 'package:musiclotm/view/settings.dart';
+import 'package:musiclotm/view/splash.dart';
 
 List<GetPage<dynamic>>? routes = [
   GetPage(
     name: "/",
+    page: () => const SplashScreen(),
+  ),
+  GetPage(
+    name: Approutes.navbar,
     page: () => const Navigator(),
   ),
   GetPage(

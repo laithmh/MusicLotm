@@ -18,7 +18,7 @@ class PolygonWaveformcustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GenerateRandomNumbers generateRandomNumbers =
-        Get.put(GenerateRandomNumbers());
+        Get.find();
 
     return StreamBuilder<Duration>(
         stream: AudioService.position,
