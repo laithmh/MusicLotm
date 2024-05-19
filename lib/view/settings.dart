@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/core/Widget/settingsdialog.dart';
 
-
 class Srttings extends StatelessWidget {
   const Srttings({super.key});
 
@@ -43,10 +42,14 @@ class Srttings extends StatelessWidget {
                                 minutes: settingscontroller.time,
                               )),
                               onEnd: () {
-                                log("Timer finished");
-                                settingscontroller.timerset.value = false;
+                                if (settingscontroller.timerends.isFalse) {
+                                  log("Timer finished");
+                                  settingscontroller.timerset.value = false;
 
-                                settingscontroller.exitAppWithDelay();
+                                  settingscontroller.exitAppWithDelay();
+                                } else {
+                                  log("timer cancel");
+                                }
                               },
                             ),
                           ),
@@ -94,7 +97,6 @@ class Srttings extends StatelessWidget {
                         builder: (context) => const Settingsdialog());
                   },
                 )),
-            
           ],
         ),
       ),

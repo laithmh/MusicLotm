@@ -10,7 +10,7 @@ import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-  RxBool haspermission = false.obs;
+RxBool haspermission = false.obs;
 
 class Songscontroller extends GetxController {
   final StreamController<RxList<MediaItem>> myStreamController =
@@ -63,12 +63,15 @@ class Songscontroller extends GetxController {
 
       songModels = await onAudioQuery.querySongs();
 
-      for (final SongModel songModel in songModels) {
-        final MediaItem song = await songToMediaItem(songModel);
-        songs.add(song);
-        myStreamController.add(songs);
-      }
-
+      // for (final SongModel songModel in songModels) {
+      //   final MediaItem song = await songToMediaItem(songModel);
+      //   songs.add(song);
+      //   myStreamController.add(songs);
+      // }
+      songs.value = await Future.wait(songModels.map((song) async {
+        return songToMediaItem(song);
+      }).toList());
+      myStreamController.add(songs);
       return songs;
     } catch (e) {
       debugPrint('Error fetching songs: $e');

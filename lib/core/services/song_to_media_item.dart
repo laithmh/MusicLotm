@@ -36,7 +36,6 @@ Future<MediaItem> songToMediaItem(SongModel song) async {
     final Uri? art = await getSongArt(
       id: song.id,
       type: ArtworkType.AUDIO,
-      quality: 100,
       size: 300,
     );
 

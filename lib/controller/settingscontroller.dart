@@ -8,6 +8,7 @@ class Settingscontroller extends GetxController {
   var box = Hive.box("music");
   RxBool isDarkMode = false.obs;
   RxBool timerset = false.obs;
+  RxBool timerends = false.obs;
   late int time = settimer();
   TextEditingController hcontroller = TextEditingController();
   TextEditingController mcontroller = TextEditingController();
