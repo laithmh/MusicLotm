@@ -6,10 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
-
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
-
 import 'package:transparent_image/transparent_image.dart';
 
 class Songlistwidget extends StatelessWidget {
@@ -89,9 +87,21 @@ class Songlistwidget extends StatelessWidget {
                                     fit: BoxFit.cover,
                                   ),
                             onTap: () async {
-                              await controller.handelallsongs();
+                              if (controller.isallmusic.isFalse) {
+                                await controller.handelallsongs();
+                              }
                               await songHandler.skipToQueueItem(index);
+
+                              controller.isallmusic.value = true;
+                              controller.isplaylist.value = false;
+                              controller.isfavorite.value = false;
+                              box.putAll({
+                                "isallmusic": controller.isallmusic.value,
+                                "isplaylist": controller.isplaylist.value,
+                                "isfavorite": controller.isfavorite.value,
+                              });
                               navigator.changepage(2);
+                              await songHandler.play();
                             },
                           ),
                         ),

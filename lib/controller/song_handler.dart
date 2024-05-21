@@ -12,7 +12,6 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     return ProgressiveAudioSource(Uri.parse(item.id));
   }
 
-
   void _listenForCurrentSongIndexChanges() {
     audioPlayer.currentIndexStream.listen((index) {
       final playlist = queue.value;
@@ -48,7 +47,9 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     ));
   }
 
-  Future<void> initSongs({required RxList<MediaItem> songs}) async {
+  Future<void> initSongs({
+    required RxList<MediaItem> songs,
+  }) async {
     audioPlayer.playbackEventStream.listen(_broadcastState);
 
     List<UriAudioSource> audioSource = songs.map(_createAudioSource).toList();
@@ -57,13 +58,15 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
         .setAudioSource(ConcatenatingAudioSource(children: audioSource));
 
     queue.value.clear();
-    queue.value.addAll (songs);
+    queue.value.addAll(songs);
     queue.add(queue.value);
 
     _listenForCurrentSongIndexChanges();
-
+    looping();
     audioPlayer.processingStateStream.listen((state) {
-      if (state == ProcessingState.completed) skipToNext();
+      if (state == ProcessingState.completed) {
+        skipToNext();
+      }
     });
   }
 
@@ -77,10 +80,10 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   Future<void> seek(Duration position) => audioPlayer.seek(position);
 
   @override
-  Future<void> skipToQueueItem(int index) async {
+  Future<void> skipToQueueItem(
+    int index,
+  ) async {
     await audioPlayer.seek(Duration.zero, index: index);
-
-    play();
   }
 
   @override

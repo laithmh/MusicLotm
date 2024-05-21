@@ -19,6 +19,7 @@ class Playlistpage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Songscontroller songscontroller = Get.find();
     Playlistcontroller playlistcontroller = Get.find();
     Navigatorcontroller navigator = Get.find();
 
@@ -29,6 +30,7 @@ class Playlistpage extends StatelessWidget {
             initialData: const [],
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               List<MediaItem> audio = snapshot.data;
+
               return Scaffold(
                   bottomNavigationBar: const Navigationbarwidget(),
                   backgroundColor: Theme.of(context).colorScheme.background,
@@ -47,6 +49,8 @@ class Playlistpage extends StatelessWidget {
                   body: GetBuilder<Playlistcontroller>(
                     builder: (controller) {
                       return ReorderableListView.builder(
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
                         buildDefaultDragHandles: false,
                         itemCount: audio.length,
                         itemBuilder: (BuildContext context, int index) {
@@ -102,10 +106,25 @@ class Playlistpage extends StatelessWidget {
                                           fit: BoxFit.cover,
                                         ),
                                   onTap: () async {
-                                    await playlistcontroller.handelplaylists();
+                                    if (songscontroller.isplaylist.isFalse) {
+                                      await playlistcontroller
+                                          .handelplaylists();
+                                    }
                                     songHandler.skipToQueueItem(index);
+                                    songscontroller.isallmusic.value = false;
+                                    songscontroller.isplaylist.value = true;
+                                    songscontroller.isfavorite.value = false;
+                                    box.putAll({
+                                      "isallmusic":
+                                          songscontroller.isallmusic.value,
+                                      "isplaylist":
+                                          songscontroller.isplaylist.value,
+                                      "isfavorite":
+                                          songscontroller.isfavorite.value,
+                                    });
                                     Get.back();
                                     navigator.changepage(2);
+                                    await songHandler.play();
                                   },
                                 ),
                               ),

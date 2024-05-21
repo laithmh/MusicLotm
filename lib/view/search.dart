@@ -56,7 +56,7 @@ class Search extends StatelessWidget {
                                   Text(controller.filteredData[index].artist!),
                               leading: const Icon(Icons.music_note),
                               onTap: () {
-                                songscontroller.findCurrentSongPlayingIndex(
+                              findCurrentSongPlayingIndex(
                                     controller.filteredData[index].id);
                                 songHandler.skipToQueueItem(songscontroller
                                     .currentSongPlayingIndex.value);

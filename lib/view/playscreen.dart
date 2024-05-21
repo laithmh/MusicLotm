@@ -1,7 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 import 'package:musiclotm/core/Widget/customaudioimage.dart';
 import 'package:musiclotm/core/Widget/customplaybutton.dart';
@@ -16,7 +15,6 @@ class Playscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Songscontroller songscontroller = Get.find();
     return StreamBuilder<MediaItem?>(
         stream: songHandler.mediaItem.stream,
         builder: (context, snapshot) {
@@ -27,7 +25,7 @@ class Playscreen extends StatelessWidget {
           } else if (snapshot.data == null) {
             return Text('Error: ${snapshot.error}');
           } else {
-            songscontroller.findCurrentSongPlayingIndex(song!.id);
+            findCurrentSongPlayingIndex(song!.id);
             return Scaffold(
                 appBar: AppBar(
                   backgroundColor: Theme.of(context).colorScheme.background,

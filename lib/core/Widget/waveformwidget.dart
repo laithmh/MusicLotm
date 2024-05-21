@@ -1,10 +1,8 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_audio_waveforms/flutter_audio_waveforms.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/main.dart';
 
@@ -17,13 +15,16 @@ class PolygonWaveformcustom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    GenerateRandomNumbers generateRandomNumbers =
-        Get.find();
+    GenerateRandomNumbers generateRandomNumbers = Get.find();
 
     return StreamBuilder<Duration>(
         stream: AudioService.position,
         builder: (context, snapshot) {
           Duration? position = snapshot.data;
+          int second = position?.inSeconds ?? 0;
+
+          box.put("position", second);
+
           return Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,

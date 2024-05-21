@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:musiclotm/core/data/songdata.dart';
+
 import 'package:musiclotm/core/services/get_song_art.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -11,25 +11,7 @@ SongModel getsongsartwork(SongModel songModel, List<SongModel> localSongList) {
   return songartwork;
 }
 
-MediaItem songDataToMediaItem(Songdata song) {
-  return MediaItem(
-      id: song.id,
-            artUri: Uri.parse(song.artUri!),
-            title: song.title,
-            artist: song.artist,
-            duration: Duration(seconds: song.duration!),
-            displayDescription: song.displayDescription);
-}
 
-Songdata mediaItemtoSongData(MediaItem song) {
-  return Songdata(
-      id: song.id,
-      artUri: song.artUri.toString(),
-      title: song.title,
-      artist: song.artist,
-      duration: song.duration!.inSeconds,
-      displayDescription: song.displayDescription);
-}
 
 Future<MediaItem> songToMediaItem(SongModel song) async {
   try {

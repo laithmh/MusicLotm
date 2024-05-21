@@ -10,7 +10,6 @@ import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
-import 'package:musiclotm/core/data/songdata.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/core/routes/routes.dart';
 import 'package:musiclotm/core/theme/themes.dart';
@@ -20,7 +19,6 @@ late Box box;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  Hive.registerAdapter(SongdataAdapter());
 
   box = await Hive.openBox("music");
 

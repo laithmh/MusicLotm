@@ -5,7 +5,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
-
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -21,18 +20,20 @@ class Playlistcontroller extends GetxController {
 
   final OnAudioQuery audioQuery = OnAudioQuery();
   RxList<MediaItem> mediasongs = <MediaItem>[].obs;
-  RxList<MediaItem> favoritelist = <MediaItem>[].obs;
-  Map<String, bool> isfavorite = {};
+  RxList<MediaItem> favorites = <MediaItem>[].obs;
+
+  Map<dynamic, dynamic> isfavorite = {};
   late List<PlaylistModel> playlists = [];
   late PlaylistModel? myPlaylist;
+
   late List<SongModel> playlistsongs = [];
   late int playlistindex = 0;
   late int playlistId = 0;
 
-  RxInt currentSongPlayingIndex = 0.obs;
-
   handelplaylists() async {
-    await songHandler.initSongs(songs: mediasongs);
+    await songHandler.initSongs(
+      songs: mediasongs,
+    );
   }
 
   Future<void> createNewPlaylist() async {
@@ -68,23 +69,17 @@ class Playlistcontroller extends GetxController {
     update();
   }
 
-  Future<List<MediaItem>> loadsongplaylist(int playlistid) async {
-    RxList<MediaItem> songs = <MediaItem>[].obs;
+  Future<RxList<MediaItem>> loadsongplaylist(int playlistid) async {
     try {
-      
-        playlistsongs = await audioQuery.queryAudiosFrom(
-            AudiosFromType.PLAYLIST, playlistid,
-            orderType: OrderType.ASC_OR_SMALLER);
-      
+      playlistsongs = await audioQuery.queryAudiosFrom(
+          AudiosFromType.PLAYLIST, playlistid,
+          orderType: OrderType.ASC_OR_SMALLER);
+      mediasongs.value = await Future.wait(playlistsongs.map((song) async {
+        return await songToMediaItem(
+            getsongsartwork(song, songscontroller.songModels));
+      }).toList());
 
-      for (final SongModel songModel in playlistsongs) {
-        final MediaItem song = await songToMediaItem(
-            getsongsartwork(songModel, songscontroller.songModels));
-        songs.add(song);
-        myStreamController.add(songs);
-      }
-      mediasongs = songs;
-      return songs;
+      return mediasongs;
     } catch (e) {
       debugPrint('Error fetching songs: $e');
       return <MediaItem>[].obs;
@@ -92,7 +87,7 @@ class Playlistcontroller extends GetxController {
   }
 
   Future<void> loadplaylist() async {
-     playlists = await audioQuery.queryPlaylists();
+    playlists = await audioQuery.queryPlaylists();
   }
 
   Future<void> deleteplaylist(int index, int playlistid) async {
@@ -107,27 +102,37 @@ class Playlistcontroller extends GetxController {
   }
 
   addfavorite(MediaItem song) {
-    favoritelist.add(song);
     isfavorite[song.id] = true;
+    box.put("favorite", isfavorite);
     update();
   }
 
   removefavorite(MediaItem song) {
-    favoritelist.remove(song);
-    isfavorite.update(song.id, (value) => false);
+    isfavorite.remove(song.id);
+    box.put("favorite", isfavorite);
     update();
   }
 
   favoritetoggel(MediaItem song) {
-    if (favoritelist.contains(song)) {
+    if (isfavorite.containsKey(song.id)) {
       removefavorite(song);
     } else {
       addfavorite(song);
     }
   }
 
-  handelfavorite() async {
-    await songHandler.initSongs(songs: favoritelist);
+  Future<RxList<MediaItem>> loadefavorites() async {
+    Iterable<MediaItem> items = songscontroller.songs
+        .where((element) => isfavorite.containsKey(element.id));
+    favorites.assignAll(items.toList());
+
+    return favorites;
+  }
+
+  handelfavorite({int? position, int? currentindex}) async {
+    await songHandler.initSongs(
+      songs: favorites,
+    );
   }
 
   List<MediaItem> reOrder(int newIndex, int oldIndex, List<MediaItem> list) {
@@ -141,11 +146,37 @@ class Playlistcontroller extends GetxController {
     return list;
   }
 
- 
   @override
   void onClose() {
     myStreamController.close();
     controller.dispose();
     super.onClose();
+  }
+
+  @override
+  void onInit() async {
+    await songscontroller.requestSongPermission();
+    playlistId = await box.get("playlistid");
+    await loadsongplaylist(playlistId);
+    isfavorite = await box.get("favorite") ?? {};
+    await loadplaylist();
+
+    log("$playlistId");
+    
+    await loadefavorites();
+    log("$favorites");
+    if (songscontroller.isallmusic.isTrue) {
+      await songHandler.initSongs(
+        songs: songscontroller.songs,
+      );
+    } else if (songscontroller.isplaylist.isTrue) {
+      await handelplaylists();
+    } else if (songscontroller.isfavorite.isTrue) {
+      await handelfavorite();
+    }
+    await songHandler
+        .skipToQueueItem(songscontroller.currentSongPlayingIndex.value);
+    await songHandler.seek(Duration(seconds: songscontroller.position));
+    super.onInit();
   }
 }
