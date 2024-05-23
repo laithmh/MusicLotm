@@ -22,12 +22,14 @@ Future<MediaItem> songToMediaItem(SongModel song) async {
     );
 
     return MediaItem(
+    
       id: song.uri.toString(),
       artUri: art,
       title: song.displayNameWOExt,
       artist: song.artist,
       duration: Duration(milliseconds: song.duration!),
       displayDescription: song.id.toString(),
+      genre: DateTime.now().toString()
     );
   } catch (e) {
     debugPrint('Error converting SongModel to MediaItem: $e');

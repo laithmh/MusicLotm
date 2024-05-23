@@ -18,14 +18,16 @@ class Playscreen extends StatelessWidget {
     return StreamBuilder<MediaItem?>(
         stream: songHandler.mediaItem.stream,
         builder: (context, snapshot) {
-          MediaItem? song = snapshot.data;
+          MediaItem song = snapshot.data!;
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.data == null) {
             return Text('Error: ${snapshot.error}');
           } else {
-            findCurrentSongPlayingIndex(song!.id);
+            Future.delayed(const Duration(seconds: 1), () {
+              findCurrentSongPlayingIndex(song.id);
+            });
             return Scaffold(
                 appBar: AppBar(
                   backgroundColor: Theme.of(context).colorScheme.background,

@@ -10,11 +10,12 @@ import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 RxBool haspermission = false.obs;
 
 class Songscontroller extends GetxController {
-  // Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
+  final ItemScrollController itemScrollController = ItemScrollController();
   late RxBool isplaylist = false.obs;
   late RxBool isfavorite = false.obs;
   late RxBool isallmusic = true.obs;
@@ -80,6 +81,14 @@ class Songscontroller extends GetxController {
     }
   }
 
+  scroll() {
+    int index = songs.indexOf(songHandler.mediaItem.value);
+    itemScrollController.scrollTo(
+        index: index,
+        duration: const Duration(seconds: 2),
+        curve: Curves.easeIn);
+  }
+
   @override
   void onInit() async {
     position = await box.get("position");
@@ -100,35 +109,34 @@ class Songscontroller extends GetxController {
 }
 
 void findCurrentSongPlayingIndex(String songId) {
- Songscontroller controller = Get.find();
- Playlistcontroller playlistcontroller = Get.find();
+  Songscontroller controller = Get.find();
+  Playlistcontroller playlistcontroller = Get.find();
   int index = 0;
-  if (controller. isallmusic.isTrue) {
-    for (var e in controller. songs) {
+  if (controller.isallmusic.isTrue) {
+    for (var e in controller.songs) {
       if (e.id == songId) {
-       controller. currentSongPlayingIndex.value = index;
+        controller.currentSongPlayingIndex.value = index;
       }
 
       index++;
     }
-  } else if (controller. isplaylist.isTrue) {
+  } else if (controller.isplaylist.isTrue) {
     for (var e in playlistcontroller.mediasongs) {
       if (e.id == songId) {
-        controller. currentSongPlayingIndex.value = index;
+        controller.currentSongPlayingIndex.value = index;
       }
-      
 
       index++;
     }
-  } else if (controller. isfavorite.isTrue) {
+  } else if (controller.isfavorite.isTrue) {
     for (var e in playlistcontroller.favorites) {
       if (e.id == songId) {
-       controller.  currentSongPlayingIndex.value = index;
+        controller.currentSongPlayingIndex.value = index;
       }
-      
+
       index++;
     }
   }
 
-  box.put("currentIndex",controller.  currentSongPlayingIndex.value);
+  box.put("currentIndex", controller.currentSongPlayingIndex.value);
 }

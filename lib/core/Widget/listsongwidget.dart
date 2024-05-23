@@ -8,6 +8,7 @@ import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class Songlistwidget extends StatelessWidget {
@@ -55,7 +56,8 @@ class Songlistwidget extends StatelessWidget {
                 SizedBox(
                   height: MediaQuery.of(context).size.height,
                   width: double.maxFinite,
-                  child: ListView.builder(
+                  child: ScrollablePositionedList.builder(
+                    itemScrollController: controller.itemScrollController,
                     shrinkWrap: true,
                     itemCount: music.length,
                     itemBuilder: (BuildContext context, int index) {
@@ -63,6 +65,7 @@ class Songlistwidget extends StatelessWidget {
                         padding: EdgeInsets.symmetric(
                             vertical: 20.h, horizontal: 10.w),
                         child: Neubox(
+                          index: music[index] == songHandler.mediaItem.value,
                           borderRadius: BorderRadius.circular(12),
                           child: ListTile(
                             title: Text(
@@ -100,6 +103,7 @@ class Songlistwidget extends StatelessWidget {
                                 "isplaylist": controller.isplaylist.value,
                                 "isfavorite": controller.isfavorite.value,
                               });
+
                               navigator.changepage(2);
                               await songHandler.play();
                             },

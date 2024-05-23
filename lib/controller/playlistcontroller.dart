@@ -29,8 +29,10 @@ class Playlistcontroller extends GetxController {
   late List<SongModel> playlistsongs = [];
   late int playlistindex = 0;
   late int playlistId = 0;
+  late int newplaylistID = 0;
 
   handelplaylists() async {
+    newplaylistID = playlistId;
     await songHandler.initSongs(
       songs: mediasongs,
     );
@@ -52,7 +54,10 @@ class Playlistcontroller extends GetxController {
     update();
   }
 
-  Future<void> addSongsToPlaylist(SongModel song) async {
+  Future<void> addSongsToPlaylist(MediaItem mediasong) async {
+    SongModel song = songscontroller.songModels
+        .firstWhere((element) => element.displayNameWOExt == mediasong.title);
+
     playlists = await audioQuery.queryPlaylists();
     myPlaylist = playlists.firstWhere(
       (playlist) => playlist.playlist == playlists[playlistindex].playlist,
@@ -73,11 +78,14 @@ class Playlistcontroller extends GetxController {
     try {
       playlistsongs = await audioQuery.queryAudiosFrom(
           AudiosFromType.PLAYLIST, playlistid,
-          orderType: OrderType.ASC_OR_SMALLER);
+          orderType: OrderType.DESC_OR_GREATER,
+          sortType: SongSortType.DATE_ADDED);
+
       mediasongs.value = await Future.wait(playlistsongs.map((song) async {
         return await songToMediaItem(
             getsongsartwork(song, songscontroller.songModels));
       }).toList());
+      mediasongs.value = mediasongs.toSet().toList();
 
       return mediasongs;
     } catch (e) {
@@ -96,8 +104,12 @@ class Playlistcontroller extends GetxController {
     update();
   }
 
-  Future<void> removeSongFromPlaylist(int playlistId, int audioId) async {
-    await audioQuery.removeFromPlaylist(playlistId, audioId);
+  Future<void> removeSongFromPlaylist(int playlistId, SongModel audioId) async {
+    await audioQuery.removeFromPlaylist(playlistId, audioId.id);
+    mediasongs.removeWhere(
+      (element) => element.title == audioId.displayNameWOExt,
+    );
+    playlistsongs.remove(audioId);
     update();
   }
 
@@ -122,14 +134,20 @@ class Playlistcontroller extends GetxController {
   }
 
   Future<RxList<MediaItem>> loadefavorites() async {
-    Iterable<MediaItem> items = songscontroller.songs
-        .where((element) => isfavorite.containsKey(element.id));
-    favorites.assignAll(items.toList());
+    List keys = isfavorite.keys.toList();
+    favorites.clear();
+    for (var i = 0; i < isfavorite.length; i++) {
+      MediaItem song =
+          songscontroller.songs.firstWhere((element) => element.id == keys[i]);
+
+      favorites.add(song);
+    }
+    favorites.value = favorites.reversed.toList();
 
     return favorites;
   }
 
-  handelfavorite({int? position, int? currentindex}) async {
+  handelfavorite() async {
     await songHandler.initSongs(
       songs: favorites,
     );
@@ -142,7 +160,6 @@ class Playlistcontroller extends GetxController {
     final MediaItem item = list.removeAt(oldIndex);
     list.insert(newIndex, item);
 
-    update();
     return list;
   }
 
@@ -162,7 +179,7 @@ class Playlistcontroller extends GetxController {
     await loadplaylist();
 
     log("$playlistId");
-    
+
     await loadefavorites();
     log("$favorites");
     if (songscontroller.isallmusic.isTrue) {
@@ -177,6 +194,7 @@ class Playlistcontroller extends GetxController {
     await songHandler
         .skipToQueueItem(songscontroller.currentSongPlayingIndex.value);
     await songHandler.seek(Duration(seconds: songscontroller.position));
+
     super.onInit();
   }
 }

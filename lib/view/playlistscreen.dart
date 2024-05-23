@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
@@ -29,8 +28,6 @@ class Playlistpage extends StatelessWidget {
                 .loadsongplaylist(playlistcontroller.playlistId),
             initialData: const [],
             builder: (BuildContext context, AsyncSnapshot snapshot) {
-              List<MediaItem> audio = snapshot.data;
-
               return Scaffold(
                   bottomNavigationBar: const Navigationbarwidget(),
                   backgroundColor: Theme.of(context).colorScheme.background,
@@ -48,14 +45,11 @@ class Playlistpage extends StatelessWidget {
                   ),
                   body: GetBuilder<Playlistcontroller>(
                     builder: (controller) {
-                      return ReorderableListView.builder(
-                        keyboardDismissBehavior:
-                            ScrollViewKeyboardDismissBehavior.onDrag,
-                        buildDefaultDragHandles: false,
+                      List<MediaItem> audio = controller.mediasongs;
+                      return ListView.builder(
                         itemCount: audio.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Padding(
-                            key: Key(audio[index].id),
                             padding: const EdgeInsets.all(7),
                             child: Neubox(
                               borderRadius: BorderRadius.circular(12),
@@ -67,8 +61,8 @@ class Playlistpage extends StatelessWidget {
                                         onPressed: (context) {
                                           controller.removeSongFromPlaylist(
                                               controller.playlistId,
-                                              playlistcontroller
-                                                  .playlistsongs[index].id);
+                                              controller.playlistsongs[index]);
+                                          
                                         },
                                         borderRadius: BorderRadius.circular(12),
                                         icon: Icons.delete,
@@ -78,11 +72,6 @@ class Playlistpage extends StatelessWidget {
                                       )
                                     ]),
                                 child: ListTile(
-                                  trailing: ReorderableDragStartListener(
-                                    enabled: true,
-                                    index: index,
-                                    child: const Icon(Icons.reorder),
-                                  ),
                                   title: Text(
                                     audio[index].title,
                                     style: const TextStyle(
@@ -106,7 +95,9 @@ class Playlistpage extends StatelessWidget {
                                           fit: BoxFit.cover,
                                         ),
                                   onTap: () async {
-                                    if (songscontroller.isplaylist.isFalse) {
+                                    if (songscontroller.isplaylist.isFalse ||
+                                        playlistcontroller.playlistId !=
+                                            playlistcontroller.newplaylistID) {
                                       await playlistcontroller
                                           .handelplaylists();
                                     }
@@ -130,10 +121,6 @@ class Playlistpage extends StatelessWidget {
                               ),
                             ),
                           );
-                        },
-                        onReorder: (int oldIndex, int newIndex) {
-                          audio = controller.reOrder(newIndex, oldIndex, audio);
-                          log("$oldIndex=====$newIndex");
                         },
                       );
                     },

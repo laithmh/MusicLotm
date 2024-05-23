@@ -1,10 +1,9 @@
-import 'dart:developer';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/core/Widget/timeandshufell.dart';
 import 'package:musiclotm/main.dart';
@@ -17,7 +16,7 @@ class Addtoplaylistbutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Playlistcontroller playlistcontroller = Get.find();
-    Songscontroller songscontroller = Get.find();
+   
     return StreamBuilder<Duration>(
         stream: AudioService.position,
         builder: (context, snapshot) {
@@ -84,14 +83,11 @@ class Addtoplaylistbutton extends StatelessWidget {
                                   ),
                                   MaterialButton(
                                     onPressed: () {
+                                      
                                       playlistcontroller.addSongsToPlaylist(
-                                          songscontroller.songModels[
-                                              songscontroller
-                                                  .currentSongPlayingIndex
-                                                  .value]);
+                                         songHandler.mediaItem.value!);
 
-                                      log("===========${playlistcontroller.loadsongplaylist(playlistcontroller.playlistId)}");
-
+                                      
                                       Get.back();
                                     },
                                     color:
