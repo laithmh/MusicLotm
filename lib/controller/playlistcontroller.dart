@@ -24,10 +24,9 @@ class Playlistcontroller extends GetxController {
 
   Map<dynamic, dynamic> isfavorite = {};
   late List<PlaylistModel> playlists = [];
-  late PlaylistModel? myPlaylist;
 
-  late List<SongModel> playlistsongs = [];
   late int playlistindex = 0;
+  late List<int> listplaylisid = [];
   late int playlistId = 0;
   late int newplaylistID = 0;
 
@@ -36,6 +35,16 @@ class Playlistcontroller extends GetxController {
     await songHandler.initSongs(
       songs: mediasongs,
     );
+  }
+
+  void onPlaylistSelected(bool? selected, int playlistId) {
+    if (selected == true) {
+      listplaylisid.add(playlistId);
+    } else {
+      listplaylisid.remove(playlistId);
+    }
+    log("$listplaylisid");
+    update();
   }
 
   Future<void> createNewPlaylist() async {
@@ -55,28 +64,36 @@ class Playlistcontroller extends GetxController {
   }
 
   Future<void> addSongsToPlaylist(MediaItem mediasong) async {
-    SongModel song = songscontroller.songModels
-        .firstWhere((element) => element.displayNameWOExt == mediasong.title);
-
     playlists = await audioQuery.queryPlaylists();
-    myPlaylist = playlists.firstWhere(
-      (playlist) => playlist.playlist == playlists[playlistindex].playlist,
-    );
-    playlistId = myPlaylist!.id;
-
-    final bool added = await audioQuery.addToPlaylist(playlistId, song.id);
-    if (added) {
-      log('Song added to the playlist successfully!');
-      log("${song.id}");
-    } else {
-      log('Failed to add the song to the playlist.');
+    for (int playlistId in listplaylisid) {
+      List<SongModel> playlistSongs =
+          await audioQuery.queryAudiosFrom(AudiosFromType.PLAYLIST, playlistId);
+      bool songExists = playlistSongs.any(
+        (element) {
+          return element.displayNameWOExt == mediasong.title;
+        },
+      );
+      if (songExists) {
+        log("alredy");
+      } else {
+        SongModel song = songscontroller.songModels.firstWhere(
+            (element) => element.displayNameWOExt == mediasong.title);
+        final bool added = await audioQuery.addToPlaylist(playlistId, song.id);
+        if (added) {
+          log('Song added to the playlist successfully!');
+          log(song.displayNameWOExt);
+        } else {
+          log('Failed to add the song to the playlist.');
+        }
+      }
     }
+
     update();
   }
 
   Future<RxList<MediaItem>> loadsongplaylist(int playlistid) async {
     try {
-      playlistsongs = await audioQuery.queryAudiosFrom(
+      List<SongModel> playlistsongs = await audioQuery.queryAudiosFrom(
           AudiosFromType.PLAYLIST, playlistid,
           orderType: OrderType.DESC_OR_GREATER,
           sortType: SongSortType.DATE_ADDED);
@@ -85,7 +102,6 @@ class Playlistcontroller extends GetxController {
         return await songToMediaItem(
             getsongsartwork(song, songscontroller.songModels));
       }).toList());
-      mediasongs.value = mediasongs.toSet().toList();
 
       return mediasongs;
     } catch (e) {
@@ -104,12 +120,14 @@ class Playlistcontroller extends GetxController {
     update();
   }
 
-  Future<void> removeSongFromPlaylist(int playlistId, SongModel audioId) async {
-    await audioQuery.removeFromPlaylist(playlistId, audioId.id);
+  Future<void> removeSongFromPlaylist(
+      int playlistId, MediaItem mediasong) async {
+    SongModel song = songscontroller.songModels
+        .firstWhere((element) => element.displayNameWOExt == mediasong.title);
+    await audioQuery.removeFromPlaylist(playlistId, song.id);
     mediasongs.removeWhere(
-      (element) => element.title == audioId.displayNameWOExt,
+      (element) => element.title == song.displayNameWOExt,
     );
-    playlistsongs.remove(audioId);
     update();
   }
 

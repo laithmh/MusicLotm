@@ -46,11 +46,6 @@ class Favorite extends StatelessWidget {
                 child: Neubox(
                   borderRadius: BorderRadius.circular(12),
                   child: ListTile(
-                    trailing: ReorderableDragStartListener(
-                      enabled: true,
-                      index: index,
-                      child: const Icon(Icons.reorder),
-                    ),
                     title: Text(
                       audio[index].title,
                       style: const TextStyle(overflow: TextOverflow.ellipsis),

@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -18,6 +19,7 @@ class Songlistwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Navigatorcontroller navigator = Get.find();
     Songscontroller controller = Get.find();
+    Playlistcontroller playlistcontroller = Get.find();
     return StreamBuilder<RxList<MediaItem>>(
       stream: controller.myStream,
       initialData: <MediaItem>[].obs,
@@ -98,6 +100,7 @@ class Songlistwidget extends StatelessWidget {
                               controller.isallmusic.value = true;
                               controller.isplaylist.value = false;
                               controller.isfavorite.value = false;
+                              playlistcontroller.newplaylistID = 0;
                               box.putAll({
                                 "isallmusic": controller.isallmusic.value,
                                 "isplaylist": controller.isplaylist.value,

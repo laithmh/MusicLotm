@@ -61,8 +61,7 @@ class Playlistpage extends StatelessWidget {
                                         onPressed: (context) {
                                           controller.removeSongFromPlaylist(
                                               controller.playlistId,
-                                              controller.playlistsongs[index]);
-                                          
+                                              songHandler.mediaItem.value!);
                                         },
                                         borderRadius: BorderRadius.circular(12),
                                         icon: Icons.delete,
