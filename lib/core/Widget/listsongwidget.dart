@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -18,10 +18,10 @@ class Songlistwidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Navigatorcontroller navigator = Get.find();
-    Songscontroller controller = Get.find();
+    Songscontroller songscontroller = Get.find();
     Playlistcontroller playlistcontroller = Get.find();
     return StreamBuilder<RxList<MediaItem>>(
-      stream: controller.myStream,
+      stream: songscontroller.myStream,
       initialData: <MediaItem>[].obs,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         RxList<MediaItem> music = snapshot.data;
@@ -59,60 +59,87 @@ class Songlistwidget extends StatelessWidget {
                   height: MediaQuery.of(context).size.height,
                   width: double.maxFinite,
                   child: ScrollablePositionedList.builder(
-                    itemScrollController: controller.itemScrollController,
+                    itemScrollController: songscontroller.itemScrollController,
                     shrinkWrap: true,
                     itemCount: music.length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 20.h, horizontal: 10.w),
-                        child: Neubox(
-                          index: music[index] == songHandler.mediaItem.value,
-                          borderRadius: BorderRadius.circular(12),
-                          child: ListTile(
-                            title: Text(
-                              music[index].title,
-                              style: const TextStyle(
-                                  overflow: TextOverflow.ellipsis),
-                            ),
-                            subtitle: Text("${music[index].artist}",
-                                style: const TextStyle(
-                                    overflow: TextOverflow.ellipsis)),
-                            leading: music[index].artUri == null
-                                ? const Icon(
-                                    Icons.music_note,
-                                  )
-                                : FadeInImage(
-                                    height: 45,
-                                    width: 45,
-                                    filterQuality: FilterQuality.high,
-                                    image: FileImage(
-                                        File.fromUri(music[index].artUri!)),
-                                    placeholder: MemoryImage(kTransparentImage),
-                                    fit: BoxFit.cover,
+                          padding: EdgeInsets.symmetric(
+                              vertical: 20.h, horizontal: 10.w),
+                          child: GetBuilder<Playlistcontroller>(
+                            builder: (controller) {
+                              return Neubox(
+                                index:
+                                    music[index] == songHandler.mediaItem.value,
+                                borderRadius: BorderRadius.circular(12),
+                                child: ListTile(
+                                  trailing: playlistcontroller.selectionMode
+                                      ? Checkbox(
+                                          checkColor: Colors.white,
+                                          activeColor: Colors.blueGrey,
+                                          value: playlistcontroller.listsongsid
+                                              .contains(songscontroller
+                                                  .songModels[index].title),
+                                          onChanged: (selected) {
+                                            playlistcontroller.onSongstSelected(
+                                                selected,
+                                                songscontroller
+                                                    .songModels[index]
+                                                    .displayNameWOExt);
+                                          },
+                                        )
+                                      : null,
+                                  title: Text(
+                                    music[index].title,
+                                    style: const TextStyle(
+                                        overflow: TextOverflow.ellipsis),
                                   ),
-                            onTap: () async {
-                              if (controller.isallmusic.isFalse) {
-                                await controller.handelallsongs();
-                              }
-                              await songHandler.skipToQueueItem(index);
+                                  subtitle: Text("${music[index].artist}",
+                                      style: const TextStyle(
+                                          overflow: TextOverflow.ellipsis)),
+                                  leading: music[index].artUri == null
+                                      ? const Icon(
+                                          Icons.music_note,
+                                        )
+                                      : FadeInImage(
+                                          height: 45,
+                                          width: 45,
+                                          filterQuality: FilterQuality.high,
+                                          image: FileImage(File.fromUri(
+                                              music[index].artUri!)),
+                                          placeholder:
+                                              MemoryImage(kTransparentImage),
+                                          fit: BoxFit.cover,
+                                        ),
+                                  onTap: () async {
+                                    if (songscontroller.isallmusic.isFalse) {
+                                      await songscontroller.handelallsongs();
+                                    }
+                                    await songHandler.skipToQueueItem(index);
 
-                              controller.isallmusic.value = true;
-                              controller.isplaylist.value = false;
-                              controller.isfavorite.value = false;
-                              playlistcontroller.newplaylistID = 0;
-                              box.putAll({
-                                "isallmusic": controller.isallmusic.value,
-                                "isplaylist": controller.isplaylist.value,
-                                "isfavorite": controller.isfavorite.value,
-                              });
+                                    songscontroller.isallmusic.value = true;
+                                    songscontroller.isplaylist.value = false;
+                                    songscontroller.isfavorite.value = false;
+                                    playlistcontroller.newplaylistID = 0;
+                                    box.putAll({
+                                      "isallmusic":
+                                          songscontroller.isallmusic.value,
+                                      "isplaylist":
+                                          songscontroller.isplaylist.value,
+                                      "isfavorite":
+                                          songscontroller.isfavorite.value,
+                                    });
 
-                              navigator.changepage(2);
-                              await songHandler.play();
+                                    navigator.changepage(2);
+                                    await songHandler.play();
+                                  },
+                                  onLongPress: () {
+                                    playlistcontroller.toggleSelection();
+                                  },
+                                ),
+                              );
                             },
-                          ),
-                        ),
-                      );
+                          ));
                     },
                   ),
                 )

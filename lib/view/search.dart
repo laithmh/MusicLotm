@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
 
 import 'package:musiclotm/core/Widget/neubox.dart';

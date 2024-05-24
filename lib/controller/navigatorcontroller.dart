@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/const/routesname.dart';
 
 class Navigatorcontroller extends GetxController {

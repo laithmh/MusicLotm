@@ -6,8 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
@@ -61,7 +61,7 @@ class Playlistpage extends StatelessWidget {
                                         onPressed: (context) {
                                           controller.removeSongFromPlaylist(
                                               controller.playlistId,
-                                              songHandler.mediaItem.value!);
+                                              controller.mediasongs[index]);
                                         },
                                         borderRadius: BorderRadius.circular(12),
                                         icon: Icons.delete,

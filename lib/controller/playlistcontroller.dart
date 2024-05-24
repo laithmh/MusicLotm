@@ -4,13 +4,15 @@ import 'dart:developer';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+import 'package:musiclotm/controller/animationcontroller.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Playlistcontroller extends GetxController {
   Songscontroller songscontroller = Get.find();
+  AnimationControllerX animationController = Get.find();
   final StreamController<RxList<MediaItem>> myStreamController =
       StreamController<RxList<MediaItem>>();
 
@@ -27,6 +29,9 @@ class Playlistcontroller extends GetxController {
 
   late int playlistindex = 0;
   late List<int> listplaylisid = [];
+  late List<String> listsongsid = [];
+
+  bool selectionMode = false;
   late int playlistId = 0;
   late int newplaylistID = 0;
 
@@ -45,6 +50,26 @@ class Playlistcontroller extends GetxController {
     }
     log("$listplaylisid");
     update();
+  }
+
+  void onSongstSelected(bool? selected, String songtitel) {
+    if (selected == true) {
+      listsongsid.add(songtitel);
+    } else {
+      listsongsid.remove(songtitel);
+    }
+    log("$listsongsid");
+    update();
+  }
+
+  void toggleSelection() {
+    if (selectionMode) {
+      selectionMode = false;
+    } else {
+      selectionMode = true;
+    }
+    update();
+    animationController.update();
   }
 
   Future<void> createNewPlaylist() async {
@@ -74,21 +99,51 @@ class Playlistcontroller extends GetxController {
         },
       );
       if (songExists) {
-        log("alredy");
+        Get.snackbar("title",
+            "Song ID ${mediasong.title} already exists in playlist ID $playlistId.");
       } else {
         SongModel song = songscontroller.songModels.firstWhere(
             (element) => element.displayNameWOExt == mediasong.title);
         final bool added = await audioQuery.addToPlaylist(playlistId, song.id);
         if (added) {
-          log('Song added to the playlist successfully!');
-          log(song.displayNameWOExt);
+          Get.snackbar("",
+              "Song ID ${mediasong.title} added to playlist ID $playlistId successfully!");
         } else {
-          log('Failed to add the song to the playlist.');
+          Get.snackbar("",
+              "Failed to add song ID ${mediasong.title} to playlist ID $playlistId.");
         }
       }
     }
 
     update();
+  }
+
+  Future<void> addSongsToSelectedPlaylists() async {
+    for (int playlistId in listplaylisid) {
+      for (String songtitel in listsongsid) {
+        List<SongModel> playlistSongs = await audioQuery.queryAudiosFrom(
+            AudiosFromType.PLAYLIST, playlistId);
+        bool songExists =
+            playlistSongs.any((song) => song.displayNameWOExt == songtitel);
+        int songid = songscontroller.songModels
+            .firstWhere((element) => element.displayNameWOExt == songtitel)
+            .id;
+
+        if (!songExists) {
+          bool result = await audioQuery.addToPlaylist(playlistId, songid);
+          if (result) {
+            Get.snackbar("",
+                "Song ID $songtitel added to playlist ID $playlistId successfully!");
+          } else {
+            Get.snackbar("",
+                "Failed to add song ID $songtitel to playlist ID $playlistId.");
+          }
+        } else {
+          Get.snackbar("title",
+              "Song ID $songtitel already exists in playlist ID $playlistId.");
+        }
+      }
+    }
   }
 
   Future<RxList<MediaItem>> loadsongplaylist(int playlistid) async {

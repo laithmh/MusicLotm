@@ -87,6 +87,7 @@ class Songscontroller extends GetxController {
         index: index,
         duration: const Duration(seconds: 2),
         curve: Curves.easeIn);
+    update();
   }
 
   @override

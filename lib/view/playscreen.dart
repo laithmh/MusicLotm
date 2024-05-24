@@ -1,7 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:musiclotm/controller/notifiers/songs_provider.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/customaudioimage.dart';
 import 'package:musiclotm/core/Widget/customplaybutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/addplaylistbutton.dart';
@@ -18,13 +18,12 @@ class Playscreen extends StatelessWidget {
     return StreamBuilder<MediaItem?>(
         stream: songHandler.mediaItem.stream,
         builder: (context, snapshot) {
-          MediaItem song = snapshot.data!;
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.data == null) {
             return Text('Error: ${snapshot.error}');
           } else {
+            MediaItem song = snapshot.data!;
             Future.delayed(const Duration(seconds: 1), () {
               findCurrentSongPlayingIndex(song.id);
             });
