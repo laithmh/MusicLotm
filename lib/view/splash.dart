@@ -9,7 +9,7 @@ class SplashScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          children: [
             Icon(Icons.music_note), // Your splash screen image
             SizedBox(height: 20),
             CircularProgressIndicator(),

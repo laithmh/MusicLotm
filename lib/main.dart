@@ -4,14 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:musiclotm/controller/animationcontroller.dart';
-import 'package:musiclotm/controller/navigatorcontroller.dart';
-import 'package:musiclotm/controller/playlistcontroller.dart';
-import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
-import 'package:musiclotm/controller/songscontroller.dart';
-import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/core/routes/routes.dart';
 import 'package:musiclotm/core/theme/themes.dart';
 
@@ -32,6 +26,7 @@ Future<void> main() async {
       androidNotificationChannelName: 'MusicLotm Player',
       androidNotificationOngoing: true,
       androidShowNotificationBadge: true,
+      
     ),
   );
 
@@ -46,14 +41,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Get.put(Songscontroller());
-    Get.put(AnimationControllerX());
-
-    Get.put(Navigatorcontroller());
     final Settingscontroller themeController = Get.put(Settingscontroller());
-    Get.put(Playlistcontroller());
-    Get.put(GenerateRandomNumbers());
-    Get.put(Searchcontroller());
+
     return ScreenUtilInit(
       builder: (_, child) => GetMaterialApp(
         debugShowCheckedModeBanner: false,

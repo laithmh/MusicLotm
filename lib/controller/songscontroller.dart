@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/services/song_to_media_item.dart';
@@ -15,10 +16,13 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 RxBool haspermission = false.obs;
 
 class Songscontroller extends GetxController {
+  AnimationControllerX animationController = Get.find();
+
   final ItemScrollController itemScrollController = ItemScrollController();
   late RxBool isplaylist = false.obs;
   late RxBool isfavorite = false.obs;
   late RxBool isallmusic = true.obs;
+  late RxBool issearch = true.obs;
 
   late int position = 0;
   final StreamController<RxList<MediaItem>> myStreamController =
@@ -52,6 +56,7 @@ class Songscontroller extends GetxController {
 
   handelallsongs() async {
     await songHandler.initSongs(songs: songs);
+    animationController.reset();
   }
 
   Future<RxList<MediaItem>> getSongs() async {
@@ -97,7 +102,6 @@ class Songscontroller extends GetxController {
     isplaylist.value = await box.get("isplaylist");
     isfavorite.value = await box.get("isfavorite");
     isallmusic.value = await box.get("isallmusic");
-    log("==========");
 
     super.onInit();
   }
@@ -139,5 +143,7 @@ void findCurrentSongPlayingIndex(String songId) {
     }
   }
 
+  playlistcontroller.update();
+  log("${songHandler.audioPlayer.currentIndex}====${controller.currentSongPlayingIndex}");
   box.put("currentIndex", controller.currentSongPlayingIndex.value);
 }

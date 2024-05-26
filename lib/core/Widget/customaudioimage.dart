@@ -4,6 +4,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 
@@ -22,25 +23,29 @@ class Customaudioimage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnimationControllerX animationControllerX = Get.find();
     return Column(
       children: [
         Neubox(
-          borderRadius: BorderRadius.circular(500),
-          child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: artUri == null
-                  ? Icon(
-                      Icons.music_note,
-                      size: 1000.w,
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(500),
-                      child: Image.file(
-                        File.fromUri(artUri!),
-                        height: 1000.w,
-                        fit: BoxFit.cover,
-                      ),
-                    )),
+          borderRadius: BorderRadius.circular(1000.r),
+          child: RotationTransition(
+            turns: animationControllerX.rotationcontroller,
+            child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: artUri == null
+                    ? Icon(
+                        Icons.music_note,
+                        size: 1000.w,
+                      )
+                    : ClipRRect(
+                        borderRadius: BorderRadius.circular(500),
+                        child: Image.file(
+                          File.fromUri(artUri!),
+                          height: 1000.w,
+                          fit: BoxFit.cover,
+                        ),
+                      )),
+          ),
         ),
         const SizedBox(
           height: 10,

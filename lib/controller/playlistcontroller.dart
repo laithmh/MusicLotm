@@ -40,6 +40,8 @@ class Playlistcontroller extends GetxController {
     await songHandler.initSongs(
       songs: mediasongs,
     );
+    animationController.reset();
+    animationController.start();
   }
 
   void onPlaylistSelected(bool? selected, int playlistId) {
@@ -224,17 +226,11 @@ class Playlistcontroller extends GetxController {
     await songHandler.initSongs(
       songs: favorites,
     );
+    animationController.reset();
+    animationController.start();
   }
 
-  List<MediaItem> reOrder(int newIndex, int oldIndex, List<MediaItem> list) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
-    final MediaItem item = list.removeAt(oldIndex);
-    list.insert(newIndex, item);
-
-    return list;
-  }
+  
 
   @override
   void onClose() {
@@ -251,10 +247,10 @@ class Playlistcontroller extends GetxController {
     isfavorite = await box.get("favorite") ?? {};
     await loadplaylist();
 
-    log("$playlistId");
+    
 
     await loadefavorites();
-    log("$favorites");
+    
     if (songscontroller.isallmusic.isTrue) {
       await songHandler.initSongs(
         songs: songscontroller.songs,

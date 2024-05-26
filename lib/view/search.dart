@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
-import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
-
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
 
@@ -55,11 +54,17 @@ class Search extends StatelessWidget {
                               subtitle:
                                   Text(controller.filteredData[index].artist!),
                               leading: const Icon(Icons.music_note),
-                              onTap: () {
-                              findCurrentSongPlayingIndex(
+                              onTap: () async {
+                                songscontroller.isallmusic.value = true;
+                                songscontroller.isplaylist.value = false;
+                                songscontroller.isfavorite.value = false;
+
+                                findCurrentSongPlayingIndex(
                                     controller.filteredData[index].id);
-                                songHandler.skipToQueueItem(songscontroller
-                                    .currentSongPlayingIndex.value);
+                                await songscontroller.handelallsongs();
+                                await songHandler.skipToQueueItem(
+                                    songscontroller
+                                        .currentSongPlayingIndex.value);
                                 navigator.changepage(2);
                               },
                             ),

@@ -4,6 +4,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
@@ -69,8 +70,6 @@ class Songlistwidget extends StatelessWidget {
                           child: GetBuilder<Playlistcontroller>(
                             builder: (controller) {
                               return Neubox(
-                                index:
-                                    music[index] == songHandler.mediaItem.value,
                                 borderRadius: BorderRadius.circular(12),
                                 child: ListTile(
                                   trailing: playlistcontroller.selectionMode
@@ -88,7 +87,26 @@ class Songlistwidget extends StatelessWidget {
                                                     .displayNameWOExt);
                                           },
                                         )
-                                      : null,
+                                      : music[index] ==
+                                              songHandler.mediaItem.value
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                MiniMusicVisualizer(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .inversePrimary,
+                                                  width: 4,
+                                                  height: 15,
+                                                  radius: 2,
+                                                  animate: songHandler
+                                                      .playbackState
+                                                      .value
+                                                      .playing,
+                                                ),
+                                              ],
+                                            )
+                                          : null,
                                   title: Text(
                                     music[index].title,
                                     style: const TextStyle(
@@ -120,6 +138,7 @@ class Songlistwidget extends StatelessWidget {
                                     songscontroller.isallmusic.value = true;
                                     songscontroller.isplaylist.value = false;
                                     songscontroller.isfavorite.value = false;
+                                    songscontroller.issearch.value = false;
                                     playlistcontroller.newplaylistID = 0;
                                     box.putAll({
                                       "isallmusic":

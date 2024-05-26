@@ -45,6 +45,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                     activeBorderColor: Theme.of(context).colorScheme.background,
                     inactiveBorderColor:
                         Theme.of(context).colorScheme.background,
+                        
                   ),
                   RectangleWaveform(
                     samples: generateRandomNumbers.samples,

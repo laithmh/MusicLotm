@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
@@ -71,6 +72,24 @@ class Playlistpage extends StatelessWidget {
                                       )
                                     ]),
                                 child: ListTile(
+                                  trailing: audio[index] ==
+                                          songHandler.mediaItem.value
+                                      ? Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            MiniMusicVisualizer(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                              width: 4,
+                                              height: 15,
+                                              radius: 2,
+                                              animate: songHandler
+                                                  .playbackState.value.playing,
+                                            ),
+                                          ],
+                                        )
+                                      : null,
                                   title: Text(
                                     audio[index].title,
                                     style: const TextStyle(
@@ -100,7 +119,8 @@ class Playlistpage extends StatelessWidget {
                                       await playlistcontroller
                                           .handelplaylists();
                                     }
-                                    songHandler.skipToQueueItem(index);
+                                    await songHandler.skipToQueueItem(index);
+                                    await songHandler.play();
                                     songscontroller.isallmusic.value = false;
                                     songscontroller.isplaylist.value = true;
                                     songscontroller.isfavorite.value = false;
@@ -114,7 +134,6 @@ class Playlistpage extends StatelessWidget {
                                     });
                                     Get.back();
                                     navigator.changepage(2);
-                                    await songHandler.play();
                                   },
                                 ),
                               ),

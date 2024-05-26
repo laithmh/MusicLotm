@@ -21,7 +21,7 @@ class Playscreen extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.data == null) {
-            return Text('Error: ${snapshot.error}');
+            return const Center(child: CircularProgressIndicator());
           } else {
             MediaItem song = snapshot.data!;
             Future.delayed(const Duration(seconds: 1), () {
@@ -54,7 +54,7 @@ class Playscreen extends StatelessWidget {
                       ),
                       const Addtoplaylistbutton(),
                       PolygonWaveformcustom(
-                        maxDuration: song.duration!.inSeconds + 1,
+                        maxDuration: song.duration!.inSeconds + 2,
                       ),
                       SizedBox(
                         height: 50.h,

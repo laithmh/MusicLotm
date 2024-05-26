@@ -16,7 +16,7 @@ class Settingsdialog extends StatelessWidget {
 
     return Obx(() => settingscontroller.timerset.isTrue
         ? Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsets.only(left: 20.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -29,8 +29,8 @@ class Settingsdialog extends StatelessWidget {
                     )),
                   ),
                 ),
-                const SizedBox(
-                  width: 20,
+                SizedBox(
+                  width: 20.w,
                 ),
                 MaterialButton(
                   onPressed: () {
@@ -54,8 +54,8 @@ class Settingsdialog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text("S E T  T I M E R  T O  S L E E P"),
-                  const SizedBox(
-                    height: 10,
+                  SizedBox(
+                    height: 10.h,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -66,8 +66,8 @@ class Settingsdialog extends StatelessWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .inversePrimary)),
-                        height: 50,
-                        width: 50,
+                        height: 50.h,
+                        width: 50.w,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
@@ -82,12 +82,12 @@ class Settingsdialog extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 10,
+                      SizedBox(
+                        width: 10.w,
                       ),
                       const Text(":"),
-                      const SizedBox(
-                        width: 10,
+                      SizedBox(
+                        width: 10.w,
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -95,8 +95,8 @@ class Settingsdialog extends StatelessWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .inversePrimary)),
-                        height: 50,
-                        width: 50,
+                        height: 50.h,
+                        width: 50.w,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
@@ -113,8 +113,8 @@ class Settingsdialog extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 10,
+                  SizedBox(
+                    height: 10.h,
                   ),
                   Row(
                     children: [
@@ -128,8 +128,8 @@ class Settingsdialog extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primary,
                         child: const Text("C A N C E L "),
                       ),
-                      const SizedBox(
-                        width: 10,
+                      SizedBox(
+                        width: 10.w,
                       ),
                       MaterialButton(
                         onPressed: () {

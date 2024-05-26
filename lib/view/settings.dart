@@ -1,11 +1,9 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
-
 import 'package:get/get.dart';
-
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/core/Widget/settingsdialog.dart';
 
@@ -17,12 +15,12 @@ class Srttings extends StatelessWidget {
     Settingscontroller settingscontroller = Get.find();
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: 60.h),
         child: Column(
           children: [
-            const Text(
+            Text(
               'S E T T I N G S',
-              style: TextStyle(fontSize: 30),
+              style: TextStyle(fontSize: 75.sp, fontWeight: FontWeight.bold),
             ),
             const SizedBox(
               height: 15,
@@ -30,7 +28,7 @@ class Srttings extends StatelessWidget {
             Obx(
               () => settingscontroller.timerset.isTrue
                   ? Padding(
-                      padding: const EdgeInsets.only(left: 20),
+                      padding: EdgeInsets.only(left: 40.w),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -53,8 +51,8 @@ class Srttings extends StatelessWidget {
                               },
                             ),
                           ),
-                          const SizedBox(
-                            width: 20,
+                          SizedBox(
+                            width: 40.w,
                           ),
                           const Text("T O  S L E E P")
                         ],
@@ -62,12 +60,12 @@ class Srttings extends StatelessWidget {
                     )
                   : const Text(""),
             ),
-            const SizedBox(
-              height: 15,
+            SizedBox(
+              height: 25.h,
             ),
             const Divider(),
             Padding(
-              padding: const EdgeInsets.only(left: 25, top: 25),
+              padding: EdgeInsets.only(left: 50.w, top: 50.h),
               child: ListTile(
                 title: const Text(
                   'D A R K M O D E',
@@ -84,7 +82,7 @@ class Srttings extends StatelessWidget {
               ),
             ),
             Padding(
-                padding: const EdgeInsets.only(left: 25, top: 25),
+                padding: EdgeInsets.only(left: 50.w, top: 50.h),
                 child: ListTile(
                   title: const Text(
                     'S L E E P  T I M E R',

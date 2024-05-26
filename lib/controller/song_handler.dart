@@ -1,8 +1,22 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:musiclotm/controller/animationcontroller.dart';
+import 'package:musiclotm/controller/navigatorcontroller.dart';
+import 'package:musiclotm/controller/playlistcontroller.dart';
+import 'package:musiclotm/controller/searchcontroller.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
+import 'package:musiclotm/core/function/generaterandomnumber.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
+  AnimationControllerX animationController = Get.put(AnimationControllerX());
+  Songscontroller songscontroller = Get.put(Songscontroller());
+
+  Navigatorcontroller navigatorcontroller = Get.put(Navigatorcontroller());
+  Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
+  GenerateRandomNumbers generateRandomNumbers =
+      Get.put(GenerateRandomNumbers());
+  Searchcontroller searchController = Get.put(Searchcontroller());
   final AudioPlayer audioPlayer = AudioPlayer();
   RxBool isloop = false.obs;
   late List<UriAudioSource> song;
@@ -18,7 +32,7 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     });
   }
 
-  void _broadcastState(PlaybackEvent event) {
+  void broadcastState(PlaybackEvent event) {
     playbackState.add(playbackState.value.copyWith(
       controls: [
         MediaControl.skipToPrevious,
@@ -44,11 +58,10 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
       queueIndex: event.currentIndex,
     ));
   }
-
   Future<void> initSongs({
     required RxList<MediaItem> songs,
   }) async {
-    audioPlayer.playbackEventStream.listen(_broadcastState);
+    audioPlayer.playbackEventStream.listen(broadcastState);
 
     List<UriAudioSource> audioSource = songs.map(_createAudioSource).toList();
     song = audioSource;
@@ -66,13 +79,25 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
         skipToNext();
       }
     });
+    animationController.stop();
   }
 
   @override
-  Future<void> play() => audioPlayer.play();
+  Future<void> play() {
+    playlistcontroller.update();
+
+    animationController.start();
+
+    return audioPlayer.play();
+  }
 
   @override
-  Future<void> pause() => audioPlayer.pause();
+  Future<void> pause() {
+    animationController.stop();
+
+    playlistcontroller.update();
+    return audioPlayer.pause();
+  }
 
   @override
   Future<void> seek(Duration position) => audioPlayer.seek(position);
@@ -82,6 +107,7 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     int index,
   ) async {
     await audioPlayer.seek(Duration.zero, index: index);
+    playlistcontroller.update();
   }
 
   @override
@@ -113,6 +139,13 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   handlePlayBackNext() {
     if (isloop.isTrue) {
+      bool playing = playbackState.value.playing;
+      animationController.reset();
+      if (!playing) {
+        animationController.stop();
+      } else {
+        animationController.start();
+      }
       int index = (audioPlayer.currentIndex! + 1) % song.length;
       skipToQueueItem(index);
     } else {
@@ -122,6 +155,13 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   handlePlayBackPrevious() {
     if (isloop.isTrue) {
+      bool playing = playbackState.value.playing;
+      animationController.reset();
+      if (!playing) {
+        animationController.stop();
+      } else {
+        animationController.start();
+      }
       if (audioPlayer.currentIndex == 0) {
         skipToQueueItem(song.length - 1);
       } else {
@@ -133,8 +173,27 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   }
 
   @override
-  Future<void> skipToNext() => audioPlayer.seekToNext();
+  Future<void> skipToNext() {
+    bool playing = playbackState.value.playing;
+    animationController.reset();
+    if (!playing) {
+      animationController.stop();
+    } else {
+      animationController.start();
+    }
+    return audioPlayer.seekToNext();
+  }
 
   @override
-  Future<void> skipToPrevious() => audioPlayer.seekToPrevious();
+  Future<void> skipToPrevious() {
+    bool playing = playbackState.value.playing;
+    animationController.reset();
+
+    if (!playing) {
+      animationController.stop();
+    } else {
+      animationController.start();
+    }
+    return audioPlayer.seekToPrevious();
+  }
 }

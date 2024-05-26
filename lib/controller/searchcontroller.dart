@@ -17,6 +17,8 @@ class Searchcontroller extends GetxController {
     update();
   }
 
+  
+
   @override
   void onClose() {
     controller.clear();
