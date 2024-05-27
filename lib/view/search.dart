@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
@@ -18,13 +18,14 @@ class Search extends StatelessWidget {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 35, horizontal: 20),
+        padding: EdgeInsets.symmetric(vertical: 120.h, horizontal: 70.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(
               width: double.infinity,
-              child: TextField(
+              child: TextFormField(
+                  keyboardType: TextInputType.text,
                   controller: searchcontroller.controller,
                   onChanged: (value) {
                     searchcontroller
@@ -33,8 +34,6 @@ class Search extends StatelessWidget {
                   decoration: const InputDecoration(
                       border: OutlineInputBorder(), hintText: "search"),
                   onTapOutside: (event) {
-                    SystemChrome.setEnabledSystemUIMode(
-                        SystemUiMode.immersiveSticky);
                     searchcontroller.controller.clear();
                   }),
             ),

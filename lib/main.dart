@@ -26,7 +26,6 @@ Future<void> main() async {
       androidNotificationChannelName: 'MusicLotm Player',
       androidNotificationOngoing: true,
       androidShowNotificationBadge: true,
-      
     ),
   );
 
@@ -55,6 +54,7 @@ class MyApp extends StatelessWidget {
       ),
       designSize: const Size(1344, 2992),
       minTextAdapt: true,
+      ensureScreenSize: true,
     );
   }
 }

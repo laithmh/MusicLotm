@@ -18,37 +18,50 @@ class Floatingbuttonwidget extends StatelessWidget {
           builder: (context) => AlertDialog(
             backgroundColor: Theme.of(context).colorScheme.primary,
             content: SizedBox(
-              height: 800.h,
+              height: 700.h,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextField(
-                    controller: playlistcontroller.controller,
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: "add new playlist"),
-                    onTapOutside: (event) {
-                      SystemChrome.setEnabledSystemUIMode(
-                          SystemUiMode.immersiveSticky);
-                    },
+                  Container(
+                    decoration: BoxDecoration(border: Border.all()),
+                    child: TextFormField(
+                      controller: playlistcontroller.controller,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: "add new playlist"),
+                      onTapOutside: (event) {
+                        SystemChrome.setEnabledSystemUIMode(
+                            SystemUiMode.immersiveSticky);
+                      },
+                    ),
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       MaterialButton(
                         onPressed: () {
-                          playlistcontroller.createNewPlaylist();
-
-                          playlistcontroller.controller.clear();
                           Get.back();
                         },
-                        child: const Text("save"),
+                        color: Theme.of(context).colorScheme.primary,
+                        child: const Text("cancel"),
                       ),
                       MaterialButton(
                         onPressed: () {
-                          Get.back();
+                          if (playlistcontroller.controller.text
+                              .trim()
+                              .isNotEmpty) {
+                            playlistcontroller.createNewPlaylist();
+
+                            playlistcontroller.controller.clear();
+                            Get.back();
+                          } else {
+                            Get.snackbar("", "the playlist name is empty");
+                          }
                         },
-                        child: const Text("cancel"),
-                      )
+                        color: Theme.of(context).colorScheme.primary,
+                        child: const Text("save"),
+                      ),
                     ],
                   )
                 ],

@@ -35,20 +35,20 @@ class Customaudioimage extends StatelessWidget {
                 child: artUri == null
                     ? Icon(
                         Icons.music_note,
-                        size: 1000.w,
+                        size: 1100.h,
                       )
                     : ClipRRect(
                         borderRadius: BorderRadius.circular(500),
                         child: Image.file(
                           File.fromUri(artUri!),
-                          height: 1000.w,
+                          height: 1100.h,
                           fit: BoxFit.cover,
                         ),
                       )),
           ),
         ),
-        const SizedBox(
-          height: 10,
+        SizedBox(
+          height: 40.h,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

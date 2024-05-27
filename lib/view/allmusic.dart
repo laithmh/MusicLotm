@@ -41,8 +41,7 @@ class Allmusicscreen extends StatelessWidget {
                                       animationControllerX.animationController
                                           .reverse();
                                       playlistcontroller.toggleSelection();
-                                      playlistcontroller.listplaylisid.clear();
-                                      playlistcontroller.listsongsid.clear();
+                                      
                                     },
                                   ));
                         },

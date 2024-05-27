@@ -37,7 +37,7 @@ class Favorite extends StatelessWidget {
         future: playlistcontroller.loadefavorites(),
         initialData: const <MediaItem>[].obs,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          List<MediaItem> audio = snapshot.data;
+          List<MediaItem> audio = snapshot.data ?? [];
           return ListView.builder(
             itemCount: audio.length,
             itemBuilder: (BuildContext context, int index) {

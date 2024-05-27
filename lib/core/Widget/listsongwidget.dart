@@ -154,6 +154,8 @@ class Songlistwidget extends StatelessWidget {
                                   },
                                   onLongPress: () {
                                     playlistcontroller.toggleSelection();
+                                    playlistcontroller.listplaylisid.clear();
+                                    playlistcontroller.listsongsid.clear();
                                   },
                                 ),
                               );

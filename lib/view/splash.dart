@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:musiclotm/controller/navigatorcontroller.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    Get.put(Navigatorcontroller());
+
+    return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.music_note), // Your splash screen image
-            SizedBox(height: 20),
-            CircularProgressIndicator(),
-          ],
+        child: Icon(
+          Icons.music_note,
+          size: 350.h,
         ),
       ),
     );

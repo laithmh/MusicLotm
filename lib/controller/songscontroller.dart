@@ -37,7 +37,8 @@ class Songscontroller extends GetxController {
       Map<Permission, PermissionStatus> statuses = await [
         Permission.audio,
         Permission.storage,
-        Permission.scheduleExactAlarm,
+        Permission.notification
+
       ].request();
 
       if (statuses[Permission.storage]!.isGranted ||
@@ -97,11 +98,11 @@ class Songscontroller extends GetxController {
 
   @override
   void onInit() async {
-    position = await box.get("position");
-    currentSongPlayingIndex.value = await box.get("currentIndex");
-    isplaylist.value = await box.get("isplaylist");
-    isfavorite.value = await box.get("isfavorite");
-    isallmusic.value = await box.get("isallmusic");
+    position = await box.get("position")??0;
+    currentSongPlayingIndex.value = await box.get("currentIndex")??0;
+    isplaylist.value = await box.get("isplaylist")??false;
+    isfavorite.value = await box.get("isfavorite")??false;
+    isallmusic.value = await box.get("isallmusic")??true;
 
     super.onInit();
   }

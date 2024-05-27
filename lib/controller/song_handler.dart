@@ -10,10 +10,11 @@ import 'package:musiclotm/core/function/generaterandomnumber.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   AnimationControllerX animationController = Get.put(AnimationControllerX());
-  Songscontroller songscontroller = Get.put(Songscontroller());
 
-  Navigatorcontroller navigatorcontroller = Get.put(Navigatorcontroller());
+  Songscontroller songscontroller = Get.put(Songscontroller());
   Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
+  Navigatorcontroller navigatorcontroller = Get.put(Navigatorcontroller());
+
   GenerateRandomNumbers generateRandomNumbers =
       Get.put(GenerateRandomNumbers());
   Searchcontroller searchController = Get.put(Searchcontroller());
@@ -32,8 +33,8 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     });
   }
 
-  void broadcastState(PlaybackEvent event) {
-    playbackState.add(playbackState.value.copyWith(
+  void _broadcastState(PlaybackEvent event) {
+   playbackState.add(playbackState.value.copyWith(
       controls: [
         MediaControl.skipToPrevious,
         if (audioPlayer.playing) MediaControl.pause else MediaControl.play,
@@ -58,10 +59,11 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
       queueIndex: event.currentIndex,
     ));
   }
+
   Future<void> initSongs({
     required RxList<MediaItem> songs,
   }) async {
-    audioPlayer.playbackEventStream.listen(broadcastState);
+    audioPlayer.playbackEventStream.listen(_broadcastState);
 
     List<UriAudioSource> audioSource = songs.map(_createAudioSource).toList();
     song = audioSource;

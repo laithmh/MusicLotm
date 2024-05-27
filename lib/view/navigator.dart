@@ -14,17 +14,19 @@ class Navigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<Navigatorcontroller>(
-      builder: (controller) => Scaffold(
-        bottomNavigationBar: const Navigationbarwidget(),
-        body: IndexedStack(
-          index: controller.currentindex,
-          children: const [
-            Allmusicscreen(),
-            Playlistscreen(),
-            Playscreen(),
-            Search(),
-            Srttings(),
-          ],
+      builder: (controller) => PopScope(
+        child: Scaffold(
+          bottomNavigationBar: const Navigationbarwidget(),
+          body: IndexedStack(
+            index: controller.currentindex,
+            children: const [
+              Allmusicscreen(),
+              Playlistscreen(),
+              Playscreen(),
+              Search(),
+              Srttings(),
+            ],
+          ),
         ),
       ),
     );

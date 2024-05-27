@@ -41,7 +41,7 @@ class Playlistcontroller extends GetxController {
       songs: mediasongs,
     );
     animationController.reset();
-    animationController.start();
+    
   }
 
   void onPlaylistSelected(bool? selected, int playlistId) {
@@ -127,12 +127,11 @@ class Playlistcontroller extends GetxController {
             AudiosFromType.PLAYLIST, playlistId);
         bool songExists =
             playlistSongs.any((song) => song.displayNameWOExt == songtitel);
-        int songid = songscontroller.songModels
-            .firstWhere((element) => element.displayNameWOExt == songtitel)
-            .id;
+        SongModel songid = songscontroller.songModels
+            .firstWhere((element) => element.displayNameWOExt == songtitel);
 
         if (!songExists) {
-          bool result = await audioQuery.addToPlaylist(playlistId, songid);
+          bool result = await audioQuery.addToPlaylist(playlistId, songid.id);
           if (result) {
             Get.snackbar("",
                 "Song ID $songtitel added to playlist ID $playlistId successfully!");
@@ -209,17 +208,21 @@ class Playlistcontroller extends GetxController {
   }
 
   Future<RxList<MediaItem>> loadefavorites() async {
-    List keys = isfavorite.keys.toList();
-    favorites.clear();
-    for (var i = 0; i < isfavorite.length; i++) {
-      MediaItem song =
-          songscontroller.songs.firstWhere((element) => element.id == keys[i]);
+    try {
+      List keys = isfavorite.keys.toList();
+      favorites.clear();
+      for (var i = 0; i < isfavorite.length; i++) {
+        MediaItem song = songscontroller.songs
+            .firstWhere((element) => element.id == keys[i]);
 
-      favorites.add(song);
+        favorites.add(song);
+      }
+      favorites.value = favorites.reversed.toList();
+
+      return favorites;
+    } catch (e) {
+      return <MediaItem>[].obs;
     }
-    favorites.value = favorites.reversed.toList();
-
-    return favorites;
   }
 
   handelfavorite() async {
@@ -227,10 +230,8 @@ class Playlistcontroller extends GetxController {
       songs: favorites,
     );
     animationController.reset();
-    animationController.start();
+    
   }
-
-  
 
   @override
   void onClose() {
@@ -242,15 +243,13 @@ class Playlistcontroller extends GetxController {
   @override
   void onInit() async {
     await songscontroller.requestSongPermission();
-    playlistId = await box.get("playlistid");
+    playlistId = await box.get("playlistid") ?? 0;
     await loadsongplaylist(playlistId);
     isfavorite = await box.get("favorite") ?? {};
     await loadplaylist();
 
-    
-
     await loadefavorites();
-    
+
     if (songscontroller.isallmusic.isTrue) {
       await songHandler.initSongs(
         songs: songscontroller.songs,

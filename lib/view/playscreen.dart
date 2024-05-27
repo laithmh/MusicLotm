@@ -27,42 +27,46 @@ class Playscreen extends StatelessWidget {
             Future.delayed(const Duration(seconds: 1), () {
               findCurrentSongPlayingIndex(song.id);
             });
-            return Scaffold(
-                appBar: AppBar(
+            return SafeArea(
+              child: Scaffold(
+                  appBar: AppBar(
+                    backgroundColor: Theme.of(context).colorScheme.background,
+                    title: Text(
+                      "P L A Y",
+                      style: TextStyle(
+                          fontSize: 75.sp, fontWeight: FontWeight.bold),
+                    ),
+                    centerTitle: true,
+                  ),
                   backgroundColor: Theme.of(context).colorScheme.background,
-                  title: Text(
-                    "P L A Y",
-                    style:
-                        TextStyle(fontSize: 75.sp, fontWeight: FontWeight.bold),
-                  ),
-                  centerTitle: true,
-                ),
-                backgroundColor: Theme.of(context).colorScheme.background,
-                body: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 25, right: 25, bottom: 25, top: 10),
-                  child: Column(
-                    children: [
-                      Customaudioimage(
-                        artist: song.artist!,
-                        title: song.title,
-                        artUri: song.artUri,
-                        song: song,
+                  body: SingleChildScrollView(
+                    child: Padding(
+                      padding:
+                          EdgeInsets.only(left: 75.w, right: 75.w, top: 40.h),
+                      child: Column(
+                        children: [
+                          Customaudioimage(
+                            artist: song.artist!,
+                            title: song.title,
+                            artUri: song.artUri,
+                            song: song,
+                          ),
+                          SizedBox(
+                            height: 25.h,
+                          ),
+                          const Addtoplaylistbutton(),
+                          PolygonWaveformcustom(
+                            maxDuration: song.duration!.inSeconds + 2,
+                          ),
+                          SizedBox(
+                            height: 40.h,
+                          ),
+                          const Customplaybutton(),
+                        ],
                       ),
-                      SizedBox(
-                        height: 25.h,
-                      ),
-                      const Addtoplaylistbutton(),
-                      PolygonWaveformcustom(
-                        maxDuration: song.duration!.inSeconds + 2,
-                      ),
-                      SizedBox(
-                        height: 50.h,
-                      ),
-                      const Customplaybutton(),
-                    ],
-                  ),
-                ));
+                    ),
+                  )),
+            );
           }
         });
   }

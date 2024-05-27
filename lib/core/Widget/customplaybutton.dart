@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
@@ -26,13 +27,13 @@ class Customplaybutton extends StatelessWidget {
                   },
                   child: Neubox(
                     borderRadius: BorderRadius.circular(12),
-                    child: const Icon(
+                    child: Icon(
                       Icons.skip_previous,
-                      size: 35,
+                      size: 150.sp,
                     ),
                   )),
-              const SizedBox(
-                width: 20,
+              SizedBox(
+                width: 70.w,
               ),
               GestureDetector(
                   onTap: () {
@@ -45,17 +46,17 @@ class Customplaybutton extends StatelessWidget {
                   child: Neubox(
                     borderRadius: BorderRadius.circular(500),
                     child: playing
-                        ? const Icon(
+                        ? Icon(
                             Icons.pause_rounded,
-                            size: 50,
+                            size: 200.sp,
                           )
-                        : const Icon(
+                        : Icon(
                             Icons.play_arrow_rounded,
-                            size: 50,
+                            size: 200.sp,
                           ),
                   )),
-              const SizedBox(
-                width: 20,
+              SizedBox(
+                width: 70.w,
               ),
               GestureDetector(
                   onTap: () {
@@ -65,9 +66,9 @@ class Customplaybutton extends StatelessWidget {
                   },
                   child: Neubox(
                       borderRadius: BorderRadius.circular(12),
-                      child: const Icon(
+                      child: Icon(
                         Icons.skip_next,
-                        size: 35,
+                        size: 150.sp,
                       ))),
             ],
           );
