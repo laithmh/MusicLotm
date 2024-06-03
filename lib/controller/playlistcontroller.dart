@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
+import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -41,7 +42,6 @@ class Playlistcontroller extends GetxController {
       songs: mediasongs,
     );
     animationController.reset();
-    
   }
 
   void onPlaylistSelected(bool? selected, int playlistId) {
@@ -150,9 +150,11 @@ class Playlistcontroller extends GetxController {
   Future<RxList<MediaItem>> loadsongplaylist(int playlistid) async {
     try {
       List<SongModel> playlistsongs = await audioQuery.queryAudiosFrom(
-          AudiosFromType.PLAYLIST, playlistid,
-          orderType: OrderType.DESC_OR_GREATER,
-          sortType: SongSortType.DATE_ADDED);
+        AudiosFromType.PLAYLIST,
+        playlistid,
+        sortType: audioQuerySongSortType(songscontroller.sortypePlaylists!),
+        orderType: audioQueryOrderType(songscontroller.sortypePlaylists!),
+      );
 
       mediasongs.value = await Future.wait(playlistsongs.map((song) async {
         return await songToMediaItem(
@@ -180,10 +182,13 @@ class Playlistcontroller extends GetxController {
       int playlistId, MediaItem mediasong) async {
     SongModel song = songscontroller.songModels
         .firstWhere((element) => element.displayNameWOExt == mediasong.title);
-    await audioQuery.removeFromPlaylist(playlistId, song.id);
+    bool done = await audioQuery.removeFromPlaylist(playlistId, song.id);
     mediasongs.removeWhere(
       (element) => element.title == song.displayNameWOExt,
     );
+    if (done) {
+      log("removed");
+    }
     update();
   }
 
@@ -217,8 +222,9 @@ class Playlistcontroller extends GetxController {
 
         favorites.add(song);
       }
-      favorites.value = favorites.reversed.toList();
 
+      favorites.assignAll(
+          sort(song: favorites, sortType: songscontroller.sortypeFavorite!));
       return favorites;
     } catch (e) {
       return <MediaItem>[].obs;
@@ -230,7 +236,6 @@ class Playlistcontroller extends GetxController {
       songs: favorites,
     );
     animationController.reset();
-    
   }
 
   @override
@@ -242,6 +247,12 @@ class Playlistcontroller extends GetxController {
 
   @override
   void onInit() async {
+    songscontroller.sortypeallMusic =
+        await box.get("sortTypeAllMusic") ?? "titelAS";
+    songscontroller.sortypeFavorite =
+        await box.get("sortTypePlaylists") ?? "titelAS";
+    songscontroller.sortypePlaylists =
+        await box.get("sortTypeFavorite") ?? "titelAS";
     await songscontroller.requestSongPermission();
     playlistId = await box.get("playlistid") ?? 0;
     await loadsongplaylist(playlistId);

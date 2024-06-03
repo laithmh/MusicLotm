@@ -50,7 +50,8 @@ dependencies:
   scrollable_positioned_list: ^0.3.8
   floating_action_bubble: ^1.1.4
   mini_music_visualizer: ^1.1.4
-  
+  sqflite: ^2.3.3+1
+  path: any
   
 
 

@@ -5,8 +5,9 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
-import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
+
+import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/core/services/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
@@ -23,11 +24,11 @@ class Songscontroller extends GetxController {
   late RxBool isfavorite = false.obs;
   late RxBool isallmusic = true.obs;
   late RxBool issearch = true.obs;
-
+  String? sortypeallMusic;
+  String? sortypePlaylists;
+  String? sortypeFavorite;
   late int position = 0;
-  final StreamController<RxList<MediaItem>> myStreamController =
-      StreamController<RxList<MediaItem>>();
-  Stream<RxList<MediaItem>> get myStream => myStreamController.stream;
+
   List<SongModel> songModels = [];
   RxList<MediaItem> songs = <MediaItem>[].obs;
   RxInt currentSongPlayingIndex = 0.obs;
@@ -38,7 +39,6 @@ class Songscontroller extends GetxController {
         Permission.audio,
         Permission.storage,
         Permission.notification
-
       ].request();
 
       if (statuses[Permission.storage]!.isGranted ||
@@ -64,12 +64,15 @@ class Songscontroller extends GetxController {
     try {
       final OnAudioQuery onAudioQuery = OnAudioQuery();
 
-      songModels = await onAudioQuery.querySongs();
+      songModels = await onAudioQuery.querySongs(
+         sortType: audioQuerySongSortType(sortypeallMusic!),
+        orderType:audioQueryOrderType(sortypeallMusic!),
+      );
 
       songs.value = await Future.wait(songModels.map((song) async {
         return songToMediaItem(song);
       }).toList());
-      myStreamController.add(songs);
+
       return songs;
     } catch (e) {
       debugPrint('Error fetching songs: $e');
@@ -98,53 +101,13 @@ class Songscontroller extends GetxController {
 
   @override
   void onInit() async {
-    position = await box.get("position")??0;
-    currentSongPlayingIndex.value = await box.get("currentIndex")??0;
-    isplaylist.value = await box.get("isplaylist")??false;
-    isfavorite.value = await box.get("isfavorite")??false;
-    isallmusic.value = await box.get("isallmusic")??true;
+    position = await box.get("position") ?? 0;
+    currentSongPlayingIndex.value = await box.get("currentIndex") ?? 0;
+    isplaylist.value = await box.get("isplaylist") ?? false;
+    isfavorite.value = await box.get("isfavorite") ?? false;
+    isallmusic.value = await box.get("isallmusic") ?? true;
+    
 
     super.onInit();
   }
-
-  @override
-  void onClose() {
-    myStreamController.close();
-    super.onClose();
-  }
-}
-
-void findCurrentSongPlayingIndex(String songId) {
-  Songscontroller controller = Get.find();
-  Playlistcontroller playlistcontroller = Get.find();
-  int index = 0;
-  if (controller.isallmusic.isTrue) {
-    for (var e in controller.songs) {
-      if (e.id == songId) {
-        controller.currentSongPlayingIndex.value = index;
-      }
-
-      index++;
-    }
-  } else if (controller.isplaylist.isTrue) {
-    for (var e in playlistcontroller.mediasongs) {
-      if (e.id == songId) {
-        controller.currentSongPlayingIndex.value = index;
-      }
-
-      index++;
-    }
-  } else if (controller.isfavorite.isTrue) {
-    for (var e in playlistcontroller.favorites) {
-      if (e.id == songId) {
-        controller.currentSongPlayingIndex.value = index;
-      }
-
-      index++;
-    }
-  }
-
-  playlistcontroller.update();
-  log("${songHandler.audioPlayer.currentIndex}====${controller.currentSongPlayingIndex}");
-  box.put("currentIndex", controller.currentSongPlayingIndex.value);
 }

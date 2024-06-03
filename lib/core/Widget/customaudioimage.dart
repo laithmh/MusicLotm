@@ -38,11 +38,19 @@ class Customaudioimage extends StatelessWidget {
                         size: 1100.h,
                       )
                     : ClipRRect(
-                        borderRadius: BorderRadius.circular(500),
-                        child: Image.file(
-                          File.fromUri(artUri!),
+                        clipBehavior: Clip.antiAlias,
+                        borderRadius: BorderRadius.circular(1000),
+                        child: Container(
                           height: 1100.h,
-                          fit: BoxFit.cover,
+                          width: 1000.w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(1000),
+                          ),
+                          child: Image.file(
+                            File.fromUri(artUri!),
+                            height: 1100.h,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       )),
           ),

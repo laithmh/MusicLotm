@@ -24,11 +24,12 @@ class Allmusicscreen extends StatelessWidget {
                     items: <Bubble>[
                       Bubble(
                         title: "Add to playlists",
-                        iconColor: Colors.white,
+                        iconColor: Colors.black,
                         bubbleColor: Theme.of(context).colorScheme.secondary,
                         icon: Icons.playlist_add,
-                        titleStyle:
-                            const TextStyle(fontSize: 16, color: Colors.white),
+                        titleStyle: const TextStyle(
+                          fontSize: 16,
+                        ),
                         onPress: () {
                           showDialog(
                               context: context,
@@ -41,7 +42,6 @@ class Allmusicscreen extends StatelessWidget {
                                       animationControllerX.animationController
                                           .reverse();
                                       playlistcontroller.toggleSelection();
-                                      
                                     },
                                   ));
                         },
@@ -49,11 +49,12 @@ class Allmusicscreen extends StatelessWidget {
                       // Floating action menu item
                       Bubble(
                         title: "select all ",
-                        iconColor: Colors.white,
+                        iconColor: Colors.black,
                         bubbleColor: Theme.of(context).colorScheme.secondary,
                         icon: Icons.select_all,
-                        titleStyle:
-                            const TextStyle(fontSize: 16, color: Colors.white),
+                        titleStyle: const TextStyle(
+                          fontSize: 16,
+                        ),
                         onPress: () {
                           controller.animationController.reverse();
                         },
@@ -61,11 +62,12 @@ class Allmusicscreen extends StatelessWidget {
                       //Floating action menu item
                       Bubble(
                         title: "cancel",
-                        iconColor: Colors.white,
+                        iconColor: Colors.black,
                         bubbleColor: Theme.of(context).colorScheme.secondary,
                         icon: Icons.close,
-                        titleStyle:
-                            const TextStyle(fontSize: 16, color: Colors.white),
+                        titleStyle: const TextStyle(
+                          fontSize: 16,
+                        ),
                         onPress: () {
                           playlistcontroller.listsongsid.clear();
                           controller.animationController.reverse();
@@ -77,7 +79,7 @@ class Allmusicscreen extends StatelessWidget {
                     animation: controller.animation,
                     onPress: controller.toggleAnimation,
                     backGroundColor: Theme.of(context).colorScheme.secondary,
-                    iconColor: Colors.white,
+                    iconColor: Theme.of(context).colorScheme.inversePrimary,
                   )
                 : const SizedBox.shrink();
           },

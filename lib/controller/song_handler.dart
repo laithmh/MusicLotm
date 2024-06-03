@@ -8,6 +8,7 @@ import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 
+
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   AnimationControllerX animationController = Get.put(AnimationControllerX());
 

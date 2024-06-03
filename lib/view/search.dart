@@ -5,6 +5,7 @@ import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
+import 'package:musiclotm/core/function/findcurrentIndex.dart';
 import 'package:musiclotm/main.dart';
 
 class Search extends StatelessWidget {
