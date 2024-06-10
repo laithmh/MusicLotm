@@ -15,13 +15,13 @@ class Navigationbarwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<Navigatorcontroller>(builder: (navigatorcontroller) {
       return CurvedNavigationBar(
-        height: 230.h,
+        height: 200.h,
         animationCurve: Curves.easeOut,
         backgroundColor: Theme.of(context).colorScheme.background,
         color: Theme.of(context).colorScheme.background,
         animationDuration: const Duration(milliseconds: 400),
         index: navigatorcontroller.currentindex,
-        iconPadding: 5,
+        iconPadding: 0,
         items: [
           CurvedNavigationBarItem(
             child: Neubox(
@@ -63,7 +63,7 @@ class Navigationbarwidget extends StatelessWidget {
         onTap: (index) {
           if (index == 0) {}
           navigatorcontroller.changepage(index);
-    
+
           log(navigatorcontroller.currentindex);
           Get.back();
         },

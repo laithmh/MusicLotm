@@ -127,7 +127,7 @@ class Playlistpage extends StatelessWidget {
                                   subtitle: Text(audio[index].artist!,
                                       style: const TextStyle(
                                           overflow: TextOverflow.ellipsis)),
-                                  leading: audio[index].artUri == null
+                                  leading: audio[index].artUri == null || audio[index].artUri== Uri.parse("null")
                                       ? const Icon(
                                           Icons.music_note,
                                         )

@@ -43,36 +43,72 @@ List<MediaItem> sort(
 
   return songs;
 }
- 
-  SongSortType audioQuerySongSortType(String sorttype ) {
-  switch (sorttype) {
-    case "titelDS"||"titelAS":
-     return SongSortType.TITLE;
-      
-      
-    
-    case "dateAS"||"dateDS":
-    return  SongSortType.DATE_ADDED;
-      
-     
-    default: 
-    return SongSortType.TITLE;
 
+List<SongModel> sortSongModel(
+    {required List<SongModel> song, String sortType = "titelAS"}) {
+  List<SongModel> songs = [];
+  switch (sortType) {
+    case 'titelAS':
+      song.sort(
+        (a, b) => a.displayNameWOExt
+            .toLowerCase()
+            .compareTo(b.displayNameWOExt.toLowerCase()),
+      );
+      songs.addAll(song);
+      break;
+    case 'titelDS':
+      song.sort(
+        (a, b) => b.displayNameWOExt
+            .toLowerCase()
+            .compareTo(a.displayNameWOExt.toLowerCase()),
+      );
+      songs.addAll(song);
+      break;
+    case 'dateAS':
+      song.sort(
+        (a, b) {
+          return a.dateAdded!.compareTo(b.dateAdded as num);
+        },
+      );
+      songs.addAll(song);
+      break;
+    case 'dateDS':
+      song.sort(
+        (a, b) {
+          return b.dateAdded!.compareTo(a.dateAdded as num);
+        },
+      );
+      songs.addAll(song);
+      break;
+    default:
+      song;
+  }
+
+  return songs;
+}
+
+SongSortType audioQuerySongSortType(String sorttype) {
+  switch (sorttype) {
+    case "titelDS" || "titelAS":
+      return SongSortType.TITLE;
+
+    case "dateAS" || "dateDS":
+      return SongSortType.DATE_ADDED;
+
+    default:
+      return SongSortType.TITLE;
   }
 }
-OrderType audioQueryOrderType(String sorttype ) {
-  switch (sorttype) {
-    case "dateAS"||"titelAS" :
-     return OrderType.ASC_OR_SMALLER;
-      
-      
-    
-    case "titelDS"||"dateDS":
-    return  OrderType.DESC_OR_GREATER;
-      
-     
-    default: 
-    return OrderType.DESC_OR_GREATER;
 
+OrderType audioQueryOrderType(String sorttype) {
+  switch (sorttype) {
+    case "dateAS" || "titelAS":
+      return OrderType.ASC_OR_SMALLER;
+
+    case "titelDS" || "dateDS":
+      return OrderType.DESC_OR_GREATER;
+
+    default:
+      return OrderType.DESC_OR_GREATER;
   }
 }

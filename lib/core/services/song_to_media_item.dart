@@ -1,6 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-
+import 'package:musiclotm/core/db/songsdata.dart';
 import 'package:musiclotm/core/services/get_song_art.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
@@ -11,8 +11,6 @@ SongModel getsongsartwork(SongModel songModel, List<SongModel> localSongList) {
   return songartwork;
 }
 
-
-
 Future<MediaItem> songToMediaItem(SongModel song) async {
   try {
     final Uri? art = await getSongArt(
@@ -22,18 +20,47 @@ Future<MediaItem> songToMediaItem(SongModel song) async {
     );
 
     return MediaItem(
-    
-      id: song.uri.toString(),
-      artUri: art,
-      title: song.displayNameWOExt,
-      artist: song.artist,
-      duration: Duration(milliseconds: song.duration!),
-      displayDescription: song.id.toString(),
-      genre: DateTime.now().toString()
-    );
+        id: song.uri.toString(),
+        artUri: art,
+        title: song.displayNameWOExt,
+        artist: song.artist,
+        duration: Duration(milliseconds: song.duration!),
+        displayDescription: song.id.toString(),
+        genre: song.dateAdded.toString());
+        
   } catch (e) {
     debugPrint('Error converting SongModel to MediaItem: $e');
 
     return const MediaItem(id: '', title: 'Error', artist: 'Unknown');
+  }
+}
+
+Future<MediaItemModel> songToMediaItemHive(SongModel song) async {
+  try {
+    final Uri? art = await getSongArt(
+      id: song.id,
+      type: ArtworkType.AUDIO,
+      size: 300,
+    );
+
+    return MediaItemModel(
+        id: song.uri.toString(),
+        artUri: art.toString(),
+        title: song.displayNameWOExt,
+        artist: song.artist ?? '',
+        duration: song.duration ?? 0,
+        displayDescription: song.id.toString(),
+        genre: song.dateAdded.toString());
+  } catch (e) {
+    debugPrint('Error converting SongModel to MediaItem: $e');
+
+    return MediaItemModel(
+        id: '',
+        title: 'Error',
+        artist: 'Unknown',
+        displayDescription: '',
+        genre: '',
+        duration: 0,
+        artUri: '');
   }
 }

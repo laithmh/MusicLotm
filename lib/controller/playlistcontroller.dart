@@ -160,7 +160,8 @@ class Playlistcontroller extends GetxController {
         return await songToMediaItem(
             getsongsartwork(song, songscontroller.songModels));
       }).toList());
-
+      mediasongs.assignAll(
+          sort(song: mediasongs, sortType: songscontroller.sortypePlaylists!));
       return mediasongs;
     } catch (e) {
       debugPrint('Error fetching songs: $e');
@@ -247,12 +248,6 @@ class Playlistcontroller extends GetxController {
 
   @override
   void onInit() async {
-    songscontroller.sortypeallMusic =
-        await box.get("sortTypeAllMusic") ?? "titelAS";
-    songscontroller.sortypeFavorite =
-        await box.get("sortTypePlaylists") ?? "titelAS";
-    songscontroller.sortypePlaylists =
-        await box.get("sortTypeFavorite") ?? "titelAS";
     await songscontroller.requestSongPermission();
     playlistId = await box.get("playlistid") ?? 0;
     await loadsongplaylist(playlistId);

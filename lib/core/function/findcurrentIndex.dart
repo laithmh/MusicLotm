@@ -39,6 +39,6 @@ void findCurrentSongPlayingIndex(String songId) {
   }
 
   playlistcontroller.update();
-  log("${songHandler.audioPlayer.currentIndex}====${controller.currentSongPlayingIndex}");
+  log("${audioPlayer.currentIndex}====${controller.currentSongPlayingIndex}");
   box.put("currentIndex", controller.currentSongPlayingIndex.value);
 }

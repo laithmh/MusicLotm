@@ -1,13 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:on_audio_query/on_audio_query.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Asynchronous function to get the artwork for a song
 Future<Uri?> getSongArt({
   required int id,
   required ArtworkType type,
-
   required int size,
 }) async {
   try {
@@ -20,32 +21,28 @@ Future<Uri?> getSongArt({
       type,
       format: ArtworkFormat.PNG,
       size: size,
-
     );
 
-    
     Uri? art;
 
-    
     if (data != null) {
-      
-      final Directory tempDir = Directory.systemTemp;
+      Directory appDocDir = await getApplicationDocumentsDirectory();
+      String customDirPath =
+          '${appDocDir.path}/Musiclotom/custom/directory/path';
+      Directory customDir = Directory(customDirPath);
+      if (!await customDir.exists()) {
+        await customDir.create(recursive: true);
+      }
+      final File file = File("${customDir.path}/$id.jpg");
 
-      
-      final File file = File("${tempDir.path}/$id.jpg");
-
-      
       await file.writeAsBytes(data);
 
-      
       art = file.uri;
     }
 
-    
     return art;
   } catch (e) {
-    
     debugPrint('Error fetching song artwork: $e');
-    return null; 
+    return null;
   }
 }

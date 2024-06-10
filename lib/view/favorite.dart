@@ -99,7 +99,8 @@ class Favorite extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis),
                           ),
                           subtitle: Text(audio[index].artist!),
-                          leading: audio[index].artUri == null
+                          leading: audio[index].artUri == null ||
+                                  audio[index].artUri == Uri.parse("null")
                               ? const Icon(
                                   Icons.music_note,
                                 )

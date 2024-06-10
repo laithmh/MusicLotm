@@ -27,16 +27,8 @@ class Songlistwidget extends StatelessWidget {
 
     List<String> dropdownItems = ['titelAS', 'titelDS', 'dateAS', 'dateDS'];
 
-    return FutureBuilder(
-      future: songscontroller.getSongs(),
-      initialData: RxList<MediaItem>,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          return Padding(
+    return haspermission.isTrue
+        ? Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 25.w,
             ),
@@ -56,7 +48,9 @@ class Songlistwidget extends StatelessWidget {
                         onChanged: (String? newValue) async {
                           sort(
                               song: songscontroller.songs, sortType: newValue!);
-
+                          sortSongModel(
+                              song: songscontroller.songModels,
+                              sortType: newValue);
                           songscontroller.isallmusic.value = false;
 
                           songscontroller.update();
@@ -83,12 +77,13 @@ class Songlistwidget extends StatelessWidget {
                     width: double.maxFinite,
                     child: GetBuilder<Songscontroller>(
                       builder: (controller) {
-                        RxList<MediaItem> audio = controller.songs;
+                        List<MediaItem> audio = controller.songs;
                         return ScrollablePositionedList.builder(
                           itemScrollController: controller.itemScrollController,
                           shrinkWrap: true,
                           itemCount: audio.length,
                           itemBuilder: (BuildContext context, int index) {
+                            
                             return Padding(
                                 padding: EdgeInsets.symmetric(
                                     vertical: 20.h, horizontal: 10.w),
@@ -147,7 +142,9 @@ class Songlistwidget extends StatelessWidget {
                                             style: const TextStyle(
                                                 overflow:
                                                     TextOverflow.ellipsis)),
-                                        leading: audio[index].artUri == null
+                                        leading: audio[index].artUri == null ||
+                                                audio[index].artUri ==
+                                                    Uri.parse("null")
                                             ? const Icon(
                                                 Icons.music_note,
                                               )
@@ -203,9 +200,9 @@ class Songlistwidget extends StatelessWidget {
                     ))
               ],
             ),
+          )
+        : const Center(
+            child: CircularProgressIndicator(),
           );
-        }
-      },
-    );
   }
 }

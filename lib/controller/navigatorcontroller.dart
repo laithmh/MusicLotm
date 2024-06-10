@@ -9,7 +9,9 @@ class Navigatorcontroller extends GetxController {
   int currentindex = 0;
 
   changepage(int i) {
-    songscontroller.scroll();
+    if (i == 0) {
+      songscontroller.scroll();
+    }
     currentindex = i;
 
     update();

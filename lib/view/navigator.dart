@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
@@ -13,19 +14,26 @@ class Navigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Theme.of(context).colorScheme.background,
+      statusBarColor: Theme.of(context).colorScheme.background,
+      systemNavigationBarContrastEnforced: true,
+    ));
     return GetBuilder<Navigatorcontroller>(
       builder: (controller) => PopScope(
-        child: Scaffold(
-          bottomNavigationBar: const Navigationbarwidget(),
-          body: IndexedStack(
-            index: controller.currentindex,
-            children: const [
-              Allmusicscreen(),
-              Playlistscreen(),
-              Playscreen(),
-              Search(),
-              Srttings(),
-            ],
+        child: SafeArea(
+          child: Scaffold(
+            bottomNavigationBar: const Navigationbarwidget(),
+            body: IndexedStack(
+              index: controller.currentindex,
+              children: const [
+                Allmusicscreen(),
+                Playlistscreen(),
+                Playscreen(),
+                Search(),
+                Srttings(),
+              ],
+            ),
           ),
         ),
       ),

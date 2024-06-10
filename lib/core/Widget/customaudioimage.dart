@@ -24,6 +24,7 @@ class Customaudioimage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AnimationControllerX animationControllerX = Get.find();
+
     return Column(
       children: [
         Neubox(
@@ -32,23 +33,23 @@ class Customaudioimage extends StatelessWidget {
             turns: animationControllerX.rotationcontroller,
             child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: artUri == null
+                child: artUri == null || artUri == Uri.parse("null")
                     ? Icon(
                         Icons.music_note,
-                        size: 1100.h,
+                        size: 1000.h,
                       )
                     : ClipRRect(
                         clipBehavior: Clip.antiAlias,
                         borderRadius: BorderRadius.circular(1000),
                         child: Container(
-                          height: 1100.h,
-                          width: 1000.w,
+                          height: 1000.h,
+                          width: 900.w,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(1000),
                           ),
                           child: Image.file(
                             File.fromUri(artUri!),
-                            height: 1100.h,
+                            height: 1000.h,
                             fit: BoxFit.cover,
                           ),
                         ),
