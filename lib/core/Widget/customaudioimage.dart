@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 class Customaudioimage extends StatelessWidget {
   final String artist;
@@ -33,27 +32,23 @@ class Customaudioimage extends StatelessWidget {
             turns: animationControllerX.rotationcontroller,
             child: Padding(
                 padding: const EdgeInsets.all(10),
-                child: artUri == null || artUri == Uri.parse("null")
-                    ? Icon(
-                        Icons.music_note,
-                        size: 1000.h,
-                      )
-                    : ClipRRect(
-                        clipBehavior: Clip.antiAlias,
-                        borderRadius: BorderRadius.circular(1000),
-                        child: Container(
-                          height: 1000.h,
-                          width: 900.w,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(1000),
-                          ),
-                          child: Image.file(
-                            File.fromUri(artUri!),
-                            height: 1000.h,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      )),
+                child: ClipRRect(
+                  clipBehavior: Clip.antiAlias,
+                  borderRadius: BorderRadius.circular(1000),
+                  child: QueryArtworkWidget(
+                    artworkBorder: BorderRadius.circular(1000),
+                    id: int.parse(song.displayDescription!),
+                    type: ArtworkType.AUDIO,
+                    artworkHeight: 1080.h,
+                    artworkWidth: 1080.h,
+                    artworkQuality: FilterQuality.high,
+                    artworkFit: BoxFit.cover,
+                    nullArtworkWidget: Icon(
+                      Icons.music_note,
+                      size: 1080.h,
+                    ),
+                  ),
+                )),
           ),
         ),
         SizedBox(

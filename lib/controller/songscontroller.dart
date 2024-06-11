@@ -5,9 +5,9 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
-import 'package:musiclotm/core/db/hiveservice.dart';
+
 import 'package:musiclotm/core/function/sort.dart';
-import 'package:musiclotm/core/services/song_to_media_item.dart';
+import 'package:musiclotm/core/function/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,13 +17,13 @@ RxBool haspermission = false.obs;
 
 class Songscontroller extends GetxController {
   AnimationControllerX animationController = Get.find();
-  HiveService hiveService = HiveService();
+  
   final ItemScrollController itemScrollController = ItemScrollController();
   late RxBool isplaylist = false.obs;
   late RxBool isfavorite = false.obs;
   late RxBool isallmusic = true.obs;
   late RxBool issearch = true.obs;
-  late RxBool openAppFirst = true.obs;
+
 
   String? sortypeallMusic;
   String? sortypePlaylists;
@@ -84,34 +84,16 @@ class Songscontroller extends GetxController {
     }
   }
 
-  loadHivesongs() async {
-    songs = await hiveService.getAllMediaItems();
-  }
+  
 
   Future<void> loadSongs() async {
     try {
-      if (openAppFirst.value) {
+      
         songs = await getSongs();
-        await hiveService.addMediaItems(songs);
-        openAppFirst.value = false;
-        await box.put("openAppFirst", openAppFirst.value);
-        log("**********${songs.first.artUri}");
-        log(songs.first.artUri.toString());
-      } else {
-        final OnAudioQuery onAudioQuery = OnAudioQuery();
-
-        loadHivesongs();
-        sort(song: songs, sortType: sortypeallMusic!);
-        songModels = await onAudioQuery.querySongs(
-          sortType: audioQuerySongSortType(sortypeallMusic!),
-          orderType: audioQueryOrderType(sortypeallMusic!),
-        );
-
-        log("${songModels.length}");
-        log("${songs.length}");
-        log("==================${songs[0].artUri}");
-        log(songs[0].artUri.toString());
-      }
+        
+      
+       
+     
 
       update();
     } catch (e) {
@@ -141,11 +123,11 @@ class Songscontroller extends GetxController {
     isplaylist.value = await box.get("isplaylist") ?? false;
     isfavorite.value = await box.get("isfavorite") ?? false;
     isallmusic.value = await box.get("isallmusic") ?? true;
-    openAppFirst.value = await box.get("openAppFirst") ?? true;
+    
     sortypeallMusic = await box.get("sortTypeAllMusic") ?? "titelAS";
     sortypeFavorite = await box.get("sortTypePlaylists") ?? "titelAS";
     sortypePlaylists = await box.get("sortTypeFavorite") ?? "titelAS";
-    log("${openAppFirst.value}");
+    
     log("$sortypeallMusic");
 
     super.onInit();

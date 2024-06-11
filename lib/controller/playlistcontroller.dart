@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/function/sort.dart';
-import 'package:musiclotm/core/services/song_to_media_item.dart';
+import 'package:musiclotm/core/function/song_to_media_item.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 

@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,7 @@ import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/main.dart';
-import 'package:transparent_image/transparent_image.dart';
+import 'package:on_audio_query/on_audio_query.dart';
 
 class Favorite extends StatelessWidget {
   const Favorite({super.key});
@@ -99,20 +98,13 @@ class Favorite extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis),
                           ),
                           subtitle: Text(audio[index].artist!),
-                          leading: audio[index].artUri == null ||
-                                  audio[index].artUri == Uri.parse("null")
-                              ? const Icon(
-                                  Icons.music_note,
-                                )
-                              : FadeInImage(
-                                  height: 45,
-                                  width: 45,
-                                  filterQuality: FilterQuality.high,
-                                  image: FileImage(
-                                      File.fromUri(audio[index].artUri!)),
-                                  placeholder: MemoryImage(kTransparentImage),
-                                  fit: BoxFit.cover,
-                                ),
+                          leading: QueryArtworkWidget(
+                            id: int.tryParse(audio[index].displayDescription!)!,
+                            type: ArtworkType.AUDIO,
+                            nullArtworkWidget: const Icon(
+                              Icons.music_note,
+                            ),
+                          ),
                           onTap: () async {
                             if (songscontroller.isfavorite.isFalse) {
                               await playlistcontroller.handelfavorite();

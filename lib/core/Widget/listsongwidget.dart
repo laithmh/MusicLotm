@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +13,6 @@ import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class Songlistwidget extends StatelessWidget {
   const Songlistwidget({super.key});
@@ -83,7 +81,6 @@ class Songlistwidget extends StatelessWidget {
                           shrinkWrap: true,
                           itemCount: audio.length,
                           itemBuilder: (BuildContext context, int index) {
-                            
                             return Padding(
                                 padding: EdgeInsets.symmetric(
                                     vertical: 20.h, horizontal: 10.w),
@@ -142,23 +139,14 @@ class Songlistwidget extends StatelessWidget {
                                             style: const TextStyle(
                                                 overflow:
                                                     TextOverflow.ellipsis)),
-                                        leading: audio[index].artUri == null ||
-                                                audio[index].artUri ==
-                                                    Uri.parse("null")
-                                            ? const Icon(
-                                                Icons.music_note,
-                                              )
-                                            : FadeInImage(
-                                                height: 45,
-                                                width: 45,
-                                                filterQuality:
-                                                    FilterQuality.high,
-                                                image: FileImage(File.fromUri(
-                                                    audio[index].artUri!)),
-                                                placeholder: MemoryImage(
-                                                    kTransparentImage),
-                                                fit: BoxFit.cover,
-                                              ),
+                                        leading: QueryArtworkWidget(
+                                          id: int.tryParse(audio[index]
+                                              .displayDescription!)!,
+                                          type: ArtworkType.AUDIO,
+                                          nullArtworkWidget: const Icon(
+                                            Icons.music_note,
+                                          ),
+                                        ),
                                         onTap: () async {
                                           if (controller.isallmusic.isFalse) {
                                             await controller.handelallsongs();
