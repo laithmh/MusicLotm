@@ -28,7 +28,10 @@ class Timerow extends StatelessWidget {
             ? IconButton(onPressed: setloop, icon: const Icon(Icons.repeat))
             : IconButton(
                 onPressed: setloop, icon: const Icon(Icons.repeat_one))),
-        IconButton(onPressed: shuffle, icon: const Icon(Icons.shuffle)),
+        Obx(() => songHandler.isShuffel.value
+            ? IconButton(
+                onPressed: shuffle, icon: const Icon(Icons.arrow_forward))
+            : IconButton(onPressed: shuffle, icon: const Icon(Icons.shuffle))),
         Text(duraion)
       ],
     );

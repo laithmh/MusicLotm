@@ -9,7 +9,6 @@ import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/main.dart';
 
-
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   AnimationControllerX animationController = Get.put(AnimationControllerX());
   Songscontroller songscontroller = Get.put(Songscontroller());
@@ -19,8 +18,9 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   GenerateRandomNumbers generateRandomNumbers =
       Get.put(GenerateRandomNumbers());
   Searchcontroller searchController = Get.put(Searchcontroller());
-  
+
   RxBool isloop = false.obs;
+  RxBool isShuffel = false.obs;
   late List<UriAudioSource> song;
   UriAudioSource _createAudioSource(MediaItem item) {
     return ProgressiveAudioSource(Uri.parse(item.id));
@@ -35,7 +35,7 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   }
 
   void _broadcastState(PlaybackEvent event) {
-   playbackState.add(playbackState.value.copyWith(
+    playbackState.add(playbackState.value.copyWith(
       controls: [
         MediaControl.skipToPrevious,
         if (audioPlayer.playing) MediaControl.pause else MediaControl.play,
@@ -137,6 +137,17 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
       setRepeatMode(AudioServiceRepeatMode.one);
     } else {
       setRepeatMode(AudioServiceRepeatMode.all);
+    }
+  }
+
+  Future<void> toggleShuffle() async {
+    isShuffel.value = !audioPlayer.shuffleModeEnabled;
+    await audioPlayer.setShuffleModeEnabled(isShuffel.value);
+    if (isShuffel.value) {
+      await audioPlayer.shuffle();
+      Get.snackbar("", " shuffle on");
+    } else {
+      Get.snackbar("", "shuffle off");
     }
   }
 

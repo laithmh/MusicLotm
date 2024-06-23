@@ -42,7 +42,9 @@ class Addtoplaylistbutton extends StatelessWidget {
               songHandler.isloop.value = !songHandler.isloop.value;
               songHandler.looping();
             },
-            shuffle: () {},
+            shuffle: ()  {
+               songHandler.toggleShuffle();
+            },
           );
         });
   }

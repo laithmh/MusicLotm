@@ -5,9 +5,8 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
-
-import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/core/function/song_to_media_item.dart';
+import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/main.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,13 +16,12 @@ RxBool haspermission = false.obs;
 
 class Songscontroller extends GetxController {
   AnimationControllerX animationController = Get.find();
-  
+
   final ItemScrollController itemScrollController = ItemScrollController();
   late RxBool isplaylist = false.obs;
   late RxBool isfavorite = false.obs;
   late RxBool isallmusic = true.obs;
   late RxBool issearch = true.obs;
-
 
   String? sortypeallMusic;
   String? sortypePlaylists;
@@ -31,7 +29,7 @@ class Songscontroller extends GetxController {
   late int position = 0;
 
   List<SongModel> songModels = [];
-  List<MediaItem> songs = <MediaItem>[].obs;
+  late List<MediaItem> songs = <MediaItem>[].obs;
   RxInt currentSongPlayingIndex = 0.obs;
 
   Future<void> requestSongPermission() async {
@@ -84,16 +82,9 @@ class Songscontroller extends GetxController {
     }
   }
 
-  
-
   Future<void> loadSongs() async {
     try {
-      
-        songs = await getSongs();
-        
-      
-       
-     
+      songs = await getSongs();
 
       update();
     } catch (e) {
@@ -123,11 +114,11 @@ class Songscontroller extends GetxController {
     isplaylist.value = await box.get("isplaylist") ?? false;
     isfavorite.value = await box.get("isfavorite") ?? false;
     isallmusic.value = await box.get("isallmusic") ?? true;
-    
+
     sortypeallMusic = await box.get("sortTypeAllMusic") ?? "titelAS";
     sortypeFavorite = await box.get("sortTypePlaylists") ?? "titelAS";
     sortypePlaylists = await box.get("sortTypeFavorite") ?? "titelAS";
-    
+
     log("$sortypeallMusic");
 
     super.onInit();

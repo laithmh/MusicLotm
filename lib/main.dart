@@ -6,7 +6,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
-
 import 'package:musiclotm/core/routes/routes.dart';
 import 'package:musiclotm/core/theme/themes.dart';
 
@@ -18,7 +17,6 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   box = await Hive.openBox("music");
-  
 
   songHandler = await AudioService.init(
     builder: () => SongHandler(),
@@ -28,7 +26,6 @@ Future<void> main() async {
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,
       androidShowNotificationBadge: true,
-      
     ),
   );
 

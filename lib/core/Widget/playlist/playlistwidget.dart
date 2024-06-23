@@ -56,17 +56,6 @@ class Playlistwidget extends StatelessWidget {
             SizedBox(
               height: 20.h,
             ),
-            ListTile(
-              leading: Icon(
-                Icons.fireplace_rounded,
-                size: 100.w,
-              ),
-              title: Text(
-                "M O S T  W A T C H E D",
-                style: TextStyle(fontSize: 70.sp),
-              ),
-              onTap: () {},
-            ),
             const Divider(),
             SizedBox(
               height: 20.w,
