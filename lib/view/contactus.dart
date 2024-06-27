@@ -35,7 +35,10 @@ class ContactUs extends StatelessWidget {
                 onPressed: () {
                   controller.sendEmail();
                 },
-                child: const Text('Send'),
+                child: const Text(
+                  'Send',
+                  style: TextStyle(),
+                ),
               ),
             ],
           ),
