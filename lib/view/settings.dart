@@ -6,6 +6,7 @@ import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/core/Widget/settingsdialog.dart';
+import 'package:musiclotm/core/const/routesname.dart';
 
 class Srttings extends StatelessWidget {
   const Srttings({super.key});
@@ -95,6 +96,20 @@ class Srttings extends StatelessWidget {
                       showDialog(
                           context: context,
                           builder: (context) => const Settingsdialog());
+                    },
+                  )),
+              Padding(
+                  padding: EdgeInsets.only(left: 50.w, top: 50.h),
+                  child: ListTile(
+                    title: const Text(
+                      'C O N T A C T  V I A  E M A I L',
+                      style: TextStyle(),
+                    ),
+                    trailing: const Icon(Icons.email_outlined),
+                    onTap: () {
+                      Get.toNamed(
+                        Approutes.contact,
+                      );
                     },
                   )),
             ],
