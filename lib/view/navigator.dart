@@ -15,8 +15,8 @@ class Navigator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: Theme.of(context).colorScheme.background,
-      statusBarColor: Theme.of(context).colorScheme.background,
+      systemNavigationBarColor: Theme.of(context).colorScheme.onPrimary,
+      statusBarColor: Theme.of(context).colorScheme.onPrimary,
       systemNavigationBarContrastEnforced: true,
     ));
     return GetBuilder<Navigatorcontroller>(

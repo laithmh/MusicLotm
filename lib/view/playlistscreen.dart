@@ -26,12 +26,12 @@ class Playlistpage extends StatelessWidget {
     List<String> dropdownItems = ['titelAS', 'titelDS', 'dateAS', 'dateDS'];
     return FutureBuilder<List<MediaItem>>(
       future:
-          playlistcontroller.loadsongplaylist(playlistcontroller.playlistId),
+          playlistcontroller.loadSongsPlaylist(playlistcontroller.playlistId),
       initialData: const [],
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return Scaffold(
             bottomNavigationBar: const Navigationbarwidget(),
-            backgroundColor: Theme.of(context).colorScheme.background,
+            backgroundColor: Theme.of(context).colorScheme.onPrimary,
             appBar: AppBar(
               actions: [
                 Padding(
@@ -66,9 +66,9 @@ class Playlistpage extends StatelessWidget {
                 style: TextStyle(
                     letterSpacing: 5,
                     fontWeight: FontWeight.bold,
-                    fontSize: 75.sp),
+                    fontSize: 35.sp),
               ),
-              backgroundColor: Theme.of(context).colorScheme.background,
+              backgroundColor: Theme.of(context).colorScheme.onPrimary,
               centerTitle: true,
             ),
             body: GetBuilder<Playlistcontroller>(
@@ -137,7 +137,7 @@ class Playlistpage extends StatelessWidget {
                               if (songscontroller.isplaylist.isFalse ||
                                   playlistcontroller.playlistId !=
                                       playlistcontroller.newplaylistID) {
-                                await playlistcontroller.handelplaylists();
+                                await playlistcontroller.handlePlaylists();
                               }
                               await songHandler.skipToQueueItem(index);
                               await songHandler.play();

@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
@@ -6,208 +10,337 @@ import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
-import 'package:musiclotm/core/function/generaterandomnumber.dart';
+import 'package:musiclotm/controller/visualizer_controller.dart';
 import 'package:musiclotm/main.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
-  AnimationControllerX animationController = Get.put(AnimationControllerX());
-  Songscontroller songscontroller = Get.put(Songscontroller());
-  Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
-  Navigatorcontroller navigatorcontroller = Get.put(Navigatorcontroller());
+  // Get controllers lazily
+  AnimationControllerX get animationController =>
+      Get.find<AnimationControllerX>();
+  Songscontroller get songscontroller => Get.find<Songscontroller>();
+  Playlistcontroller get playlistcontroller => Get.find<Playlistcontroller>();
+  Navigatorcontroller get navigatorcontroller =>
+      Get.find<Navigatorcontroller>();
+  Searchcontroller get searchController => Get.find<Searchcontroller>();
+  VisualizerController get visualizerController =>
+      Get.find<VisualizerController>();
 
-  GenerateRandomNumbers generateRandomNumbers =
-      Get.put(GenerateRandomNumbers());
-  Searchcontroller searchController = Get.put(Searchcontroller());
+  // Use main.dart audioPlayer
 
   RxBool isloop = false.obs;
   RxBool isShuffel = false.obs;
-  late List<UriAudioSource> song;
+  late List<UriAudioSource> songSources;
+  late List<MediaItem> _currentQueue;
+
+  // Stream subscriptions
+  StreamSubscription<PlaybackEvent>? _playbackSubscription;
+  StreamSubscription<int?>? _currentIndexSubscription;
+  StreamSubscription<ProcessingState>? _processingStateSubscription;
+  StreamSubscription<Duration?>? _durationSubscription;
+
+  Stream<int?> get sessionIdStream => audioPlayer.androidAudioSessionIdStream;
+  int? get sessionId => audioPlayer.androidAudioSessionId;
+
   UriAudioSource _createAudioSource(MediaItem item) {
-    return ProgressiveAudioSource(Uri.parse(item.id));
+    return AudioSource.uri(Uri.parse(item.id), tag: item);
   }
 
   void _listenForCurrentSongIndexChanges() {
-    audioPlayer.currentIndexStream.listen((index) {
-      final playlist = queue.value;
-      if (index == null || playlist.isEmpty) return;
-      mediaItem.add(playlist[index]);
+    _currentIndexSubscription?.cancel();
+    _currentIndexSubscription = audioPlayer.currentIndexStream.listen((index) {
+      if (index == null || _currentQueue.isEmpty) return;
+      if (index >= 0 && index < _currentQueue.length) {
+        mediaItem.add(_currentQueue[index]);
+
+        // Update visualizer session
+        if (sessionId != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            visualizerController.updateSessionId(sessionId!);
+          });
+        }
+      }
     });
   }
 
   void _broadcastState(PlaybackEvent event) {
-    playbackState.add(playbackState.value.copyWith(
-      controls: [
-        MediaControl.skipToPrevious,
-        if (audioPlayer.playing) MediaControl.pause else MediaControl.play,
-        MediaControl.skipToNext,
-      ],
-      systemActions: {
-        MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
-      },
-      processingState: const {
-        ProcessingState.idle: AudioProcessingState.idle,
-        ProcessingState.loading: AudioProcessingState.loading,
-        ProcessingState.buffering: AudioProcessingState.buffering,
-        ProcessingState.ready: AudioProcessingState.ready,
-        ProcessingState.completed: AudioProcessingState.completed,
-      }[audioPlayer.processingState]!,
-      playing: audioPlayer.playing,
-      updatePosition: audioPlayer.position,
-      bufferedPosition: audioPlayer.bufferedPosition,
-      speed: audioPlayer.speed,
-      queueIndex: event.currentIndex,
-    ));
+    final controls = [
+      MediaControl.skipToPrevious,
+      if (audioPlayer.playing) MediaControl.pause else MediaControl.play,
+      MediaControl.skipToNext,
+    ];
+
+    final systemActions = {
+      MediaAction.seek,
+      MediaAction.seekForward,
+      MediaAction.seekBackward,
+    };
+
+    final processingState = const {
+      ProcessingState.idle: AudioProcessingState.idle,
+      ProcessingState.loading: AudioProcessingState.loading,
+      ProcessingState.buffering: AudioProcessingState.buffering,
+      ProcessingState.ready: AudioProcessingState.ready,
+      ProcessingState.completed: AudioProcessingState.completed,
+    }[audioPlayer.processingState];
+
+    if (processingState != null) {
+      playbackState.add(
+        playbackState.value.copyWith(
+          controls: controls,
+          systemActions: systemActions,
+          processingState: processingState,
+          playing: audioPlayer.playing,
+          updatePosition: audioPlayer.position,
+          bufferedPosition: audioPlayer.bufferedPosition,
+          speed: audioPlayer.speed,
+          queueIndex: event.currentIndex,
+        ),
+      );
+    }
   }
 
-  Future<void> initSongs({
-    required List<MediaItem> songs,
-  }) async {
-    audioPlayer.playbackEventStream.listen(_broadcastState);
+  Future<void> initSongs({required List<MediaItem> songs}) async {
+    log('Initializing ${songs.length} songs');
 
-    List<UriAudioSource> audioSource = songs.map(_createAudioSource).toList();
-    song = audioSource;
-    await audioPlayer
-        .setAudioSource(ConcatenatingAudioSource(children: audioSource));
+    if (songs.isEmpty) {
+      log('No songs to initialize');
+      return;
+    }
 
-    queue.value.clear();
-    queue.value.addAll(songs);
-    queue.add(queue.value);
+    await _cancelSubscriptions();
 
+    _currentQueue = List.from(songs);
+    songSources = songs.map(_createAudioSource).toList();
+
+    final audioSource = ConcatenatingAudioSource(children: songSources);
+
+    try {
+      await audioPlayer.setAudioSource(audioSource);
+      log('Audio source set successfully');
+    } catch (error) {
+      log('Error setting audio source: $error');
+      return;
+    }
+
+    queue.value = _currentQueue;
+
+    _playbackSubscription = audioPlayer.playbackEventStream.listen(
+      _broadcastState,
+    );
     _listenForCurrentSongIndexChanges();
-    looping();
-    audioPlayer.processingStateStream.listen((state) {
+
+    _processingStateSubscription = audioPlayer.processingStateStream.listen((
+      state,
+    ) {
+      log('Processing state: $state');
       if (state == ProcessingState.completed) {
         skipToNext();
       }
     });
-    animationController.stop();
+
+    await _applyCurrentRepeatAndShuffleModes();
+  }
+
+  Future<void> _applyCurrentRepeatAndShuffleModes() async {
+    LoopMode loopMode = isloop.isTrue ? LoopMode.one : LoopMode.all;
+    await audioPlayer.setLoopMode(loopMode);
+    await audioPlayer.setShuffleModeEnabled(isShuffel.value);
   }
 
   @override
-  Future<void> play() {
-    playlistcontroller.update();
+  Future<void> play() async {
+    try {
+      playlistcontroller.update();
 
-    animationController.start();
-
-    return audioPlayer.play();
+      await audioPlayer.play();
+    } catch (e) {
+      log('Error playing: $e');
+    }
   }
 
   @override
-  Future<void> pause() {
-    animationController.stop();
-
-    playlistcontroller.update();
-    return audioPlayer.pause();
+  Future<void> pause() async {
+    try {
+      playlistcontroller.update();
+      await audioPlayer.pause();
+    } catch (e) {
+      log('Error pausing: $e');
+    }
   }
 
   @override
-  Future<void> seek(Duration position) => audioPlayer.seek(position);
+  Future<void> seek(Duration position) async {
+    await audioPlayer.seek(position);
+  }
 
   @override
-  Future<void> skipToQueueItem(
-    int index,
-  ) async {
-    await audioPlayer.seek(Duration.zero, index: index);
-    playlistcontroller.update();
+  Future<void> skipToQueueItem(int index) async {
+    if (index < 0 || index >= _currentQueue.length) {
+      log('Invalid index: $index');
+      return;
+    }
+
+    try {
+      await audioPlayer.seek(Duration.zero, index: index);
+      playlistcontroller.update();
+    } catch (e) {
+      log('Error skipping to queue item: $e');
+    }
   }
 
   @override
   Future<void> setRepeatMode(AudioServiceRepeatMode repeatMode) async {
-    super.setRepeatMode(repeatMode);
+    await super.setRepeatMode(repeatMode);
+
+    LoopMode loopMode = LoopMode.all;
     switch (repeatMode) {
       case AudioServiceRepeatMode.all:
-        audioPlayer.setLoopMode(LoopMode.all);
+        loopMode = LoopMode.all;
         break;
       case AudioServiceRepeatMode.none:
-        audioPlayer.setLoopMode(LoopMode.off);
+        loopMode = LoopMode.off;
         break;
       case AudioServiceRepeatMode.one:
-        audioPlayer.setLoopMode(LoopMode.one);
+        loopMode = LoopMode.one;
         break;
       case AudioServiceRepeatMode.group:
-        audioPlayer.setLoopMode(LoopMode.all);
+        loopMode = LoopMode.all;
         break;
     }
+
+    await audioPlayer.setLoopMode(loopMode);
   }
 
-  Future<void> looping() async {
-    if (isloop.isTrue) {
-      setRepeatMode(AudioServiceRepeatMode.one);
-    } else {
-      setRepeatMode(AudioServiceRepeatMode.all);
-    }
+  Future<void> toggleLoop() async {
+    isloop.value = !isloop.value;
+    await _applyCurrentRepeatAndShuffleModes();
+
+    String message = isloop.value ? "Loop ON" : "Loop OFF";
+    Get.snackbar("Loop Mode", message, snackPosition: SnackPosition.BOTTOM);
   }
 
   Future<void> toggleShuffle() async {
-    isShuffel.value = !audioPlayer.shuffleModeEnabled;
+    isShuffel.value = !isShuffel.value;
     await audioPlayer.setShuffleModeEnabled(isShuffel.value);
+
     if (isShuffel.value) {
       await audioPlayer.shuffle();
-      Get.snackbar("", " shuffle on");
+      Get.snackbar(
+        "Shuffle",
+        "Shuffle ON",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } else {
-      Get.snackbar("", "shuffle off");
+      Get.snackbar(
+        "Shuffle",
+        "Shuffle OFF",
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
-  handlePlayBackNext() {
-    if (isloop.isTrue) {
-      bool playing = playbackState.value.playing;
-      animationController.reset();
-      if (!playing) {
-        animationController.stop();
+  Future<void> handlePlayBackNext() async {
+    try {
+      if (isloop.isTrue && _currentQueue.isNotEmpty) {
+        int currentIndex = audioPlayer.currentIndex ?? 0;
+        int nextIndex = (currentIndex + 1) % _currentQueue.length;
+        await skipToQueueItem(nextIndex);
       } else {
-        animationController.start();
+        await skipToNext();
       }
-      int index = (audioPlayer.currentIndex! + 1) % song.length;
-      skipToQueueItem(index);
-    } else {
-      skipToNext();
+    } catch (e) {
+      log('Error in handlePlayBackNext: $e');
     }
   }
 
-  handlePlayBackPrevious() {
-    if (isloop.isTrue) {
-      bool playing = playbackState.value.playing;
-      animationController.reset();
-      if (!playing) {
-        animationController.stop();
+  Future<void> handlePlayBackPrevious() async {
+    try {
+      if (isloop.isTrue && _currentQueue.isNotEmpty) {
+        int currentIndex = audioPlayer.currentIndex ?? 0;
+        int previousIndex;
+        if (currentIndex == 0) {
+          previousIndex = _currentQueue.length - 1;
+        } else {
+          previousIndex = currentIndex - 1;
+        }
+        await skipToQueueItem(previousIndex);
       } else {
-        animationController.start();
+        await skipToPrevious();
       }
-      if (audioPlayer.currentIndex == 0) {
-        skipToQueueItem(song.length - 1);
-      } else {
-        skipToQueueItem(audioPlayer.currentIndex! - 1);
-      }
-    } else {
-      skipToPrevious();
+    } catch (e) {
+      log('Error in handlePlayBackPrevious: $e');
     }
   }
 
   @override
-  Future<void> skipToNext() {
-    bool playing = playbackState.value.playing;
-    animationController.reset();
-    if (!playing) {
-      animationController.stop();
-    } else {
-      animationController.start();
+  Future<void> skipToNext() async {
+    try {
+      await audioPlayer.seekToNext();
+    } catch (e) {
+      log('Error skipping to next: $e');
     }
-    return audioPlayer.seekToNext();
   }
 
   @override
-  Future<void> skipToPrevious() {
-    bool playing = playbackState.value.playing;
-    animationController.reset();
-
-    if (!playing) {
-      animationController.stop();
-    } else {
-      animationController.start();
+  Future<void> skipToPrevious() async {
+    try {
+      await audioPlayer.seekToPrevious();
+    } catch (e) {
+      log('Error skipping to previous: $e');
     }
-    return audioPlayer.seekToPrevious();
+  }
+
+  Future<void> _cancelSubscriptions() async {
+    await _playbackSubscription?.cancel();
+    await _currentIndexSubscription?.cancel();
+    await _processingStateSubscription?.cancel();
+    await _durationSubscription?.cancel();
+
+    _playbackSubscription = null;
+    _currentIndexSubscription = null;
+    _processingStateSubscription = null;
+    _durationSubscription = null;
+  }
+
+  @override
+  Future<void> stop() async {
+    await _cancelSubscriptions();
+    await audioPlayer.stop();
+    return super.stop();
+  }
+
+  @override
+  Future<void> onTaskRemoved() async {
+    await _cancelSubscriptions();
+    await audioPlayer.stop();
+    return super.onTaskRemoved();
+  }
+
+  Future<void> updatequeue(List<MediaItem> newSongs) async {
+    if (newSongs.isEmpty) return;
+
+    _currentQueue = List.from(newSongs);
+    final newSources = newSongs.map(_createAudioSource).toList();
+
+    final currentPosition = audioPlayer.position;
+    final wasPlaying = audioPlayer.playing;
+    final currentIndex = audioPlayer.currentIndex;
+
+    try {
+      final newAudioSource = ConcatenatingAudioSource(children: newSources);
+      await audioPlayer.setAudioSource(newAudioSource);
+
+      if (currentIndex != null && currentIndex < newSongs.length) {
+        await audioPlayer.seek(currentPosition, index: currentIndex);
+      }
+
+      if (wasPlaying) {
+        await audioPlayer.play();
+      }
+
+      queue.value = _currentQueue;
+    } catch (e) {
+      log('Error updating queue: $e');
+    }
   }
 }

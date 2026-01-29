@@ -40,7 +40,7 @@ class Addtoplaylistbutton extends StatelessWidget {
                 : audioPlayer.duration.toString().split(".")[0],
             setloop: () {
               songHandler.isloop.value = !songHandler.isloop.value;
-              songHandler.looping();
+              songHandler.toggleLoop();
             },
             shuffle: ()  {
                songHandler.toggleShuffle();

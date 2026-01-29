@@ -11,10 +11,10 @@ class Playlistscreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: const Floatingbuttonwidget(),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(
           "P L A Y  L I S T",
-          style: TextStyle(fontSize: 75.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),

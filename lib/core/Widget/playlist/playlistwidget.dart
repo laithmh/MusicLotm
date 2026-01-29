@@ -15,9 +15,10 @@ class Playlistwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Navigatorcontroller navigatorcontroller = Get.find();
     Playlistcontroller playlistcontroller = Get.find();
-    return SizedBox(
+    return Container(
+      color: Theme.of(context).colorScheme.onPrimary,
       child: Padding(
-        padding: EdgeInsets.only(left: 75.w, right: 75.w, bottom: 50.h),
+        padding: EdgeInsets.only(left: 15.w, right: 15.w, bottom: 14.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -25,27 +26,27 @@ class Playlistwidget extends StatelessWidget {
             ListTile(
               leading: Icon(
                 Icons.music_note,
-                size: 100.w,
+                size: 30.w,
               ),
               title: Text(
                 "A L L  M U S I C",
-                style: TextStyle(fontSize: 70.sp),
+                style: TextStyle(fontSize: 20.sp),
               ),
               onTap: () {
                 navigatorcontroller.changepage(0);
               },
             ),
             SizedBox(
-              height: 20.h,
+              height: 10.h,
             ),
             ListTile(
               leading: Icon(
                 Icons.favorite,
-                size: 100.w,
+                size: 30.w,
               ),
               title: Text(
                 "F A V O R I T E",
-                style: TextStyle(fontSize: 70.sp),
+                style: TextStyle(fontSize: 20.sp),
               ),
               onTap: () {
                 Get.toNamed(
@@ -62,13 +63,13 @@ class Playlistwidget extends StatelessWidget {
             ),
             Text(
               "Y O U R   P L A Y L I S T :",
-              style: TextStyle(fontSize: 70.sp),
+              style: TextStyle(fontSize: 25.sp),
             ),
             Expanded(
               child: SizedBox(
-                  height: 400.h,
+                  height: 200.h,
                   child: FutureBuilder(
-                    future: playlistcontroller.loadplaylist(),
+                    future: playlistcontroller.loadPlaylists(),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       return GetBuilder<Playlistcontroller>(
                         builder: (controller) => ListView.builder(
@@ -86,7 +87,7 @@ class Playlistwidget extends StatelessWidget {
                                       children: [
                                         SlidableAction(
                                           onPressed: (context) {
-                                            controller.deleteplaylist(index,
+                                            controller.deletePlaylist(index,
                                                 controller.playlists[index].id);
                                           },
                                           borderRadius:

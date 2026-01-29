@@ -18,8 +18,8 @@ class CustomAlertDialog extends StatelessWidget {
     return AlertDialog(
       backgroundColor: Theme.of(context).colorScheme.primary,
       content: SizedBox(
-        height: 900.h,
-        width: 400.w,
+        height: 450.h,
+        width: 200.w,
         child: Column(
           children: [
             Expanded(
@@ -38,7 +38,7 @@ class CustomAlertDialog extends StatelessWidget {
                         controlAffinity: ListTileControlAffinity.leading,
                         checkboxShape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
-                        value: controller.listplaylisid.contains(playlist.id),
+                        value: controller.playlists.contains(playlist),
                         onChanged: (selected) {
                           controller.onPlaylistSelected(selected, playlist.id);
                         },
@@ -54,8 +54,8 @@ class CustomAlertDialog extends StatelessWidget {
                 MaterialButton(
                   onPressed: () {
                     Get.back();
-                    playlistcontroller.listplaylisid.clear();
-                    playlistcontroller.listsongsid.clear();
+                    playlistcontroller.playlists.clear();
+                    playlistcontroller.clearSongSelection();
                   },
                   color: Theme.of(context).colorScheme.primary,
                   child: const Text("cancel"),

@@ -17,9 +17,10 @@ class Search extends StatelessWidget {
     Songscontroller songscontroller = Get.find();
     Navigatorcontroller navigator = Get.find();
 
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 120.h, horizontal: 70.w),
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      body: Padding(
+        padding: EdgeInsets.symmetric(vertical: 60.h, horizontal: 35.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -61,7 +62,7 @@ class Search extends StatelessWidget {
 
                                 findCurrentSongPlayingIndex(
                                     controller.filteredData[index].id);
-                                await songscontroller.handelallsongs();
+                                await songscontroller.handleAllSongs();
                                 await songHandler.skipToQueueItem(
                                     songscontroller
                                         .currentSongPlayingIndex.value);

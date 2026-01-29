@@ -15,10 +15,10 @@ class Navigationbarwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetBuilder<Navigatorcontroller>(builder: (navigatorcontroller) {
       return CurvedNavigationBar(
-        height: 200.h,
+        height: 50.h,
         animationCurve: Curves.easeOut,
-        backgroundColor: Theme.of(context).colorScheme.background,
-        color: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).colorScheme.onPrimary,
         animationDuration: const Duration(milliseconds: 400),
         index: navigatorcontroller.currentindex,
         iconPadding: 0,
@@ -28,7 +28,7 @@ class Navigationbarwidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Icon(
                 Icons.queue_music,
-                size: 100.w,
+                size: 25.w,
               ),
             ),
           ),
@@ -37,31 +37,30 @@ class Navigationbarwidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Icon(
                 Icons.library_music,
-                size: 100.w,
+                size: 25.w,
               ),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(Icons.music_note, size: 100.w),
+              child: Icon(Icons.music_note, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(Icons.search, size: 100.w),
+              child: Icon(Icons.search, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(Icons.settings, size: 100.w),
+              child: Icon(Icons.settings, size: 25.w),
             ),
           ),
         ],
         onTap: (index) {
-          
           navigatorcontroller.changepage(index);
 
           log(navigatorcontroller.currentindex);

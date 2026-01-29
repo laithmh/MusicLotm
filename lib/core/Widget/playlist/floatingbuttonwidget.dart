@@ -9,7 +9,7 @@ class Floatingbuttonwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Playlistcontroller playlistcontroller = Get.put(Playlistcontroller());
+    Playlistcontroller playlistcontroller = Get.find<Playlistcontroller>();
 
     return FloatingActionButton(
       onPressed: () {
@@ -18,7 +18,7 @@ class Floatingbuttonwidget extends StatelessWidget {
           builder: (context) => AlertDialog(
             backgroundColor: Theme.of(context).colorScheme.primary,
             content: SizedBox(
-              height: 700.h,
+              height: 350.h,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

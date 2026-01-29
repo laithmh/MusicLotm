@@ -8,13 +8,14 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(Navigatorcontroller());
+    Get.find<Navigatorcontroller>();
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       body: Center(
         child: Icon(
           Icons.music_note,
-          size: 350.h,
+          size: 175.h,
         ),
       ),
     );

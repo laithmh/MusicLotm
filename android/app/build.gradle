@@ -31,18 +31,17 @@ if (keystorePropertiesFile.exists()) {
 
   
 android {
-    namespace "com.laithmh.musiclotm.musiclotm"
+    namespace "com.laithmh.musiclotm"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+   compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17 
+}
+kotlinOptions {
+    jvmTarget = '17'
+}
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -50,7 +49,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.laithmh.musiclotm.musiclotm"
+        applicationId "com.laithmh.musiclotm"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 24

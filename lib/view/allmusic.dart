@@ -14,85 +14,102 @@ class Allmusicscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AnimationControllerX animationControllerX = Get.find();
     Playlistcontroller playlistcontroller = Get.find();
-    return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: GetBuilder(
-          init: animationControllerX,
-          builder: (controller) {
-            return playlistcontroller.selectionMode == true
-                ? FloatingActionBubble(
-                    items: <Bubble>[
-                      Bubble(
-                        title: "Add to playlists",
-                        iconColor: Colors.black,
-                        bubbleColor: Theme.of(context).colorScheme.secondary,
-                        icon: Icons.playlist_add,
-                        titleStyle: const TextStyle(
-                          fontSize: 16,
-                        ),
-                        onPress: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) => CustomAlertDialog(
-                                    onPressed: () {
-                                      playlistcontroller
-                                          .addSongsToSelectedPlaylists();
 
-                                      Get.back();
-                                      animationControllerX.animationController
-                                          .reverse();
-                                      playlistcontroller.toggleSelection();
-                                    },
-                                  ));
-                        },
+    return Scaffold(
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: GetBuilder<AnimationControllerX>(
+        init: animationControllerX,
+        builder: (controller) {
+          return playlistcontroller.selectionMode == true
+              ? FloatingActionBubble(
+                  items: <Bubble>[
+                    Bubble(
+                      title: "Add to playlists",
+                      iconColor: Colors.black,
+                      bubbleColor: Theme.of(context).colorScheme.secondary,
+                      icon: Icons.playlist_add,
+                      titleStyle: TextStyle(
+                        fontSize: 8.sp, // Added: Responsive font size
+                        color: Colors.white, // Added: Explicit text color
                       ),
-                      // Floating action menu item
-                      Bubble(
-                        title: "select all ",
-                        iconColor: Colors.black,
-                        bubbleColor: Theme.of(context).colorScheme.secondary,
-                        icon: Icons.select_all,
-                        titleStyle: const TextStyle(
-                          fontSize: 16,
-                        ),
-                        onPress: () {
-                          controller.animationController.reverse();
-                        },
+                      onPress: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => CustomAlertDialog(
+                            onPressed: () {
+                              playlistcontroller.addSongsToSelectedPlaylists();
+                              Get.back();
+                              controller
+                                  .reverseAnimation(); // Fixed: Use proper method
+                              playlistcontroller.toggleSelection();
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    Bubble(
+                      title: "Select all",
+                      iconColor: Colors.black,
+                      bubbleColor: Theme.of(context).colorScheme.secondary,
+                      icon: Icons.select_all,
+                      titleStyle: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.white,
                       ),
-                      //Floating action menu item
-                      Bubble(
-                        title: "cancel",
-                        iconColor: Colors.black,
-                        bubbleColor: Theme.of(context).colorScheme.secondary,
-                        icon: Icons.close,
-                        titleStyle: const TextStyle(
-                          fontSize: 16,
-                        ),
-                        onPress: () {
-                          playlistcontroller.listsongsid.clear();
-                          controller.animationController.reverse();
-                          playlistcontroller.toggleSelection();
-                        },
+                      onPress: () {
+                        // Select all songs
+                        for (var song
+                            in playlistcontroller.selectedSongTitles) {
+                          playlistcontroller.onSongSelected(true, song);
+                        }
+                        controller
+                            .reverseAnimation(); // Fixed: Use proper method
+                      },
+                    ),
+                    Bubble(
+                      title: "Cancel",
+                      iconColor: Colors.black,
+                      bubbleColor: Theme.of(context).colorScheme.secondary,
+                      icon: Icons.close,
+                      titleStyle: TextStyle(
+                        fontSize: 8.sp,
+                        color: Colors.white,
                       ),
-                    ],
-                    animatedIconData: AnimatedIcons.menu_arrow,
-                    animation: controller.animation,
-                    onPress: controller.toggleAnimation,
-                    backGroundColor: Theme.of(context).colorScheme.secondary,
-                    iconColor: Theme.of(context).colorScheme.inversePrimary,
-                  )
-                : const SizedBox.shrink();
-          },
-        ),
-        backgroundColor: Theme.of(context).colorScheme.background,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          title: Text(
-            "A L L  M U S I C",
-            style: TextStyle(fontSize: 75.sp, fontWeight: FontWeight.bold),
+                      onPress: () {
+                        playlistcontroller.clearSongSelection();
+                        controller
+                            .reverseAnimation(); // Fixed: Use proper method
+                        playlistcontroller.toggleSelection();
+                      },
+                    ),
+                  ],
+                  animatedIconData: AnimatedIcons.menu_arrow,
+                  animation:
+                      controller.animation, // Fixed: Use the correct animation
+                  onPress: controller.toggleAnimation,
+                  backGroundColor: Theme.of(context).colorScheme.secondary,
+                  iconColor: Theme.of(context).colorScheme.inversePrimary,
+                )
+              : const SizedBox.shrink();
+        },
+      ),
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        title: Text(
+          "A L L  M U S I C",
+          style: TextStyle(
+            fontSize: 25.sp,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context)
+                .colorScheme
+                .primary, // Added: Theme-aware color
           ),
-          centerTitle: true,
         ),
-        body: const SingleChildScrollView(child: Songlistwidget()));
+        centerTitle: true,
+        elevation: 0, // Added: Remove shadow for cleaner look
+      ),
+      body: Songlistwidget(),
+    );
   }
 }

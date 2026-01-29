@@ -12,11 +12,11 @@ class Settingsdialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Settingscontroller settingscontroller = Get.put(Settingscontroller());
+    Settingscontroller settingscontroller = Get.find<Settingscontroller>();
 
-    return Obx(() => settingscontroller.timerset.isTrue
+    return Obx(() => settingscontroller.timerSet.isTrue
         ? Padding(
-            padding: EdgeInsets.only(left: 80.w),
+            padding: EdgeInsets.only(left: 40.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -30,12 +30,12 @@ class Settingsdialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: 60.w,
+                  width: 30.w,
                 ),
                 MaterialButton(
                   onPressed: () {
-                    settingscontroller.timerset.value = false;
-                    settingscontroller.timerends.value = true;
+                    settingscontroller.timerSet.value = false;
+                    settingscontroller.timerEnds.value = true;
                     settingscontroller.time = 0;
                     Get.back();
                   },
@@ -48,14 +48,14 @@ class Settingsdialog extends StatelessWidget {
         : AlertDialog(
             backgroundColor: Theme.of(context).colorScheme.primary,
             content: SizedBox(
-              height: 650.h,
-              width: 400.w,
+              height: 325.h,
+              width: 200.w,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text("S E T  T I M E R  T O  S L E E P"),
                   SizedBox(
-                    height: 50.h,
+                    height: 25.h,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -66,12 +66,12 @@ class Settingsdialog extends StatelessWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .inversePrimary)),
-                        height: 200.h,
-                        width: 200.w,
+                        height: 100.h,
+                        width: 100.w,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
-                            controller: settingscontroller.hcontroller,
+                            controller: settingscontroller.hourController,
                             decoration: const InputDecoration(hintText: "H"),
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.number,
@@ -83,11 +83,11 @@ class Settingsdialog extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        width: 50.w,
+                        width: 25.w,
                       ),
                       const Text(":"),
                       SizedBox(
-                        width: 50.w,
+                        width: 25.w,
                       ),
                       Container(
                         decoration: BoxDecoration(
@@ -95,12 +95,12 @@ class Settingsdialog extends StatelessWidget {
                                 color: Theme.of(context)
                                     .colorScheme
                                     .inversePrimary)),
-                        height: 200.h,
-                        width: 200.w,
+                        height: 100.h,
+                        width: 100.w,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
-                            controller: settingscontroller.mcontroller,
+                            controller: settingscontroller.minuteController,
                             decoration: const InputDecoration(hintText: "M"),
                             textAlign: TextAlign.center,
                             keyboardType: TextInputType.number,
@@ -114,14 +114,14 @@ class Settingsdialog extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: 50.h,
+                    height: 25.h,
                   ),
                   Row(
                     children: [
                       MaterialButton(
                         onPressed: () {
-                          settingscontroller.timerset.value = false;
-                          settingscontroller.timerends.value = true;
+                          settingscontroller.timerSet.value = false;
+                          settingscontroller.timerEnds.value = true;
                           settingscontroller.time = 0;
                           Get.back();
                         },
@@ -129,16 +129,16 @@ class Settingsdialog extends StatelessWidget {
                         child: const Text("C A N C E L "),
                       ),
                       SizedBox(
-                        width: 50.w,
+                        width: 25.w,
                       ),
                       MaterialButton(
                         onPressed: () {
                           settingscontroller.time =
-                              settingscontroller.settimer();
-                          settingscontroller.timerset.value = true;
+                              settingscontroller.setTimer();
+                          settingscontroller.timerSet.value = true;
                           log("${settingscontroller.time}");
-                          settingscontroller.mcontroller.clear();
-                          settingscontroller.hcontroller.clear();
+                          settingscontroller.minuteController.clear();
+                          settingscontroller.hourController.clear();
                           Get.back();
                         },
                         color: Theme.of(context).colorScheme.primary,

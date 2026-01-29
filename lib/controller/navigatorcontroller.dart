@@ -10,7 +10,7 @@ class Navigatorcontroller extends GetxController {
 
   changepage(int i) {
     if (i == 0) {
-      songscontroller.scroll();
+      songscontroller.scrollToCurrentSong();
     }
     currentindex = i;
 
@@ -18,7 +18,7 @@ class Navigatorcontroller extends GetxController {
   }
 
   timer() {
-    Timer(const Duration(seconds: 5), () {
+    Timer(const Duration(seconds: 3), () {
       Get.offAllNamed(
         Approutes.navbar,
       );

@@ -14,23 +14,24 @@ class Srttings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Settingscontroller settingscontroller = Get.find();
-    return SafeArea(
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 60.h),
+          padding: EdgeInsets.symmetric(vertical: 30.h),
           child: Column(
             children: [
               Text(
                 'S E T T I N G S',
-                style: TextStyle(fontSize: 75.sp, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
               ),
               const SizedBox(
                 height: 15,
               ),
               Obx(
-                () => settingscontroller.timerset.isTrue
+                () => settingscontroller.timerSet.isTrue
                     ? Padding(
-                        padding: EdgeInsets.only(left: 40.w),
+                        padding: EdgeInsets.only(left: 20.w),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -43,9 +44,9 @@ class Srttings extends StatelessWidget {
                                   minutes: settingscontroller.time,
                                 )),
                                 onEnd: () {
-                                  if (settingscontroller.timerends.isFalse) {
+                                  if (settingscontroller.timerEnds.isFalse) {
                                     log("Timer finished");
-                                    settingscontroller.timerset.value = false;
+                                    settingscontroller.timerSet.value = false;
 
                                     settingscontroller.exitAppWithDelay();
                                   } else {
@@ -55,7 +56,7 @@ class Srttings extends StatelessWidget {
                               ),
                             ),
                             SizedBox(
-                              width: 40.w,
+                              width: 20.w,
                             ),
                             const Text("T O  S L E E P")
                           ],
@@ -64,11 +65,11 @@ class Srttings extends StatelessWidget {
                     : const Text(""),
               ),
               SizedBox(
-                height: 25.h,
+                height: 12.h,
               ),
               const Divider(),
               Padding(
-                padding: EdgeInsets.only(left: 50.w, top: 50.h),
+                padding: EdgeInsets.only(left: 25.w, top: 25.h),
                 child: ListTile(
                   title: const Text(
                     'D A R K M O D E',
@@ -85,7 +86,7 @@ class Srttings extends StatelessWidget {
                 ),
               ),
               Padding(
-                  padding: EdgeInsets.only(left: 50.w, top: 50.h),
+                  padding: EdgeInsets.only(left: 25.w, top: 25.h),
                   child: ListTile(
                     title: const Text(
                       'S L E E P  T I M E R',
@@ -99,7 +100,7 @@ class Srttings extends StatelessWidget {
                     },
                   )),
               Padding(
-                  padding: EdgeInsets.only(left: 50.w, top: 50.h),
+                  padding: EdgeInsets.only(left: 25.w, top: 25.h),
                   child: ListTile(
                     title: const Text(
                       'C O N T A C T  V I A  E M A I L',

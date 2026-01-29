@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
-
 import 'package:musiclotm/core/const/routesname.dart';
+import 'package:musiclotm/core/middeleware/middeleware.dart';
 import 'package:musiclotm/view/allmusic.dart';
-import 'package:musiclotm/view/contactus.dart';
 import 'package:musiclotm/view/favorite.dart';
 import 'package:musiclotm/view/navigator.dart';
 import 'package:musiclotm/view/playlistscreen.dart';
@@ -15,39 +14,19 @@ List<GetPage<dynamic>>? routes = [
   GetPage(
     name: "/",
     page: () => const SplashScreen(),
+    middlewares: [Mymiddlware()],
   ),
-  GetPage(
-    name: Approutes.navbar,
-    page: () => const Navigator(),
-  ),
-  GetPage(
-    name: Approutes.allmusic,
-    page: () => const Allmusicscreen(),
-  ),
-  GetPage(
-    name: Approutes.play,
-    page: () => const Playscreen(),
-  ),
-  GetPage(
-    name: Approutes.playlistscreen,
-    page: () => const Playlistpage(),
-  ),
-  GetPage(
-    name: Approutes.search,
-    page: () => const Search(),
-  ),
-  GetPage(
-    name: Approutes.settings,
-    page: () => const Srttings(),
-  ),
-  GetPage(
-    name: Approutes.favorite,
-    page: () => const Favorite(),
-  ),
- GetPage(
-    name: Approutes.contact,
-    page: () => const ContactUs(),
-  ),
+  GetPage(name: Approutes.navbar, page: () => const Navigator()),
+  GetPage(name: Approutes.allmusic, page: () => const Allmusicscreen()),
+  GetPage(name: Approutes.play, page: () => const Playscreen()),
+  GetPage(name: Approutes.playlistscreen, page: () => const Playlistpage()),
+  GetPage(name: Approutes.search, page: () => const Search()),
+  GetPage(name: Approutes.settings, page: () => const Srttings()),
+  GetPage(name: Approutes.favorite, page: () => const Favorite()),
+  //  GetPage(
+  //     name: Approutes.contact,
+  //     page: () => const ContactUs(),
+  //   ),
 
   // GetPage(name: navbar, page: ()=>const Navigationbarwidget(),),
   // GetPage(name: navbar, page: ()=>const Navigationbarwidget(),),

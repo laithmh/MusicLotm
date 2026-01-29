@@ -12,6 +12,7 @@ class Customaudioimage extends StatelessWidget {
   final String title;
   final Uri? artUri;
   final MediaItem song;
+
   const Customaudioimage({
     super.key,
     required this.artist,
@@ -26,79 +27,94 @@ class Customaudioimage extends StatelessWidget {
 
     return Column(
       children: [
+        
         Neubox(
-          borderRadius: BorderRadius.circular(1000.r),
+          height: 250.h,
+          width: 250.w,
+          borderRadius: BorderRadius.circular(500.r),
           child: RotationTransition(
-            turns: animationControllerX.rotationcontroller,
+            turns: animationControllerX
+                .animation, // Fixed: Use the correct animation property
             child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ClipRRect(
-                  clipBehavior: Clip.antiAlias,
-                  borderRadius: BorderRadius.circular(1000),
-                  child: QueryArtworkWidget(
-                    artworkBorder: BorderRadius.circular(1000),
-                    id: int.parse(song.displayDescription!),
-                    type: ArtworkType.AUDIO,
-                    artworkHeight: 1080.h,
-                    artworkWidth: 1080.h,
-                    artworkQuality: FilterQuality.high,
-                    artworkFit: BoxFit.cover,
-                    nullArtworkWidget: Icon(
-                      Icons.music_note,
-                      size: 1080.h,
-                    ),
-                  ),
-                )),
+              padding: const EdgeInsets.all(10),
+              child: ClipRRect(
+                clipBehavior: Clip.antiAlias,
+                borderRadius: BorderRadius.circular(1000),
+                child: QueryArtworkWidget(
+                  key: ValueKey(
+                    song.id,
+                  ), // Use a key so Flutter knows specifically which song this is
+                  keepOldArtwork: true,
+                  artworkBorder: BorderRadius.circular(1000),
+                  id: int.tryParse(song.id) ?? 0,
+                  type: ArtworkType.AUDIO,
+                  artworkHeight: 540.h,
+                  artworkWidth: 540.h,
+                  artworkQuality: FilterQuality.high,
+                  artworkFit: BoxFit.cover,
+                  nullArtworkWidget: Icon(Icons.music_note, size: 100.h),
+                ),
+              ),
+            ),
           ),
         ),
-        SizedBox(
-          height: 40.h,
-        ),
+        SizedBox(height: 20.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Column(
-              children: [
-                SizedBox(
-                  width: 700.w,
-                  height: 100.h,
-                  child: Text(
-                    title,
-                    style: const TextStyle(
+            Expanded(
+              // Added: Proper expansion for title area
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // Added: Better alignment
+                children: [
+                  SizedBox(
+                    width: 350.w,
+                    height: 50.h,
+                    child: Text(
+                      title,
+                      maxLines: 1, // Added: Explicit max lines
                       overflow: TextOverflow.ellipsis,
-                      fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                        // Removed const: Widget rebuilds may need different instances
+                        fontSize: 20.sp, // Added: Responsive font size
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  artist,
-                  style: const TextStyle(
+                  Text(
+                    artist,
+                    maxLines: 1, // Added: Explicit max lines
                     overflow: TextOverflow.ellipsis,
-                    fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      // Removed const: Widget rebuilds may need different instances
+                      fontSize: 15.sp, // Added: Responsive font size
+                      fontWeight: FontWeight
+                          .normal, // Changed: Normal weight for artist
+                      color: Theme.of(context).textTheme.bodyMedium?.color
+                          ?.withValues(alpha: 0.8), // Added: Subtle color
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             GetBuilder<Playlistcontroller>(
               builder: (controller) => IconButton(
-                  onPressed: () {
-                    controller.favoritetoggel(song);
-                  },
-                  icon: controller.isfavorite.containsKey(song.id)
-                      ? controller.isfavorite[song.id]!
-                          ? const Icon(
-                              Icons.favorite,
-                              color: Colors.red,
-                            )
-                          : const Icon(
-                              Icons.favorite_border,
-                              color: Colors.red,
-                            )
-                      : const Icon(
-                          Icons.favorite_border,
-                          color: Colors.red,
-                        )),
-            )
+                onPressed: () {
+                  controller.toggleFavorite(song);
+                },
+                icon: Icon(
+                  controller.isfavorite.containsKey(song.id)
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  color: controller.isfavorite.containsKey(song.id)
+                      ? Colors.red
+                      : Theme.of(
+                          context,
+                        ).iconTheme.color, // Added: Theme-aware color
+                ),
+              ),
+            ),
           ],
         ),
       ],

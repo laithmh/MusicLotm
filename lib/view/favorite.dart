@@ -25,7 +25,7 @@ class Favorite extends StatelessWidget {
     List<String> dropdownItems = ['titelAS', 'titelDS', 'dateAS', 'dateDS'];
     return Scaffold(
       bottomNavigationBar: const Navigationbarwidget(),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         actions: [
           Padding(
@@ -51,15 +51,15 @@ class Favorite extends StatelessWidget {
             ),
           ),
         ],
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(
           "F A V O R I T E",
-          style: TextStyle(fontSize: 75.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
       body: FutureBuilder<RxList<MediaItem>>(
-        future: playlistcontroller.loadefavorites(),
+        future: playlistcontroller.loadFavorites(),
         initialData: const <MediaItem>[].obs,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           List<MediaItem> audio = snapshot.data ?? [];
@@ -69,7 +69,7 @@ class Favorite extends StatelessWidget {
               return Padding(
                   key: Key(audio[index].id),
                   padding:
-                      EdgeInsets.symmetric(vertical: 20.h, horizontal: 10.w),
+                      EdgeInsets.symmetric(vertical: 10.h, horizontal: 5.w),
                   child: GetBuilder<Playlistcontroller>(
                     builder: (controller) {
                       return Neubox(
@@ -107,7 +107,7 @@ class Favorite extends StatelessWidget {
                           ),
                           onTap: () async {
                             if (songscontroller.isfavorite.isFalse) {
-                              await playlistcontroller.handelfavorite();
+                              await playlistcontroller.handleFavorites();
                             }
                             songHandler.skipToQueueItem(index);
                             songscontroller.isallmusic.value = false;

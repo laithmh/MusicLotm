@@ -29,11 +29,11 @@ class Customplaybutton extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     child: Icon(
                       Icons.skip_previous,
-                      size: 150.sp,
+                      size: 50.sp,
                     ),
                   )),
               SizedBox(
-                width: 70.w,
+                width: 25.w,
               ),
               GestureDetector(
                   onTap: () {
@@ -44,19 +44,19 @@ class Customplaybutton extends StatelessWidget {
                     }
                   },
                   child: Neubox(
-                    borderRadius: BorderRadius.circular(500),
+                    borderRadius: BorderRadius.circular(250),
                     child: playing
                         ? Icon(
                             Icons.pause_rounded,
-                            size: 200.sp,
+                            size: 70.sp,
                           )
                         : Icon(
                             Icons.play_arrow_rounded,
-                            size: 200.sp,
+                            size: 70.sp,
                           ),
                   )),
               SizedBox(
-                width: 70.w,
+                width: 25.w,
               ),
               GestureDetector(
                   onTap: () {
@@ -68,7 +68,7 @@ class Customplaybutton extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       child: Icon(
                         Icons.skip_next,
-                        size: 150.sp,
+                        size: 50.sp,
                       ))),
             ],
           );

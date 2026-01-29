@@ -16,7 +16,7 @@ class Customappbar extends StatelessWidget {
                           icon: const Icon(Icons.arrow_back)),
                       const Text(
                         "P L A Y",
-                        style: TextStyle(fontSize: 30),
+                        style: TextStyle(fontSize: 15),
                       ),
                       IconButton(onPressed: () {}, icon: const Icon(Icons.menu))
                     ],

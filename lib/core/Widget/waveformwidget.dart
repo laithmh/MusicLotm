@@ -33,7 +33,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                 children: [
                   RectangleWaveform(
                     samples: generateRandomNumbers.samples,
-                    height: 150.h,
+                    height: 60.h,
                     width: MediaQuery.of(context).size.width - 100,
                     maxDuration: Duration(seconds: maxDuration ?? 0),
                     elapsedDuration: position ?? const Duration(seconds: 0),
@@ -42,26 +42,25 @@ class PolygonWaveformcustom extends StatelessWidget {
                     showActiveWaveform: true,
                     absolute: true,
                     isRoundedRectangle: true,
-                    activeBorderColor: Theme.of(context).colorScheme.background,
+                    activeBorderColor: Theme.of(context).colorScheme.onPrimary,
                     inactiveBorderColor:
-                        Theme.of(context).colorScheme.background,
-                        
+                        Theme.of(context).colorScheme.onPrimary,
                   ),
                   RectangleWaveform(
                     samples: generateRandomNumbers.samples,
-                    height: 150.h,
+                    height: 60.h,
                     width: MediaQuery.of(context).size.width - 100,
                     maxDuration: Duration(seconds: maxDuration ?? 0),
                     elapsedDuration: position ?? const Duration(seconds: 0),
-                    inactiveColor: Theme.of(context).colorScheme.background,
+                    inactiveColor: Theme.of(context).colorScheme.onPrimary,
                     activeColor: Theme.of(context).colorScheme.primary,
                     showActiveWaveform: true,
                     absolute: true,
                     isRoundedRectangle: true,
                     invert: true,
-                    activeBorderColor: Theme.of(context).colorScheme.background,
+                    activeBorderColor: Theme.of(context).colorScheme.onPrimary,
                     inactiveBorderColor:
-                        Theme.of(context).colorScheme.background,
+                        Theme.of(context).colorScheme.onPrimary,
                     borderWidth: 0,
                   ),
                 ],
@@ -77,8 +76,8 @@ class PolygonWaveformcustom extends StatelessWidget {
                   onChanged: (position) {
                     songHandler.seek(position.seconds);
                   },
-                  activeColor: Theme.of(context).colorScheme.background,
-                  inactiveColor: Theme.of(context).colorScheme.background,
+                  activeColor: Theme.of(context).colorScheme.onPrimary,
+                  inactiveColor: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
             ],
