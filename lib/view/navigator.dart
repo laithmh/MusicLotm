@@ -26,12 +26,12 @@ class Navigator extends StatelessWidget {
             bottomNavigationBar: const Navigationbarwidget(),
             body: IndexedStack(
               index: controller.currentindex,
-              children: const [
+              children:  [
                 Allmusicscreen(),
                 Playlistscreen(),
                 Playscreen(),
-                Search(),
-                Srttings(),
+                SearchScreen(),
+                Settings(),
               ],
             ),
           ),

@@ -4,135 +4,135 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
+import 'package:musiclotm/main.dart';
 
 class Searchcontroller extends GetxController {
-  late final Songscontroller songscontroller;
-  final TextEditingController controller = TextEditingController();
-  
-  final RxList<MediaItem> filteredData = <MediaItem>[].obs;
+  final Songscontroller songsController = Get.find();
+  final TextEditingController textController = TextEditingController();
+
+  final RxList<MediaItem> filteredSongs = <MediaItem>[].obs;
   final RxString _searchQuery = ''.obs;
-  
+  final RxBool _isSearching = false.obs;
+  final RxBool _hasError = false.obs;
+
   String get searchQuery => _searchQuery.value;
-  
+  bool get isSearching => _isSearching.value;
+  bool get hasError => _hasError.value;
+  bool get hasResults => filteredSongs.isNotEmpty;
+  int get resultCount => filteredSongs.length;
+
+  Timer? _debounceTimer;
+  static const Duration debounceDelay = Duration(milliseconds: 300);
+
   @override
   void onInit() {
     super.onInit();
-    songscontroller = Get.find<Songscontroller>(); // Use find instead of put
-    
-    // Listen for changes in the main songs list and re-filter if needed
-    ever(songscontroller.songs, (_) => _reFilterIfNeeded());
+    _setupSearchListener();
+  }
+
+  void _setupSearchListener() {
+    ever(songsController.songs, (_) => _reFilterIfNeeded());
   }
 
   void _reFilterIfNeeded() {
     if (_searchQuery.value.isNotEmpty) {
-      _performSearch(_searchQuery.value);
+      performSearch(_searchQuery.value);
     }
   }
 
-  void filterData(String songName) {
-    _searchQuery.value = songName;
-    
-    if (songName.trim().isEmpty) {
-      filteredData.clear();
+  void search(String query) {
+    _debounceTimer?.cancel();
+
+    _searchQuery.value = query.trim();
+
+    if (query.isEmpty) {
+      filteredSongs.clear();
+      _isSearching.value = false;
       return;
     }
-    
-    _performSearch(songName.toLowerCase());
-  }
 
-  void _performSearch(String searchTerm) {
-    try {
-      final results = songscontroller.songs
-          .where((item) => item.title.toLowerCase().contains(searchTerm))
-          .toList();
-      
-      filteredData.assignAll(results);
-    } catch (e) {
-      debugPrint('Error filtering search data: $e');
-      filteredData.clear();
-    }
-  }
+    _isSearching.value = true;
+    _hasError.value = false;
 
-  // Debounced search for better performance
-  Timer? _debounceTimer;
-  
-  void debouncedFilterData(String songName, {Duration delay = const Duration(milliseconds: 300)}) {
-    _debounceTimer?.cancel();
-    
-    _debounceTimer = Timer(delay, () {
-      filterData(songName);
+    _debounceTimer = Timer(debounceDelay, () {
+      performSearch(query);
     });
   }
 
-  // Clear search results
-  void clearSearch() {
-    _searchQuery.value = '';
-    filteredData.clear();
-    controller.clear();
-  }
-
-  // Get search results count
-  int get searchResultCount => filteredData.length;
-
-  // Check if search has results
-  bool get hasResults => filteredData.isNotEmpty;
-
-  // Check if search is active
-  bool get isSearching => _searchQuery.value.isNotEmpty;
-
-  // Perform advanced search with multiple criteria
-  void advancedFilter({
-    String? title,
-    String? artist,
-    String? album,
-  }) {
-    final searchTerm = (title ?? '').toLowerCase();
-    final artistTerm = (artist ?? '').toLowerCase();
-    final albumTerm = (album ?? '').toLowerCase();
-
-    final results = songscontroller.songs.where((item) {
-      bool matchesTitle = title == null || 
-          item.title.toLowerCase().contains(searchTerm);
-      bool matchesArtist = artist == null || 
-          (item.artist?.toLowerCase().contains(artistTerm) ?? false);
-      bool matchesAlbum = album == null || 
-          (item.album?.toLowerCase().contains(albumTerm) ?? false);
-
-      return matchesTitle || matchesArtist || matchesAlbum;
-    }).toList();
-
-    filteredData.assignAll(results);
-  }
-
-  // Search with case sensitivity option
-  void caseSensitiveFilter(String songName, {bool caseSensitive = false}) {
-    _searchQuery.value = songName;
-    
-    if (songName.trim().isEmpty) {
-      filteredData.clear();
-      return;
-    }
-
+  void performSearch(String query) {
     try {
-      final results = songscontroller.songs.where((item) {
-        if (caseSensitive) {
-          return item.title.contains(songName);
-        } else {
-          return item.title.toLowerCase().contains(songName.toLowerCase());
-        }
+      final searchTerm = query.toLowerCase();
+
+      final results = songsController.songs.where((song) {
+        return song.title.toLowerCase().contains(searchTerm) ||
+            (song.artist?.toLowerCase().contains(searchTerm) ?? false) ||
+            (song.album?.toLowerCase().contains(searchTerm) ?? false);
       }).toList();
-      
-      filteredData.assignAll(results);
+
+      filteredSongs.assignAll(results);
+      _isSearching.value = false;
     } catch (e) {
-      debugPrint('Error in case-sensitive search: $e');
-      filteredData.clear();
+      debugPrint('Search error: $e');
+      filteredSongs.clear();
+      _hasError.value = true;
+      _isSearching.value = false;
     }
+  }
+
+  Future<void> playSongFromSearch(MediaItem song) async {
+    try {
+      // Find index in all songs
+      final allSongs = songsController.songs;
+      final songIndex = allSongs.indexWhere((s) => s.id == song.id);
+
+      if (songIndex != -1) {
+        // Play the song
+        await songsController.handleAllSongs();
+        await songHandler.skipToQueueItem(songIndex);
+        songHandler.play();
+      }
+    } catch (e) {
+      debugPrint('Error playing song from search: $e');
+      Get.snackbar(
+        'Error',
+        'Could not play song',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  void clear() {
+    _searchQuery.value = '';
+    filteredSongs.clear();
+    textController.clear();
+    _isSearching.value = false;
+    _hasError.value = false;
+  }
+
+  // Optional: Get search suggestions
+  List<String> getSearchSuggestions(String query, {int limit = 5}) {
+    if (query.isEmpty) return [];
+
+    final searchTerm = query.toLowerCase();
+    final suggestions = <String>{};
+
+    for (final song in songsController.songs) {
+      if (song.title.toLowerCase().contains(searchTerm)) {
+        suggestions.add(song.title);
+      }
+      if (song.artist?.toLowerCase().contains(searchTerm) ?? false) {
+        suggestions.add(song.artist!);
+      }
+      if (suggestions.length >= limit) break;
+    }
+
+    return suggestions.toList();
   }
 
   @override
   void onClose() {
     _debounceTimer?.cancel();
-    controller.dispose(); // Dispose controller instead of just clearing
+    textController.dispose();
     super.onClose();
   }
 }

@@ -18,6 +18,7 @@ import 'package:musiclotm/controller/visualizer_controller.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/core/function/permission.dart';
 import 'package:musiclotm/core/routes/routes.dart';
+import 'package:musiclotm/core/service/playlist_service.dart';
 import 'package:musiclotm/core/theme/themes.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -37,7 +38,7 @@ Future<void> main() async {
 
     // Request permissions
     await requestInitialPermissions();
-
+    await AppPlaylistService.init();
     // Create global audio player instance
     audioPlayer = AudioPlayer(
       handleAudioSessionActivation: true,

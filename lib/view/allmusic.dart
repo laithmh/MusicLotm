@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/listsongwidget.dart';
 import 'package:musiclotm/core/Widget/showdialog.dart';
 
@@ -14,85 +15,104 @@ class Allmusicscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     AnimationControllerX animationControllerX = Get.find();
     Playlistcontroller playlistcontroller = Get.find();
+    Songscontroller songscontroller = Get.find();
 
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: GetBuilder<AnimationControllerX>(
-        init: animationControllerX,
-        builder: (controller) {
-          return playlistcontroller.selectionMode == true
-              ? FloatingActionBubble(
-                  items: <Bubble>[
-                    Bubble(
-                      title: "Add to playlists",
-                      iconColor: Colors.black,
-                      bubbleColor: Theme.of(context).colorScheme.secondary,
-                      icon: Icons.playlist_add,
-                      titleStyle: TextStyle(
-                        fontSize: 8.sp, // Added: Responsive font size
-                        color: Colors.white, // Added: Explicit text color
-                      ),
-                      onPress: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => CustomAlertDialog(
-                            onPressed: () {
-                              playlistcontroller.addSongsToSelectedPlaylists();
-                              Get.back();
-                              controller
-                                  .reverseAnimation(); // Fixed: Use proper method
-                              playlistcontroller.toggleSelection();
-                            },
-                          ),
-                        );
-                      },
+      floatingActionButton: Obx(() {
+        return playlistcontroller.isSelectionMode.value
+            ? FloatingActionBubble(
+                items: <Bubble>[
+                  Bubble(
+                    title: "Add to playlists",
+                    iconColor: Colors.black,
+                    bubbleColor: Theme.of(context).colorScheme.secondary,
+                    icon: Icons.playlist_add,
+                    titleStyle: TextStyle(
+                      fontSize: 8.sp,
+                      color: Colors.white,
                     ),
-                    Bubble(
-                      title: "Select all",
-                      iconColor: Colors.black,
-                      bubbleColor: Theme.of(context).colorScheme.secondary,
-                      icon: Icons.select_all,
-                      titleStyle: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.white,
-                      ),
-                      onPress: () {
-                        // Select all songs
-                        for (var song
-                            in playlistcontroller.selectedSongTitles) {
-                          playlistcontroller.onSongSelected(true, song);
+                    onPress: () {
+                      if (playlistcontroller.selectedSongIds.isEmpty) {
+                        Get.snackbar('Info', 'Please select songs first');
+                        return;
+                      }
+                      
+                      showDialog(
+                        context: context,
+                        builder: (context) => CustomAlertDialog(
+                          onPressed: () async {
+                            if (playlistcontroller.selectedPlaylistIds.isEmpty) {
+                              Get.snackbar('Info', 'Please select at least one playlist');
+                              return;
+                            }
+                            
+                            await playlistcontroller.addSelectedSongsToSelectedPlaylists();
+                            Get.back();
+                            animationControllerX.reverseAnimation();
+                            playlistcontroller.toggleSelectionMode();
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  Bubble(
+                    title: "Select all",
+                    iconColor: Colors.black,
+                    bubbleColor: Theme.of(context).colorScheme.secondary,
+                    icon: Icons.select_all,
+                    titleStyle: TextStyle(
+                      fontSize: 8.sp,
+                      color: Colors.white,
+                    ),
+                    onPress: () {
+                      // Select all songs
+                      for (var song in songscontroller.songs) {
+                        if (!playlistcontroller.selectedSongIds.contains(song.id)) {
+                          playlistcontroller.selectSong(song.id);
                         }
-                        controller
-                            .reverseAnimation(); // Fixed: Use proper method
-                      },
+                      }
+                      animationControllerX.reverseAnimation();
+                    },
+                  ),
+                  Bubble(
+                    title: "Clear all",
+                    iconColor: Colors.black,
+                    bubbleColor: Theme.of(context).colorScheme.secondary,
+                    icon: Icons.clear_all,
+                    titleStyle: TextStyle(
+                      fontSize: 8.sp,
+                      color: Colors.white,
                     ),
-                    Bubble(
-                      title: "Cancel",
-                      iconColor: Colors.black,
-                      bubbleColor: Theme.of(context).colorScheme.secondary,
-                      icon: Icons.close,
-                      titleStyle: TextStyle(
-                        fontSize: 8.sp,
-                        color: Colors.white,
-                      ),
-                      onPress: () {
-                        playlistcontroller.clearSongSelection();
-                        controller
-                            .reverseAnimation(); // Fixed: Use proper method
-                        playlistcontroller.toggleSelection();
-                      },
+                    onPress: () {
+                      playlistcontroller.clearSelections();
+                      animationControllerX.reverseAnimation();
+                    },
+                  ),
+                  Bubble(
+                    title: "Cancel",
+                    iconColor: Colors.black,
+                    bubbleColor: Theme.of(context).colorScheme.secondary,
+                    icon: Icons.close,
+                    titleStyle: TextStyle(
+                      fontSize: 8.sp,
+                      color: Colors.white,
                     ),
-                  ],
-                  animatedIconData: AnimatedIcons.menu_arrow,
-                  animation:
-                      controller.animation, // Fixed: Use the correct animation
-                  onPress: controller.toggleAnimation,
-                  backGroundColor: Theme.of(context).colorScheme.secondary,
-                  iconColor: Theme.of(context).colorScheme.inversePrimary,
-                )
-              : const SizedBox.shrink();
-        },
-      ),
+                    onPress: () {
+                      playlistcontroller.clearSelections();
+                      animationControllerX.reverseAnimation();
+                      playlistcontroller.toggleSelectionMode();
+                    },
+                  ),
+                ],
+                animatedIconData: AnimatedIcons.menu_arrow,
+                animation: animationControllerX.animation,
+                onPress: animationControllerX.toggleAnimation,
+                backGroundColor: Theme.of(context).colorScheme.secondary,
+                iconColor: Theme.of(context).colorScheme.inversePrimary,
+              )
+            : const SizedBox.shrink();
+      }),
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
@@ -101,13 +121,11 @@ class Allmusicscreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 25.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context)
-                .colorScheme
-                .primary, // Added: Theme-aware color
+            color: Theme.of(context).colorScheme.primary,
           ),
         ),
         centerTitle: true,
-        elevation: 0, // Added: Remove shadow for cleaner look
+        elevation: 0,
       ),
       body: Songlistwidget(),
     );

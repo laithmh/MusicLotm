@@ -2,13 +2,16 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
-import 'package:musiclotm/core/Widget/customplaybutton.dart';
+import 'package:musiclotm/controller/visualizer_controller.dart';
 import 'package:musiclotm/core/Widget/playscreen/addplaylistbutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/customaudioimage.dart';
+import 'package:musiclotm/core/Widget/playscreen/customplaybutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/titlefavo_widget.dart';
 import 'package:musiclotm/core/Widget/playscreen/visualizer_widget.dart';
 import 'package:musiclotm/core/Widget/playscreen/waveformwidget.dart';
+import 'package:musiclotm/core/Widget/timer_widget.dart';
 import 'package:musiclotm/main.dart';
 
 class Playscreen extends StatefulWidget {
@@ -20,11 +23,31 @@ class Playscreen extends StatefulWidget {
 
 class _PlayscreenState extends State<Playscreen> {
   late Songscontroller songscontroller;
+  late Playlistcontroller playlistcontroller;
+  late VisualizerController visualizerController;
+  MediaItem? _currentSong;
 
   @override
   void initState() {
     super.initState();
     songscontroller = Get.find<Songscontroller>();
+    playlistcontroller = Get.find<Playlistcontroller>();
+    visualizerController = Get.find<VisualizerController>();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Start visualizer when screen appears
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      visualizerController.startVisualizer();
+    });
+  }
+
+  @override
+  void dispose() {
+    visualizerController.stopVisualizer();
+    super.dispose();
   }
 
   @override
@@ -32,6 +55,18 @@ class _PlayscreenState extends State<Playscreen> {
     return StreamBuilder<MediaItem?>(
       stream: songHandler.mediaItem.stream,
       builder: (context, snapshot) {
+        // Get current song
+        if (snapshot.hasData && snapshot.data != null) {
+          _currentSong = snapshot.data!;
+        } else {
+          _currentSong = songHandler.mediaItem.value;
+        }
+
+        // If still no current song, try to get from songs list
+        if (_currentSong == null && songscontroller.songs.isNotEmpty) {
+          _currentSong = songscontroller.songs.first;
+        }
+
         // Show loading state
         if (songscontroller.isLoading.value) {
           return Scaffold(
@@ -48,7 +83,10 @@ class _PlayscreenState extends State<Playscreen> {
                   SizedBox(height: 20.h),
                   Text(
                     "LOADING MUSIC LIBRARY...",
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Theme.of(context).disabledColor,
+                    ),
                   ),
                 ],
               ),
@@ -72,13 +110,26 @@ class _PlayscreenState extends State<Playscreen> {
                   SizedBox(height: 20.h),
                   Text(
                     "No songs found",
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   SizedBox(height: 10.h),
                   Text(
                     "Check your music library or permissions",
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      color: Theme.of(context).disabledColor,
+                    ),
                     textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20.h),
+                  ElevatedButton(
+                    onPressed: () {
+                      songscontroller.loadSongs();
+                    },
+                    child: Text("Retry"),
                   ),
                 ],
               ),
@@ -86,25 +137,21 @@ class _PlayscreenState extends State<Playscreen> {
           );
         }
 
-        // Get current song
-        MediaItem currentSong;
-        if (snapshot.hasData && snapshot.data != null) {
-          currentSong = snapshot.data!;
-        } else {
-          currentSong = songscontroller.songs.firstWhere(
-            (song) => song.id == songHandler.mediaItem.value?.id,
-            orElse: () => songscontroller.songs.first,
-          );
-        }
+        // If still no current song, use first song
+        _currentSong ??= songscontroller.songs.first;
+
+        final currentSong = _currentSong!;
+        final duration = currentSong.duration ?? const Duration();
 
         return Scaffold(
           appBar: AppBar(
+            leading: SleepTimerAppBarIndicator(),
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 0,
             title: Text(
-              "P L A Y",
+              "N O W  P L A Y I N G",
               style: TextStyle(
-                fontSize: 25.sp,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
@@ -120,7 +167,6 @@ class _PlayscreenState extends State<Playscreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Visualizer with album art
                     VisualizerImageWrapper(
                       diskSize: 280.w,
                       imageChild: Customaudioimage(
@@ -131,7 +177,7 @@ class _PlayscreenState extends State<Playscreen> {
                       ),
                     ),
 
-                    SizedBox(height: 15.h),
+                    SizedBox(height: 20.h),
 
                     // Song title and favorite
                     TitlefavoWidget(
@@ -140,19 +186,21 @@ class _PlayscreenState extends State<Playscreen> {
                       title: currentSong.title,
                     ),
 
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 15.h),
 
-                    // Add to playlist button
+                    // Add to playlist button and time
                     const Addtoplaylistbutton(),
 
-                    SizedBox(height: 15.h),
+                    SizedBox(height: 20.h),
 
-                    // Waveform with fixed height
+                    // Waveform
                     PolygonWaveformcustom(
-                      maxDuration: (currentSong.duration?.inSeconds ?? 0) + 2,
+                      maxDuration: duration.inSeconds > 0
+                          ? duration.inSeconds
+                          : 300,
                     ),
 
-                    SizedBox(height: 15.h),
+                    SizedBox(height: 20.h),
 
                     // Playback controls
                     const Customplaybutton(),

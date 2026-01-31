@@ -5,6 +5,8 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
+import 'package:musiclotm/controller/playlistcontroller.dart';
+import 'package:musiclotm/core/function/findcurrentIndex.dart';
 import 'package:musiclotm/core/function/permission.dart';
 import 'package:musiclotm/core/function/song_to_media_item.dart';
 import 'package:musiclotm/core/function/sort.dart';
@@ -69,8 +71,14 @@ class Songscontroller extends GetxController {
         ignoreCase: true,
       );
 
-      // Filter invalid songs
-      songModels.removeWhere((song) => song.data.isEmpty || song.title.isEmpty);
+      // FIX: Better filtering
+      songModels.removeWhere(
+        (song) =>
+            song.data.isEmpty ||
+            song.title.isEmpty ||
+            song.duration == null ||
+            song.duration! <= 0,
+      );
 
       const chunkSize = 20;
       final List<MediaItem> result = [];
@@ -80,18 +88,28 @@ class Songscontroller extends GetxController {
         final chunk = songModels.sublist(i, end);
 
         final processedChunk = await Future.wait(
-          chunk.map((song) => songToMediaItem(song)),
+          chunk.map((song) async {
+            try {
+              return await songToMediaItem(song);
+            } catch (e) {
+              log('Error converting song ${song.title}: $e');
+              return null;
+            }
+          }),
         );
 
-        result.addAll(processedChunk.where((item) => item.id.isNotEmpty));
+        result.addAll(processedChunk.whereType<MediaItem>());
 
         await Future.delayed(Duration.zero);
       }
 
-      log('Loaded ${result.length} songs');
+      log(
+        'Loaded ${result.length} valid songs out of ${songModels.length} total',
+      );
       return result;
     } catch (e) {
       log('Error fetching songs: $e');
+      Get.snackbar('Error', 'Failed to load songs: ${e.toString()}');
       return <MediaItem>[];
     }
   }
@@ -191,9 +209,9 @@ class Songscontroller extends GetxController {
       sortypeallMusic =
           box.get("sortTypeAllMusic", defaultValue: "titleASC") ?? "titleASC";
       sortypeFavorite =
-          box.get("sortTypePlaylists", defaultValue: "titleASC") ?? "titleASC";
-      sortypePlaylists =
           box.get("sortTypeFavorite", defaultValue: "titleASC") ?? "titleASC";
+      sortypePlaylists =
+          box.get("sortTypePlaylists", defaultValue: "titleASC") ?? "titleASC";
 
       log('Loaded sort type: $sortypeallMusic');
     } catch (e) {
@@ -216,12 +234,25 @@ class Songscontroller extends GetxController {
   }
 
   void refreshCurrentSongIndex() {
-    final currentMediaItem = songHandler.mediaItem.value;
-    if (currentMediaItem != null) {
-      final index = songs.indexWhere((item) => item.id == currentMediaItem.id);
-      if (index != -1) {
-        currentSongPlayingIndex.value = index;
-      }
-    }
+  final currentMediaItem = songHandler.mediaItem.value;
+  if (currentMediaItem != null) {
+    CurrentSongIndexFinder.findAndUpdateCurrentIndex(currentMediaItem.id);
   }
+}
+  // Add these methods to your Songscontroller class
+
+Future<void> addSongToPlaylist(MediaItem song, String playlistId) async {
+  final playlistController = Get.find<Playlistcontroller>();
+  await playlistController.addSongToPlaylist(
+    playlistId: playlistId,
+    songId: song.id,
+  );
+}
+
+Future<void> addCurrentSongToPlaylist(String playlistId) async {
+  final currentSong = songHandler.mediaItem.value;
+  if (currentSong != null) {
+    await addSongToPlaylist(currentSong, playlistId);
+  }
+}
 }

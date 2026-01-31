@@ -29,24 +29,30 @@ class Customaudioimage extends StatelessWidget {
       width: 220.w,
       borderRadius: BorderRadius.circular(500.r),
       child: RotationTransition(
-        turns: animationControllerX
-            .animation, // Fixed: Use the correct animation property
+        turns: animationControllerX.animation,
         child: ClipRRect(
           clipBehavior: Clip.antiAlias,
           borderRadius: BorderRadius.circular(1000),
           child: QueryArtworkWidget(
-            key: ValueKey(
-              song.id,
-            ), // Use a key so Flutter knows specifically which song this is
+            key: ValueKey(song.id),
             keepOldArtwork: true,
             artworkBorder: BorderRadius.circular(1000),
-            id: int.tryParse(song.id) ?? 0,
+            id: int.tryParse(song.displayDescription ?? "0") ?? 0,
             type: ArtworkType.AUDIO,
             artworkHeight: 540.h,
             artworkWidth: 540.h,
             artworkQuality: FilterQuality.high,
             artworkFit: BoxFit.cover,
-            nullArtworkWidget: Icon(Icons.music_note, size: 100.h),
+            nullArtworkWidget: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: Theme.of(context).primaryColor.withOpacity(0.2),
+              child: Icon(
+                Icons.music_note,
+                size: 100.h,
+                color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+              ),
+            ),
           ),
         ),
       ),

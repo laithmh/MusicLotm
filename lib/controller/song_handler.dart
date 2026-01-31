@@ -11,6 +11,7 @@ import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/controller/visualizer_controller.dart';
+import 'package:musiclotm/core/function/findcurrentIndex.dart';
 import 'package:musiclotm/main.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
@@ -45,22 +46,33 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     return AudioSource.uri(Uri.parse(item.id), tag: item);
   }
 
-  void _listenForCurrentSongIndexChanges() {
-    _currentIndexSubscription?.cancel();
-    _currentIndexSubscription = audioPlayer.currentIndexStream.listen((index) {
-      if (index == null || _currentQueue.isEmpty) return;
-      if (index >= 0 && index < _currentQueue.length) {
-        mediaItem.add(_currentQueue[index]);
+ void _listenForCurrentSongIndexChanges() {
+  _currentIndexSubscription?.cancel();
+  _currentIndexSubscription = audioPlayer.currentIndexStream.listen((index) {
+    if (index == null || _currentQueue.isEmpty) return;
+    
+    if (index >= 0 && index < _currentQueue.length) {
+      final currentMediaItem = _currentQueue[index];
+      mediaItem.add(currentMediaItem);
 
-        // Update visualizer session
-        if (sessionId != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            visualizerController.updateSessionId(sessionId!);
-          });
+      // Update the current song index in controllers
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        try {
+          await CurrentSongIndexFinder.findAndUpdateCurrentIndex(currentMediaItem.id);
+          
+          // Update visualizer session
+          if (sessionId != null) {
+            Future.delayed(const Duration(milliseconds: 500), () {
+              visualizerController.updateSessionId(sessionId!);
+            });
+          }
+        } catch (e) {
+          log('Error updating current song index: $e');
         }
-      }
-    });
-  }
+      });
+    }
+  });
+}
 
   void _broadcastState(PlaybackEvent event) {
     final controls = [
@@ -239,38 +251,56 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     }
   }
 
-  Future<void> handlePlayBackNext() async {
-    try {
-      if (isloop.isTrue && _currentQueue.isNotEmpty) {
-        int currentIndex = audioPlayer.currentIndex ?? 0;
-        int nextIndex = (currentIndex + 1) % _currentQueue.length;
-        await skipToQueueItem(nextIndex);
-      } else {
-        await skipToNext();
-      }
-    } catch (e) {
-      log('Error in handlePlayBackNext: $e');
+ Future<void> handlePlayBackNext() async {
+  try {
+    // Check if player is ready
+    if (audioPlayer.processingState != ProcessingState.ready) {
+      return;
     }
-  }
 
-  Future<void> handlePlayBackPrevious() async {
-    try {
-      if (isloop.isTrue && _currentQueue.isNotEmpty) {
+    if (audioPlayer.hasNext) {
+      await audioPlayer.seekToNext();
+    } else if (isloop.value) {
+      // Loop back to beginning
+      await skipToQueueItem(0);
+    } else {
+      // No next song and loop is off - stop or pause
+      await audioPlayer.pause();
+      playbackState.add(playbackState.value.copyWith(
+        processingState: AudioProcessingState.completed,
+        playing: false,
+      ));
+    }
+  } catch (e) {
+    log('Error in handlePlayBackNext: $e');
+  }
+}
+
+Future<void> handlePlayBackPrevious() async {
+  try {
+    if (audioPlayer.processingState != ProcessingState.ready) {
+      return;
+    }
+
+    // If less than 3 seconds into the song, go to previous song
+    // Otherwise, restart current song
+    if (audioPlayer.position.inSeconds > 3) {
+      await audioPlayer.seek(Duration.zero);
+    } else {
+      if (isloop.value && _currentQueue.isNotEmpty) {
         int currentIndex = audioPlayer.currentIndex ?? 0;
-        int previousIndex;
-        if (currentIndex == 0) {
-          previousIndex = _currentQueue.length - 1;
-        } else {
-          previousIndex = currentIndex - 1;
-        }
+        int previousIndex = currentIndex > 0 
+            ? currentIndex - 1 
+            : _currentQueue.length - 1;
         await skipToQueueItem(previousIndex);
       } else {
         await skipToPrevious();
       }
-    } catch (e) {
-      log('Error in handlePlayBackPrevious: $e');
     }
+  } catch (e) {
+    log('Error in handlePlayBackPrevious: $e');
   }
+}
 
   @override
   Future<void> skipToNext() async {
@@ -291,16 +321,16 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   }
 
   Future<void> _cancelSubscriptions() async {
-    await _playbackSubscription?.cancel();
-    await _currentIndexSubscription?.cancel();
-    await _processingStateSubscription?.cancel();
-    await _durationSubscription?.cancel();
+  _playbackSubscription?.cancel();
+  _currentIndexSubscription?.cancel();
+  _processingStateSubscription?.cancel();
+  _durationSubscription?.cancel();
 
-    _playbackSubscription = null;
-    _currentIndexSubscription = null;
-    _processingStateSubscription = null;
-    _durationSubscription = null;
-  }
+  _playbackSubscription = null;
+  _currentIndexSubscription = null;
+  _processingStateSubscription = null;
+  _durationSubscription = null;
+}
 
   @override
   Future<void> stop() async {

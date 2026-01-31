@@ -20,8 +20,8 @@ List<GetPage<dynamic>>? routes = [
   GetPage(name: Approutes.allmusic, page: () => const Allmusicscreen()),
   GetPage(name: Approutes.play, page: () => const Playscreen()),
   GetPage(name: Approutes.playlistscreen, page: () => const Playlistpage()),
-  GetPage(name: Approutes.search, page: () => const Search()),
-  GetPage(name: Approutes.settings, page: () => const Srttings()),
+  GetPage(name: Approutes.search, page: () => SearchScreen()),
+  GetPage(name: Approutes.settings, page: () => const Settings()),
   GetPage(name: Approutes.favorite, page: () => const Favorite()),
   //  GetPage(
   //     name: Approutes.contact,

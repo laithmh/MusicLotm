@@ -21,58 +21,53 @@ class TitlefavoWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Expanded(
-          // Added: Proper expansion for title area
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Added: Better alignment
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 width: 350.w,
                 height: 50.h,
                 child: Text(
                   title,
-                  maxLines: 1, // Added: Explicit max lines
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    // Removed const: Widget rebuilds may need different instances
-                    fontSize: 20.sp, // Added: Responsive font size
+                    fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               Text(
                 artist,
-                maxLines: 1, // Added: Explicit max lines
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  // Removed const: Widget rebuilds may need different instances
-                  fontSize: 15.sp, // Added: Responsive font size
-                  fontWeight:
-                      FontWeight.normal, // Changed: Normal weight for artist
-                  color: Theme.of(context).textTheme.bodyMedium?.color
-                      ?.withValues(alpha: 0.8), // Added: Subtle color
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.normal,
+                  color: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.color?.withOpacity(0.8),
                 ),
               ),
             ],
           ),
         ),
-        GetBuilder<Playlistcontroller>(
-          builder: (controller) => IconButton(
-            onPressed: () {
-              controller.toggleFavorite(song);
+        Obx(() {
+          final playlistcontroller = Get.find<Playlistcontroller>();
+          final isFavorite = playlistcontroller.isSongFavorited(song.id);
+          return IconButton(
+            onPressed: () async {
+              await playlistcontroller.toggleFavorite(song);
             },
             icon: Icon(
-              controller.isfavorite.containsKey(song.id)
-                  ? Icons.favorite
-                  : Icons.favorite_border,
-              color: controller.isfavorite.containsKey(song.id)
+              isFavorite.value ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite.value
                   ? Colors.red
-                  : Theme.of(
-                      context,
-                    ).iconTheme.color, // Added: Theme-aware color
+                  : Theme.of(context).iconTheme.color,
+              size: 24.w,
             ),
-          ),
-        ),
+          );
+        }),
       ],
     );
   }

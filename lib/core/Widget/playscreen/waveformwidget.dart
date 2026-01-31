@@ -30,7 +30,7 @@ class PolygonWaveformcustom extends StatelessWidget {
               children: [
                 RectangleWaveform(
                   samples: generateRandomNumbers.samples,
-                  height: 50.h,
+                  height: 40.h,
                   width: MediaQuery.of(context).size.width - 100,
                   maxDuration: Duration(seconds: maxDuration ?? 0),
                   elapsedDuration: position ?? const Duration(seconds: 0),
@@ -44,7 +44,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                 ),
                 RectangleWaveform(
                   samples: generateRandomNumbers.samples,
-                  height: 50.h,
+                  height: 40.h,
                   width: MediaQuery.of(context).size.width - 100,
                   maxDuration: Duration(seconds: maxDuration ?? 0),
                   elapsedDuration: position ?? const Duration(seconds: 0),

@@ -21,7 +21,7 @@ class Songlistwidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Navigatorcontroller navigator = Get.find();
     Songscontroller songscontroller = Get.find();
-    // Playlistcontroller playlistcontroller = Get.find();
+    Playlistcontroller playlistcontroller = Get.find();
 
     List<String> dropdownItems = [
       'titleASC',
@@ -45,16 +45,12 @@ class Songlistwidget extends StatelessWidget {
               DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   icon: const Icon(Icons.sort),
-                  value: songscontroller.sortypeallMusic ??
-                      'titleASC', // Added: Default value
+                  value: songscontroller.sortypeallMusic ?? 'titleASC',
                   onChanged: (String? newValue) async {
-                    if (newValue == null) return; // Added: Null check
+                    if (newValue == null) return;
 
                     sort(song: songscontroller.songs, sortType: newValue);
-                    sortSongModel(
-                        song: songscontroller.songModels, sortType: newValue);
-                    songscontroller.sortypeallMusic =
-                        newValue; // Updated: Set the sort type
+                    songscontroller.sortypeallMusic = newValue;
                     songscontroller.isallmusic.value = true;
 
                     songscontroller.update();
@@ -67,8 +63,7 @@ class Songlistwidget extends StatelessWidget {
                       value: value,
                       child: Text(
                         value,
-                        style: TextStyle(
-                            fontSize: 10.sp), // Added: Responsive text size
+                        style: TextStyle(fontSize: 10.sp),
                       ),
                     );
                   }).toList(),
@@ -79,13 +74,11 @@ class Songlistwidget extends StatelessWidget {
           const Divider(),
           SizedBox(height: 5.w),
           Expanded(
-            // Changed: Use Expanded instead of fixed height for better responsiveness
             child: GetX<Songscontroller>(
               builder: (controller) {
                 List<MediaItem> audio = controller.songs;
 
                 if (audio.isEmpty) {
-                  // Added: Empty state handling
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -112,169 +105,127 @@ class Songlistwidget extends StatelessWidget {
                   itemScrollController: controller.itemScrollController,
                   itemCount: audio.length,
                   itemBuilder: (BuildContext context, int index) {
+                    final song = audio[index];
                     return Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 4.h, horizontal: 5.w), // Reduced padding
-                      child: GetBuilder<Playlistcontroller>(
-                        builder: (pcontroller) {
-                          SongModel? selectedSong =
-                              controller.songModels.firstWhere(
-                            (element) =>
-                                element.displayNameWOExt == audio[index].title,
-                            // orElse: () => SongModel(
-                            // ),
-                          );
+                      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 5.w),
+                      child: Obx(() {
+                        return Neubox(
+                          borderRadius: BorderRadius.circular(12),
+                          child: ListTile(
+                            trailing: playlistcontroller.isSelectionMode.value
+                                ? Checkbox(
+                                    checkColor: Colors.white,
+                                    activeColor: Colors.blueGrey,
+                                    value: playlistcontroller.selectedSongIds.contains(song.id),
+                                    onChanged: (selected) {
+                                      playlistcontroller.selectSong(song.id);
+                                    },
+                                  )
+                                : StreamBuilder<MediaItem?>(
+                                    stream: songHandler.mediaItem,
+                                    builder: (context, snapshot) {
+                                      final playingItem = snapshot.data;
+                                      final bool isCurrentSong =
+                                          playingItem != null && playingItem.id == song.id;
 
-                          return Neubox(
-                            borderRadius: BorderRadius.circular(12),
-                            child: ListTile(
-                              trailing: pcontroller.selectionMode
-                                  ? Checkbox(
-                                      checkColor: Colors.white,
-                                      activeColor: Colors.blueGrey,
-                                      value: pcontroller.selectedSongTitles
-                                          .contains(
-                                              selectedSong.displayNameWOExt),
-                                      onChanged: (selected) {
-                                        pcontroller.onSongSelected(selected,
-                                            selectedSong.displayNameWOExt);
-                                      },
-                                    )
-                                  : StreamBuilder<MediaItem?>(
-                                      stream: songHandler
-                                          .mediaItem, // Listen to the global song stream
-                                      builder: (context, snapshot) {
-                                        final playingItem = snapshot.data;
-                                        // Compare IDs to see if this specific tile is the one playing
-                                        final bool isCurrentSong =
-                                            playingItem != null &&
-                                                playingItem.id ==
-                                                    audio[index].id;
-
-                                        if (isCurrentSong) {
-                                          return SizedBox(
-                                            width: 30
-                                                .w, // Constraints the width so it doesn't "consume" the tile
-                                            child: StreamBuilder<PlaybackState>(
-                                              stream: songHandler
-                                                  .playbackState, // Listen for play/pause changes
-                                              builder:
-                                                  (context, playbackSnapshot) {
-                                                final isPlaying =
-                                                    playbackSnapshot
-                                                            .data?.playing ??
-                                                        false;
-                                                return MiniMusicVisualizer(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                  width: 4,
-                                                  height: 15,
-                                                  radius: 2,
-                                                  animate:
-                                                      isPlaying, // Bars move only if music is active
-                                                );
-                                              },
-                                            ),
-                                          );
-                                        } else {
-                                          // Standard icon for non-playing songs
-                                          return Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 16,
-                                            color: Theme.of(context)
-                                                .iconTheme
-                                                .color
-                                                ?.withValues(alpha: 0.6),
-                                          );
-                                        }
-                                      },
-                                    ),
-                              title: Text(
-                                audio[index].title,
-                                style: TextStyle(
-                                  fontSize: 15.sp,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                      if (isCurrentSong) {
+                                        return SizedBox(
+                                          width: 30.w,
+                                          child: StreamBuilder<PlaybackState>(
+                                            stream: songHandler.playbackState,
+                                            builder: (context, playbackSnapshot) {
+                                              final isPlaying = playbackSnapshot.data?.playing ?? false;
+                                              return MiniMusicVisualizer(
+                                                color: Theme.of(context).colorScheme.primary,
+                                                width: 4,
+                                                height: 15,
+                                                radius: 2,
+                                                animate: isPlaying,
+                                              );
+                                            },
+                                          ),
+                                        );
+                                      } else {
+                                        return Icon(
+                                          Icons.arrow_forward_ios,
+                                          size: 16,
+                                          color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                                        );
+                                      }
+                                    },
+                                  ),
+                            title: Text(
+                              song.title,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              subtitle: Text(
-                                audio[index].artist ?? 'Unknown Artist',
-                                style: TextStyle(
-                                  fontSize: 10.sp,
-                                  overflow: TextOverflow.ellipsis,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall
-                                      ?.color,
-                                ),
+                            ),
+                            subtitle: Text(
+                              song.artist ?? 'Unknown Artist',
+                              style: TextStyle(
+                                fontSize: 10.sp,
+                                overflow: TextOverflow.ellipsis,
+                                color: Theme.of(context).textTheme.bodySmall?.color,
                               ),
-                              leading: Container(
-                                // Added: Container for consistent sizing
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Theme.of(context)
-                                      .cardColor
-                                      .withValues(alpha: 0.3),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: QueryArtworkWidget(
-                                    id: int.tryParse(
-                                          audio[index].displayDescription ??
-                                              "0",
-                                        ) ??
-                                        0,
-                                    keepOldArtwork: true,
-                                    type: ArtworkType.AUDIO,
-                                    artworkWidth: 50,
-                                    artworkHeight: 50,
-                                    artworkFit: BoxFit.cover,
-                                    artworkQuality: FilterQuality
-                                        .low, // Reduced quality for performance
-                                    nullArtworkWidget: Icon(
-                                      Icons.music_note,
-                                      color: Theme.of(context)
-                                          .iconTheme
-                                          .color
-                                          ?.withValues(alpha: 0.6),
-                                    ),
+                            ),
+                            leading: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Theme.of(context).cardColor.withOpacity(0.3),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: QueryArtworkWidget(
+                                  id: int.tryParse(song.displayDescription ?? "0") ?? 0,
+                                  keepOldArtwork: true,
+                                  type: ArtworkType.AUDIO,
+                                  artworkWidth: 50,
+                                  artworkHeight: 50,
+                                  artworkFit: BoxFit.cover,
+                                  artworkQuality: FilterQuality.low,
+                                  nullArtworkWidget: Icon(
+                                    Icons.music_note,
+                                    color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
                                   ),
                                 ),
                               ),
-                              onTap: () async {
-                                if (controller.isallmusic.isFalse) {
-                                  await controller.handleAllSongs();
-                                }
-
-                                await songHandler.skipToQueueItem(index);
-
-                                // Update controller states
-                                controller.isallmusic.value = true;
-                                controller.isplaylist.value = false;
-                                controller.isfavorite.value = false;
-                                controller.issearch.value = false;
-
-                                // Update persistent storage
-                                await box.putAll({
-                                  "isallmusic": controller.isallmusic.value,
-                                  "isplaylist": controller.isplaylist.value,
-                                  "isfavorite": controller.isfavorite.value,
-                                });
-
-                                navigator.changepage(2);
-                                await songHandler.play();
-                              },
-                              onLongPress: () {
-                                pcontroller.toggleSelection();
-                                pcontroller.clearPlaylistSelection();
-                                pcontroller.clearSongSelection();
-                              },
                             ),
-                          );
-                        },
-                      ),
+                            onTap: () async {
+                              if (playlistcontroller.isSelectionMode.value) {
+                                playlistcontroller.selectSong(song.id);
+                                return;
+                              }
+
+                              if (controller.isallmusic.isFalse) {
+                                await controller.handleAllSongs();
+                              }
+
+                              await songHandler.skipToQueueItem(index);
+
+                              controller.isallmusic.value = true;
+                              controller.isplaylist.value = false;
+                              controller.isfavorite.value = false;
+                              controller.issearch.value = false;
+
+                              await box.putAll({
+                                "isallmusic": controller.isallmusic.value,
+                                "isplaylist": controller.isplaylist.value,
+                                "isfavorite": controller.isfavorite.value,
+                              });
+
+                              navigator.changepage(2);
+                              await songHandler.play();
+                            },
+                            onLongPress: () {
+                              playlistcontroller.toggleSelectionMode();
+                              playlistcontroller.selectSong(song.id);
+                            },
+                          ),
+                        );
+                      }),
                     );
                   },
                 );
