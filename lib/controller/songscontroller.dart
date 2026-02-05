@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
-import 'package:musiclotm/core/function/findcurrentIndex.dart';
-import 'package:musiclotm/core/function/permission.dart';
+import 'package:musiclotm/core/function/find_current_index.dart';
 import 'package:musiclotm/core/function/song_to_media_item.dart';
 import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/main.dart';
@@ -57,6 +56,7 @@ class Songscontroller extends GetxController {
 
   Future<List<MediaItem>> getSongs() async {
     try {
+      await Future.delayed(const Duration(milliseconds: 500));
       final effectiveSortType = audioQuerySongSortType(
         sortypeallMusic ?? "titleASC",
       );
@@ -77,7 +77,7 @@ class Songscontroller extends GetxController {
             song.data.isEmpty ||
             song.title.isEmpty ||
             song.duration == null ||
-            song.duration! <= 0,
+            song.duration! <= 2000,
       );
 
       const chunkSize = 20;
@@ -125,6 +125,7 @@ class Songscontroller extends GetxController {
     _loadCompleter = Completer<void>();
 
     try {
+      songs.clear();
       final fetchedSongs = await getSongs();
 
       if (fetchedSongs.isNotEmpty) {
@@ -219,27 +220,34 @@ class Songscontroller extends GetxController {
     }
   }
 
+  // songscontroller.dart
+
   Future<void> checkPermissionAndLoad() async {
+    // 1. Check current status
     bool audioGranted = await Permission.audio.isGranted;
     bool storageGranted = await Permission.storage.isGranted;
-    bool microphone = await Permission.microphone.isGranted;
 
-    if (audioGranted || storageGranted || microphone) {
+    if (audioGranted || storageGranted) {
       haspermission.value = true;
       await loadSongs();
     } else {
-      // If not granted in main, ask one more time or show settings
-      await requestInitialPermissions();
+      log("User denied permissions.");
+      Get.snackbar(
+        'Permission Required',
+        'Please grant storage access to see your music.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
+}
 
-  void refreshCurrentSongIndex() {
+void refreshCurrentSongIndex() {
   final currentMediaItem = songHandler.mediaItem.value;
   if (currentMediaItem != null) {
     CurrentSongIndexFinder.findAndUpdateCurrentIndex(currentMediaItem.id);
   }
 }
-  // Add these methods to your Songscontroller class
+// Add these methods to your Songscontroller class
 
 Future<void> addSongToPlaylist(MediaItem song, String playlistId) async {
   final playlistController = Get.find<Playlistcontroller>();
@@ -254,5 +262,4 @@ Future<void> addCurrentSongToPlaylist(String playlistId) async {
   if (currentSong != null) {
     await addSongToPlaylist(currentSong, playlistId);
   }
-}
 }

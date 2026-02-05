@@ -90,7 +90,7 @@ void paint(Canvas canvas, Size size) {
   void _applyNeumorphicStroke(Canvas canvas, Path path, bool isInward) {
     // A. The Shadow Path (Bottom Right offset)
     final shadowPaint = Paint()
-      ..color = shadowColor.withOpacity(isInward ? 0.2 : 0.5)
+      ..color = shadowColor.withValues(alpha:  isInward ? 0.2 : 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
@@ -102,7 +102,7 @@ void paint(Canvas canvas, Size size) {
 
     // B. The Highlight Path (Top Left offset)
     final highlightPaint = Paint()
-      ..color = highlightColor.withOpacity(isInward ? 0.3 : 0.8)
+      ..color = highlightColor.withValues(alpha:  isInward ? 0.3 : 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1);

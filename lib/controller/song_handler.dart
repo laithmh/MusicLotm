@@ -11,7 +11,8 @@ import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/controller/visualizer_controller.dart';
-import 'package:musiclotm/core/function/findcurrentIndex.dart';
+import 'package:musiclotm/core/function/find_current_index.dart';
+
 import 'package:musiclotm/main.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
@@ -124,10 +125,10 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     _currentQueue = List.from(songs);
     songSources = songs.map(_createAudioSource).toList();
 
-    final audioSource = ConcatenatingAudioSource(children: songSources);
+    
 
     try {
-      await audioPlayer.setAudioSource(audioSource);
+      await audioPlayer.setAudioSources(songSources);
       log('Audio source set successfully');
     } catch (error) {
       log('Error setting audio source: $error');
@@ -357,8 +358,8 @@ Future<void> handlePlayBackPrevious() async {
     final currentIndex = audioPlayer.currentIndex;
 
     try {
-      final newAudioSource = ConcatenatingAudioSource(children: newSources);
-      await audioPlayer.setAudioSource(newAudioSource);
+      
+      await audioPlayer.setAudioSources(newSources);
 
       if (currentIndex != null && currentIndex < newSongs.length) {
         await audioPlayer.seek(currentPosition, index: currentIndex);

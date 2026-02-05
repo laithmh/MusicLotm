@@ -46,7 +46,7 @@ class TitlefavoWidget extends StatelessWidget {
                   fontWeight: FontWeight.normal,
                   color: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.color?.withOpacity(0.8),
+                  ).textTheme.bodyMedium?.color?.withValues(alpha:  0.8),
                 ),
               ),
             ],

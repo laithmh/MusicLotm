@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:media_store_plus/media_store_plus.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
@@ -14,13 +15,13 @@ import 'package:musiclotm/controller/searchcontroller.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
+import 'package:musiclotm/controller/tag_editor_controller.dart';
 import 'package:musiclotm/controller/visualizer_controller.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 import 'package:musiclotm/core/function/permission.dart';
 import 'package:musiclotm/core/routes/routes.dart';
 import 'package:musiclotm/core/service/playlist_service.dart';
 import 'package:musiclotm/core/theme/themes.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 // Global instances
 late AudioPlayer audioPlayer;
@@ -35,9 +36,15 @@ Future<void> main() async {
     // Initialize Hive
     await Hive.initFlutter();
     box = await Hive.openBox("music");
+    MediaStore.ensureInitialized();
+    MediaStore.appFolder = "MusicLotm";
+    // Request permissions FIRST
+    final bool hasPermission = await requestInitialPermissions();
 
-    // Request permissions
-    await requestInitialPermissions();
+    if (!hasPermission) {
+      log('Permissions not granted');
+      // Handle permission denial gracefully
+    }
     await AppPlaylistService.init();
     // Create global audio player instance
     audioPlayer = AudioPlayer(
@@ -55,7 +62,6 @@ Future<void> main() async {
         androidStopForegroundOnPause: true,
         androidShowNotificationBadge: true,
         androidNotificationIcon: 'mipmap/ic_launcher',
-
         preloadArtwork: true,
 
         fastForwardInterval: Duration(seconds: 10),
@@ -71,6 +77,7 @@ Future<void> main() async {
     Get.put(Searchcontroller());
     Get.put(VisualizerController());
     Get.put(Settingscontroller());
+    Get.put(TagEditorController());
     runApp(const MyApp());
   } catch (e) {
     log('Error during initialization: $e');
@@ -150,30 +157,6 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    try {
-      // Check if permissions are granted
-      final audioStatus = await Permission.audio.status;
-      final storageStatus = await Permission.storage.status;
-
-      if (!audioStatus.isGranted && !storageStatus.isGranted) {
-        // Request permissions again if needed
-        await [
-          Permission.audio,
-          Permission.storage,
-          if (GetPlatform.isAndroid) Permission.notification,
-        ].request();
-      }
-
-      // Initialize songs controller
-      final songsController = Get.find<Songscontroller>();
-      await songsController.loadSongs();
-    } catch (e) {
-      log('Error in app initialization: $e');
-    }
   }
 
   @override
@@ -200,10 +183,8 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
 
   Future<void> _cleanupResources() async {
     try {
-      // Stop audio service if running
-      if (AudioService.running) {
-        await AudioService.stop();
-      }
+      // Stop audio service (safe to call even if not running)
+      await songHandler.stop();
 
       // Dispose audio player
       await audioPlayer.dispose();

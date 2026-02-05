@@ -11,6 +11,7 @@ import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/main.dart';
+
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -149,7 +150,7 @@ class Songlistwidget extends StatelessWidget {
                                         return Icon(
                                           Icons.arrow_forward_ios,
                                           size: 16,
-                                          color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                                          color: Theme.of(context).iconTheme.color?.withValues(alpha:  0.6),
                                         );
                                       }
                                     },
@@ -174,7 +175,7 @@ class Songlistwidget extends StatelessWidget {
                               height: 50,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Theme.of(context).cardColor.withOpacity(0.3),
+                                color: Theme.of(context).cardColor.withValues(alpha:  0.3),
                               ),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(25),
@@ -188,7 +189,7 @@ class Songlistwidget extends StatelessWidget {
                                   artworkQuality: FilterQuality.low,
                                   nullArtworkWidget: Icon(
                                     Icons.music_note,
-                                    color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                                    color: Theme.of(context).iconTheme.color?.withValues(alpha:  0.6),
                                   ),
                                 ),
                               ),

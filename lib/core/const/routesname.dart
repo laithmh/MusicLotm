@@ -8,4 +8,5 @@ class Approutes {
   static String search = "/search";
   static String favorite = "/favorite";
   static String contact = "/contact";
+  static String tagEditor = "/tag-editor";
 }

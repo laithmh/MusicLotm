@@ -12,6 +12,7 @@ import 'package:musiclotm/core/Widget/playscreen/titlefavo_widget.dart';
 import 'package:musiclotm/core/Widget/playscreen/visualizer_widget.dart';
 import 'package:musiclotm/core/Widget/playscreen/waveformwidget.dart';
 import 'package:musiclotm/core/Widget/timer_widget.dart';
+import 'package:musiclotm/core/const/routesname.dart';
 import 'package:musiclotm/main.dart';
 
 class Playscreen extends StatefulWidget {
@@ -146,6 +147,17 @@ class _PlayscreenState extends State<Playscreen> {
         return Scaffold(
           appBar: AppBar(
             leading: SleepTimerAppBarIndicator(),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Get.toNamed(
+                    Approutes.tagEditor,
+                    parameters: {'songId': currentSong.id},
+                  );
+                },
+                icon: Icon(Icons.edit),
+              ),
+            ],
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
             elevation: 0,
             title: Text(

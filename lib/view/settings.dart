@@ -55,7 +55,7 @@ class _SettingsState extends State<Settings> {
                               borderRadius: BorderRadius.circular(15.r),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha:  0.1),
                                   blurRadius: 10,
                                   offset: Offset(0, 4),
                                 ),
@@ -103,7 +103,7 @@ class _SettingsState extends State<Settings> {
                                   value: _calculateProgress(),
                                   backgroundColor: Theme.of(
                                     context,
-                                  ).colorScheme.onPrimary.withOpacity(0.3),
+                                  ).colorScheme.onPrimary.withValues(alpha:  0.3),
                                   color: Theme.of(
                                     context,
                                   ).colorScheme.onPrimary,

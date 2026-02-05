@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
+
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Customaudioimage extends StatelessWidget {
@@ -46,11 +47,11 @@ class Customaudioimage extends StatelessWidget {
             nullArtworkWidget: Container(
               width: double.infinity,
               height: double.infinity,
-              color: Theme.of(context).primaryColor.withOpacity(0.2),
+              color: Theme.of(context).primaryColor.withValues(alpha:  0.2),
               child: Icon(
                 Icons.music_note,
                 size: 100.h,
-                color: Theme.of(context).iconTheme.color?.withOpacity(0.6),
+                color: Theme.of(context).iconTheme.color?.withValues(alpha:  0.6),
               ),
             ),
           ),

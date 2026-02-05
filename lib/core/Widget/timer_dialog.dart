@@ -110,7 +110,7 @@ class _TimerDialogState extends State<TimerDialog> {
         Container(
           padding: EdgeInsets.all(20.h),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.secondary.withValues(alpha:  0.3),
             borderRadius: BorderRadius.circular(15.r),
             border: Border.all(
               color: Theme.of(context).colorScheme.inversePrimary,
@@ -132,7 +132,7 @@ class _TimerDialogState extends State<TimerDialog> {
         LinearProgressIndicator(
           value: _calculateProgress(),
           backgroundColor:
-              Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+              Theme.of(context).colorScheme.secondary.withValues(alpha:  0.3),
           color: Theme.of(context).colorScheme.inversePrimary,
           minHeight: 8.h,
         ),
@@ -198,7 +198,7 @@ class _TimerDialogState extends State<TimerDialog> {
                 ),
               ),
               backgroundColor:
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+                  Theme.of(context).colorScheme.secondary.withValues(alpha:  0.5),
               onPressed: () {
                 final currentEndTime = settingscontroller.timerEndTime.value;
                 if (currentEndTime != null) {
@@ -248,7 +248,7 @@ class _TimerDialogState extends State<TimerDialog> {
                 Navigator.of(context).pop();
               },
               backgroundColor:
-                  Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+                  Theme.of(context).colorScheme.secondary.withValues(alpha:  0.3),
               selectedColor: Theme.of(context).colorScheme.inversePrimary,
               labelStyle: TextStyle(
                 color: Theme.of(context).colorScheme.inversePrimary,
@@ -304,7 +304,7 @@ class _TimerDialogState extends State<TimerDialog> {
                         color: Theme.of(context)
                             .colorScheme
                             .onSecondary
-                            .withOpacity(0.5),
+                            .withValues(alpha:  0.5),
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
@@ -367,7 +367,7 @@ class _TimerDialogState extends State<TimerDialog> {
                         color: Theme.of(context)
                             .colorScheme
                             .onSecondary
-                            .withOpacity(0.5),
+                            .withValues(alpha:  0.5),
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,

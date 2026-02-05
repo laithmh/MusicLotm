@@ -9,6 +9,7 @@ import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/main.dart';
+
 import 'package:on_audio_query/on_audio_query.dart';
 
 class Favorite extends StatelessWidget {
@@ -182,7 +183,7 @@ class Favorite extends StatelessWidget {
                     height: 50.w,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Theme.of(context).cardColor.withOpacity(0.3),
+                      color: Theme.of(context).cardColor.withValues(alpha:  0.3),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(25),
@@ -195,7 +196,7 @@ class Favorite extends StatelessWidget {
                           Icons.music_note,
                           color: Theme.of(
                             context,
-                          ).iconTheme.color?.withOpacity(0.6),
+                          ).iconTheme.color?.withValues(alpha: 0.6),
                         ),
                       ),
                     ),

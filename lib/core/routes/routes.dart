@@ -9,6 +9,7 @@ import 'package:musiclotm/view/playscreen.dart';
 import 'package:musiclotm/view/search.dart';
 import 'package:musiclotm/view/settings.dart';
 import 'package:musiclotm/view/splash.dart';
+import 'package:musiclotm/view/tag_editor.dart';
 
 List<GetPage<dynamic>>? routes = [
   GetPage(
@@ -23,6 +24,14 @@ List<GetPage<dynamic>>? routes = [
   GetPage(name: Approutes.search, page: () => SearchScreen()),
   GetPage(name: Approutes.settings, page: () => const Settings()),
   GetPage(name: Approutes.favorite, page: () => const Favorite()),
+
+  GetPage(
+  name: Approutes.tagEditor,
+  page: () => TagEditorScreen(
+    songId: Get.parameters['songId'] ?? '',
+  ),
+  transition: Transition.rightToLeft,
+),
   //  GetPage(
   //     name: Approutes.contact,
   //     page: () => const ContactUs(),

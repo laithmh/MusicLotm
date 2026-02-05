@@ -523,7 +523,27 @@ class Playlistcontroller extends GetxController {
     animationController.reset();
     Get.snackbar('Playing', 'Favorites playlist loaded');
   }
+// Add these to Playlistcontroller class:
 
+/// Update song in favorites list
+void updateSongInFavorites(String songId, MediaItem updatedSong) {
+  final index = favorites.indexWhere((item) => item.id == songId);
+  if (index != -1) {
+    favorites[index] = updatedSong;
+    log('✅ Updated song in favorites: ${updatedSong.title}');
+    update();
+  }
+}
+
+/// Update song in current playlist
+void updateSongInCurrentPlaylist(String songId, MediaItem updatedSong) {
+  final index = currentPlaylistSongs.indexWhere((item) => item.id == songId);
+  if (index != -1) {
+    currentPlaylistSongs[index] = updatedSong;
+    log('✅ Updated song in current playlist: ${updatedSong.title}');
+    update();
+  }
+}
   /// Helper method to check if a song is favorited
   RxBool isSongFavorited(String songId) {
     return isfavorite.containsKey(songId).obs;

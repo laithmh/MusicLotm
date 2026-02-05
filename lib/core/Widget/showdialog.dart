@@ -91,7 +91,7 @@ class CustomAlertDialog extends StatelessWidget {
                           color: isSelected
                               ? Theme.of(
                                   context,
-                                ).colorScheme.primary.withOpacity(0.1)
+                                ).colorScheme.primary.withValues(alpha:  0.1)
                               : Colors.transparent,
                           border: Border.all(
                             color: isSelected
@@ -113,7 +113,7 @@ class CustomAlertDialog extends StatelessWidget {
                               color: isSelected
                                   ? Theme.of(
                                       context,
-                                    ).colorScheme.primary.withOpacity(0.2)
+                                    ).colorScheme.primary.withValues(alpha:  0.2)
                                   : Colors.grey.shade200,
                             ),
                             child: Icon(

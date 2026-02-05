@@ -64,12 +64,12 @@ class VisualizerImageWrapper extends StatelessWidget {
                   color: colorScheme.secondary,
                   boxShadow: [
                     BoxShadow(
-                      color: colorScheme.primary.withOpacity(0.4),
+                      color: colorScheme.primary.withValues(alpha:  0.4),
                       offset: const Offset(8, 8),
                       blurRadius: 16,
                     ),
                     BoxShadow(
-                      color: colorScheme.onPrimary.withOpacity(0.8),
+                      color: colorScheme.onPrimary.withValues(alpha:  0.8),
                       offset: const Offset(-8, -8),
                       blurRadius: 16,
                     ),

@@ -136,8 +136,9 @@ class VisualizerController extends GetxController {
 
       // 4. Frequency Sensitivity: Boost low-end kicks
       double boost = 1.0 + (percent * 3.5);
-      if (i < barCount * 0.15)
+      if (i < barCount * 0.15) {
         boost *= 1.4; // Extra punch for the kick drum area
+      }
 
       double target = (rawValue * boost).clamp(0.0, 1.2);
       if (target < noiseFloor) target = 0;
