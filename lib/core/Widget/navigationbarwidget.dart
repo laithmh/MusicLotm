@@ -13,32 +13,27 @@ class Navigationbarwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<Navigatorcontroller>(builder: (navigatorcontroller) {
-      return CurvedNavigationBar(
+    Navigatorcontroller navigatorcontroller = Get.find<Navigatorcontroller>();
+    return Obx(
+      () => CurvedNavigationBar(
         height: 50.h,
         animationCurve: Curves.easeOut,
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         color: Theme.of(context).colorScheme.onPrimary,
         animationDuration: const Duration(milliseconds: 400),
-        index: navigatorcontroller.currentindex,
+        index: navigatorcontroller.currentindex.value,
         iconPadding: 0,
         items: [
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(
-                Icons.queue_music,
-                size: 25.w,
-              ),
+              child: Icon(Icons.queue_music, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(
-                Icons.library_music,
-                size: 25.w,
-              ),
+              child: Icon(Icons.library_music, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
@@ -63,10 +58,10 @@ class Navigationbarwidget extends StatelessWidget {
         onTap: (index) {
           navigatorcontroller.changepage(index);
 
-          log(navigatorcontroller.currentindex);
+          log(navigatorcontroller.currentindex.value);
           Get.back();
         },
-      );
-    });
+      ),
+    );
   }
 }

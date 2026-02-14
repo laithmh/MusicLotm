@@ -21,17 +21,14 @@ class VisualizerImageWrapper extends StatelessWidget {
       width: diskSize,
       height: diskSize,
       child: Obx(() {
-        if (!controller.isInitialized.value || !controller.isCapturing.value) {
-          return Center(key: const ValueKey('static'), child: imageChild);
-        }
-
         final fftData = controller.fftData.toList();
 
-       // Calculate Kick Intensity (first 10% of the bars)
+        // Calculate Kick Intensity (first 10% of the bars)
         final data = controller.fftData;
         int kickEnd = (data.length * 0.1).toInt().clamp(1, data.length);
-        double kickAvg = data.sublist(0, kickEnd).reduce((a, b) => a + b) / kickEnd;
-        
+        double kickAvg =
+            data.sublist(0, kickEnd).reduce((a, b) => a + b) / kickEnd;
+
         // Elastic scale: 1.0 to 1.18
         double bassScale = 1.0 + (kickAvg * 0.18).clamp(0.0, 0.2);
 
@@ -44,9 +41,9 @@ class VisualizerImageWrapper extends StatelessWidget {
               size: Size(diskSize * 0.72, diskSize * 0.72),
               painter: NeumorphicLiquidPainter(
                 fftData: fftData,
-                surfaceColor: colorScheme.secondary,
-                highlightColor: colorScheme.onPrimary,
-                shadowColor: colorScheme.primary,
+                surfaceColor: colorScheme.inversePrimary,
+                highlightColor: colorScheme.inversePrimary,
+                shadowColor: colorScheme.surface,
                 intensity: 30 + (kickAvg * 20),
               ),
             ),
@@ -64,12 +61,12 @@ class VisualizerImageWrapper extends StatelessWidget {
                   color: colorScheme.secondary,
                   boxShadow: [
                     BoxShadow(
-                      color: colorScheme.primary.withValues(alpha:  0.4),
+                      color: colorScheme.primary.withValues(alpha: 0.4),
                       offset: const Offset(8, 8),
                       blurRadius: 16,
                     ),
                     BoxShadow(
-                      color: colorScheme.onPrimary.withValues(alpha:  0.8),
+                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
                       offset: const Offset(-8, -8),
                       blurRadius: 16,
                     ),

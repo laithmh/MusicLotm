@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:musiclotm/core/const/routesname.dart';
 import 'package:musiclotm/core/middeleware/middeleware.dart';
 import 'package:musiclotm/view/allmusic.dart';
+import 'package:musiclotm/view/contactus.dart';
 import 'package:musiclotm/view/favorite.dart';
 import 'package:musiclotm/view/navigator.dart';
 import 'package:musiclotm/view/playlistscreen.dart';
@@ -16,6 +17,7 @@ List<GetPage<dynamic>>? routes = [
     name: "/",
     page: () => const SplashScreen(),
     middlewares: [Mymiddlware()],
+    
   ),
   GetPage(name: Approutes.navbar, page: () => const Navigator()),
   GetPage(name: Approutes.allmusic, page: () => const Allmusicscreen()),
@@ -32,12 +34,10 @@ List<GetPage<dynamic>>? routes = [
   ),
   transition: Transition.rightToLeft,
 ),
-  //  GetPage(
-  //     name: Approutes.contact,
-  //     page: () => const ContactUs(),
-  //   ),
+   GetPage(
+      name: Approutes.contact,
+      page: () =>  ContactUsScreen(),
+    ),
 
-  // GetPage(name: navbar, page: ()=>const Navigationbarwidget(),),
-  // GetPage(name: navbar, page: ()=>const Navigationbarwidget(),),
-  // GetPage(name: navbar, page: ()=>const Navigationbarwidget(),),
+
 ];

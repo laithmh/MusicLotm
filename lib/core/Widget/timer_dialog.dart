@@ -400,7 +400,7 @@ class _TimerDialogState extends State<TimerDialog> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  settingscontroller.clearControllers();
+                  settingscontroller.clearTimerForm();
                   Navigator.of(context).pop();
                 },
                 style: OutlinedButton.styleFrom(
@@ -424,7 +424,7 @@ class _TimerDialogState extends State<TimerDialog> {
                   final minutes = settingscontroller.setTimer();
                   if (minutes > 0) {
                     settingscontroller.startTimer(minutes);
-                    settingscontroller.clearControllers();
+                    settingscontroller.clearTimerForm();
                     Navigator.of(context).pop();
                   } else {
                     Get.snackbar(

@@ -4,11 +4,11 @@ import 'dart:math' hide log;
 
 import 'package:audify/audify.dart';
 import 'package:get/get.dart';
-import 'package:musiclotm/main.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 
 class VisualizerController extends GetxController {
   // Get dependencies
-
+  SongHandler get songHandler => Get.find<SongHandler>();
   // Visualizer properties
   late AudifyController audify;
   RxList<double> fftData = <double>[].obs;

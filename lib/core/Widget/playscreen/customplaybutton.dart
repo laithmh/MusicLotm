@@ -2,9 +2,9 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
-import 'package:musiclotm/main.dart';
 
 class Customplaybutton extends StatelessWidget {
   const Customplaybutton({super.key});
@@ -12,6 +12,7 @@ class Customplaybutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GenerateRandomNumbers generateRandomNumbers = Get.find();
+    SongHandler songHandler = Get.find<SongHandler>();
 
     return StreamBuilder<PlaybackState>(
       stream: songHandler.playbackState.stream,

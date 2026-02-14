@@ -4,30 +4,39 @@ import 'dart:developer';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/function/sort.dart';
 import 'package:musiclotm/core/model/playlist_model.dart';
 import 'package:musiclotm/core/service/playlist_service.dart';
-import 'package:musiclotm/main.dart';
 
 class Playlistcontroller extends GetxController {
   Songscontroller songscontroller = Get.find();
   AnimationControllerX animationController = Get.find();
+  SongHandler get songHandler => Get.find<SongHandler>();
 
   final TextEditingController playlistNameController = TextEditingController();
   final TextEditingController playlistDescriptionController =
       TextEditingController();
 
+  late Box box;
   RxList<MediaItem> favorites = <MediaItem>[].obs;
   RxBool favoriteUpdated = false.obs;
 
-  Map<dynamic, dynamic> isfavorite = {};
+  RxList<String> favoriteIds = <String>[].obs;
   // Observables
   RxList<AppPlaylist> playlists = <AppPlaylist>[].obs;
   RxList<MediaItem> currentPlaylistSongs = <MediaItem>[].obs;
   RxString currentPlaylistId = ''.obs;
+  RxString currentPlaylistName = ''.obs;
   RxBool isLoading = false.obs;
+  RxBool isPlayingFromPlaylist = false.obs;
+
+  // Sorting
+  RxString sortTypePlaylists = "titleASC".obs;
+  RxString sortTypeFavorites = "titleASC".obs;
 
   // Selection
   final RxList<String> selectedSongIds = <String>[].obs;
@@ -40,30 +49,144 @@ class Playlistcontroller extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-
-    await loadFavoritesFromHive();
-
+    await _initMusicBox();
+    await _loadSavedState();
+    await loadFavoritesFromHive(); // load the ordered list
+    ever(songscontroller.songs, (_) {
+      if (songscontroller.songs.isNotEmpty) {
+        loadFavorites(); // rebuild UI when songs arrive
+      }
+    });
     await loadAppPlaylists();
-    await loadFavorites();
+    await _restoreCurrentPlaylist();
   }
 
   @override
   void onClose() {
+    _saveCurrentState();
     playlistNameController.dispose();
     playlistDescriptionController.dispose();
     super.onClose();
   }
 
-  /// Load favorite map from Hive
-  Future<void> loadFavoriteMap() async {
+  // FIX: Safe box initialisation
+  Future<void> _initMusicBox() async {
     try {
-      final favoriteMap = box.get("favorite");
-      if (favoriteMap != null && favoriteMap is Map) {
-        isfavorite = Map<String, bool>.from(favoriteMap);
-        log('❤️ Loaded ${isfavorite.length} favorites from storage');
+      if (!Hive.isBoxOpen('music')) {
+        box = await Hive.openBox('music');
+      } else {
+        box = Hive.box('music');
       }
     } catch (e) {
-      log('❌ Error loading favorites map: $e');
+      log('❌ Failed to open music box: $e');
+      rethrow;
+    }
+  }
+
+  /// Save current state to Hive
+  Future<void> _saveCurrentState() async {
+    try {
+      // Save current playlist state
+      if (currentPlaylistId.value.isNotEmpty) {
+        box.put("currentPlaylistId", currentPlaylistId.value);
+        box.put("currentPlaylistName", currentPlaylistName.value);
+      } else {
+        box.delete("currentPlaylistId");
+        box.delete("currentPlaylistName");
+      }
+
+      // Save sort types
+      box.put("sortTypePlaylists", sortTypePlaylists.value);
+      box.put("sortTypeFavorites", sortTypeFavorites.value);
+
+      // Save playing state
+      box.put("isPlayingFromPlaylist", isPlayingFromPlaylist.value);
+
+      log('✅ Playlist state saved: ${currentPlaylistId.value}');
+    } catch (e) {
+      log('❌ Error saving playlist state: $e');
+    }
+  }
+
+  /// Load saved state from Hive
+  Future<void> _loadSavedState() async {
+    try {
+      // Load sort types
+      sortTypePlaylists.value = box.get(
+        "sortTypePlaylists",
+        defaultValue: "titleASC",
+      );
+      sortTypeFavorites.value = box.get(
+        "sortTypeFavorites",
+        defaultValue: "titleASC",
+      );
+
+      // Load playing state
+      isPlayingFromPlaylist.value = box.get(
+        "isPlayingFromPlaylist",
+        defaultValue: false,
+      );
+
+      // Load current playlist info
+      currentPlaylistId.value = box.get("currentPlaylistId", defaultValue: '');
+      currentPlaylistName.value = box.get(
+        "currentPlaylistName",
+        defaultValue: '',
+      );
+
+      log('📋 Loaded playlist state: ${currentPlaylistId.value}');
+    } catch (e) {
+      log('❌ Error loading playlist state: $e');
+    }
+  }
+
+  Future<void> _restoreCurrentPlaylist() async {
+    try {
+      if (currentPlaylistId.value.isEmpty) return;
+
+      // ✅ Skip restoration if already playing this playlist
+      if (isPlayingFromPlaylist.value &&
+          songHandler.mediaItem.value != null &&
+          currentPlaylistSongs.any(
+            (s) => s.id == songHandler.mediaItem.value!.id,
+          )) {
+        log('⏭️ Already playing this playlist - skipping restoration');
+        return;
+      }
+
+      final playlist = AppPlaylistService.getPlaylist(currentPlaylistId.value);
+      if (playlist != null) {
+        await loadPlaylistSongs(currentPlaylistId.value, restoreState: true);
+        log('🎵 Restored playlist: ${playlist.name}');
+      } else {
+        // Playlist no longer exists, clear saved state
+        currentPlaylistId.value = '';
+        currentPlaylistName.value = '';
+        await _saveCurrentState();
+      }
+    } catch (e) {
+      log('❌ Error restoring playlist: $e');
+    }
+  }
+
+  /// Load favorite map from Hive
+  Future<void> loadFavoritesFromHive() async {
+    try {
+      final dynamic data = box.get("favorite");
+      if (data != null) {
+        if (data is List) {
+          favoriteIds.value = List<String>.from(data);
+        } else if (data is Map) {
+          // Convert old map to list (keys only)
+          favoriteIds.value = data.keys.cast<String>().toList();
+        }
+      } else {
+        favoriteIds.clear();
+      }
+      log('❤️ Loaded ${favoriteIds.length} favorite IDs');
+    } catch (e) {
+      log('❌ Error loading favorites: $e');
+      favoriteIds.clear();
     }
   }
 
@@ -71,7 +194,8 @@ class Playlistcontroller extends GetxController {
   Future<void> loadAppPlaylists() async {
     try {
       isLoading.value = true;
-      playlists.assignAll(AppPlaylistService.getAllPlaylists());
+      final loadedPlaylists = AppPlaylistService.getAllPlaylists();
+      playlists.assignAll(loadedPlaylists);
       log('📂 Loaded ${playlists.length} app playlists');
     } catch (e) {
       log('❌ Error loading app playlists: $e');
@@ -107,6 +231,9 @@ class Playlistcontroller extends GetxController {
       playlistNameController.clear();
       playlistDescriptionController.clear();
 
+      // Auto-select the new playlist
+      await loadPlaylistSongs(playlist.id, restoreState: false);
+
       Get.snackbar('Success', 'Playlist "$playlistName" created!');
       return playlist;
     } catch (e) {
@@ -125,7 +252,12 @@ class Playlistcontroller extends GetxController {
       // If deleted playlist is currently viewed, clear it
       if (currentPlaylistId.value == playlistId) {
         currentPlaylistId.value = '';
+        currentPlaylistName.value = '';
         currentPlaylistSongs.clear();
+        isPlayingFromPlaylist.value = false;
+
+        // Save cleared state
+        await _saveCurrentState();
       }
 
       Get.snackbar('Success', 'Playlist deleted');
@@ -135,8 +267,20 @@ class Playlistcontroller extends GetxController {
     }
   }
 
-  /// Load songs for a specific playlist
-  Future<void> loadPlaylistSongs(String playlistId) async {
+  /// Load playlist songs with performance optimization and reload guarding
+  Future<void> loadPlaylistSongs(
+    String playlistId, {
+    bool restoreState = false,
+    bool force = false,
+  }) async {
+    // Prevent reloading the same playlist unless forced
+    if (!force &&
+        playlistId == currentPlaylistId.value &&
+        currentPlaylistSongs.isNotEmpty) {
+      log('⏭️ Already loaded playlist $playlistId, skipping');
+
+      return;
+    }
     try {
       isLoading.value = true;
       currentPlaylistId.value = playlistId;
@@ -144,33 +288,96 @@ class Playlistcontroller extends GetxController {
       final playlist = AppPlaylistService.getPlaylist(playlistId);
       if (playlist == null) {
         currentPlaylistSongs.clear();
+        currentPlaylistName.value = '';
         return;
       }
 
-      // Get all available songs
-      final allSongs = songscontroller.songs;
+      currentPlaylistName.value = playlist.name;
 
-      // Filter songs that are in this playlist
-      final playlistSongIds = playlist.songIds;
-      final filteredSongs = allSongs.where((song) {
-        return playlistSongIds.contains(song.id);
+      final Map<String, MediaItem> allSongsMap = {
+        for (var song in songscontroller.songs) song.id: song,
+      };
+
+      final List<MediaItem> sortedSongs = playlist.songIds.map((id) {
+        return allSongsMap[id] ??
+            MediaItem(id: id, title: 'Unknown Song', artist: 'Unknown Artist');
       }).toList();
 
-      // Sort if needed
-      final sortedSongs = sort(
-        song: filteredSongs,
-        sortType: songscontroller.sortypePlaylists ?? 'titleASC',
-      );
-
       currentPlaylistSongs.assignAll(sortedSongs);
-      log(
-        '🎵 Loaded ${filteredSongs.length} songs for playlist: ${playlist.name}',
-      );
+      await _saveCurrentState();
+
+      log('🎵 Loaded ${sortedSongs.length} songs for: ${playlist.name}');
+
+      if (restoreState && isPlayingFromPlaylist.value) {
+        await _restorePlaylistPlayback();
+        log('🎵 Restored playback for playlist: ${playlist.name}');
+      }
     } catch (e) {
-      log('❌ Error loading playlist songs: $e');
-      Get.snackbar('Error', 'Failed to load playlist songs');
+      log('❌ Error: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Optimized: Check if playlist is already active before re-initializing audio handler
+  Future<void> handlePlaylist(
+    String playlistId, {
+    bool restoreState = false,
+    int? initialIndex,
+  }) async {
+    try {
+      bool alreadyPlayingThis =
+          isPlayingFromPlaylist.value && currentPlaylistId.value == playlistId;
+
+      await loadPlaylistSongs(
+        playlistId,
+        restoreState: restoreState,
+        force: false,
+      );
+
+      if (currentPlaylistSongs.isNotEmpty) {
+        final currentQueue = songHandler.queue.value;
+        bool isSameQueue =
+            currentQueue.length == currentPlaylistSongs.length &&
+            currentQueue.asMap().entries.every(
+              (entry) => entry.value.id == currentPlaylistSongs[entry.key].id,
+            );
+
+        if (isSameQueue && alreadyPlayingThis && !restoreState) {
+          // Queue already matches – just skip to the requested index
+          if (initialIndex != null) {
+            await songHandler.skipToQueueItem(initialIndex);
+            await songHandler.play();
+          }
+        } else {
+          // Queue differs – initialise the player with the playlist
+          isPlayingFromPlaylist.value = true;
+          await _saveCurrentState();
+          await songHandler.initSongs(
+            songs: currentPlaylistSongs,
+            restoreState: restoreState,
+            initialIndex: initialIndex ?? 0,
+          );
+          animationController.reset();
+        }
+      }
+    } catch (e) {
+      log('❌ Error: $e');
+    }
+  }
+
+  /// Restore playlist playback from saved state
+  Future<void> _restorePlaylistPlayback() async {
+    try {
+      if (currentPlaylistSongs.isNotEmpty) {
+        await songHandler.initSongs(
+          songs: currentPlaylistSongs,
+          restoreState: true,
+        );
+        log('🎵 Restored playlist playback');
+      }
+    } catch (e) {
+      log('❌ Error restoring playlist playback: $e');
     }
   }
 
@@ -187,9 +394,15 @@ class Playlistcontroller extends GetxController {
       );
 
       if (success) {
-        // Update local state if this playlist is currently viewed
         if (currentPlaylistId.value == playlistId) {
-          await loadPlaylistSongs(playlistId);
+          final song = songscontroller.songs.firstWhereOrNull(
+            (s) => s.id == songId,
+          );
+          if (song != null &&
+              !currentPlaylistSongs.any((s) => s.id == songId)) {
+            currentPlaylistSongs.add(song);
+            await _saveCurrentState();
+          }
         }
 
         if (showNotification) {
@@ -219,6 +432,8 @@ class Playlistcontroller extends GetxController {
         // Update local state
         if (currentPlaylistId.value == playlistId) {
           currentPlaylistSongs.removeWhere((song) => song.id == songId);
+          // Save updated state
+          await _saveCurrentState();
         }
 
         Get.snackbar('Success', 'Song removed from playlist');
@@ -261,6 +476,8 @@ class Playlistcontroller extends GetxController {
       if (success) {
         if (currentPlaylistId.value == playlistId) {
           currentPlaylistSongs.clear();
+          // Save cleared state
+          await _saveCurrentState();
         }
 
         Get.snackbar('Success', 'Playlist cleared');
@@ -289,28 +506,16 @@ class Playlistcontroller extends GetxController {
         playlists[index] = playlist;
       }
 
+      // Update current playlist name if it's the current one
+      if (currentPlaylistId.value == playlistId) {
+        currentPlaylistName.value = newName;
+        await _saveCurrentState();
+      }
+
       Get.snackbar('Success', 'Playlist renamed to "$newName"');
     } catch (e) {
       log('❌ Error renaming playlist: $e');
       Get.snackbar('Error', 'Failed to rename playlist');
-    }
-  }
-
-  /// Handle playlist playback
-  Future<void> handlePlaylist(String playlistId) async {
-    try {
-      await loadPlaylistSongs(playlistId);
-
-      if (currentPlaylistSongs.isNotEmpty) {
-        await songHandler.initSongs(songs: currentPlaylistSongs);
-        animationController.reset();
-        Get.snackbar('Playing', 'Playlist loaded');
-      } else {
-        Get.snackbar('Info', 'Playlist is empty');
-      }
-    } catch (e) {
-      log('❌ Error handling playlist playback: $e');
-      Get.snackbar('Error', 'Failed to play playlist');
     }
   }
 
@@ -323,6 +528,17 @@ class Playlistcontroller extends GetxController {
     } else {
       final results = AppPlaylistService.searchPlaylists(query);
       playlists.assignAll(results);
+    }
+  }
+
+  // Modify updatePlaylistSortType to call the above method
+  void updatePlaylistSortType(String type) {
+    sortTypePlaylists.value = type;
+    box.put("sortTypePlaylists", type);
+
+    // If a playlist is currently open, reorder it permanently
+    if (currentPlaylistId.value.isNotEmpty) {
+      _reorderCurrentPlaylistBySortType();
     }
   }
 
@@ -384,168 +600,325 @@ class Playlistcontroller extends GetxController {
     }
   }
 
+  // Add this method
+  Future<void> _reorderCurrentPlaylistBySortType() async {
+    final playlistId = currentPlaylistId.value;
+    if (playlistId.isEmpty) return;
+
+    final playlist = AppPlaylistService.getPlaylist(playlistId);
+    if (playlist == null) return;
+
+    // Build a map of all songs for O(1) lookup
+    final Map<String, MediaItem> allSongsMap = {
+      for (var song in songscontroller.songs) song.id: song,
+    };
+
+    // Get the actual MediaItem objects in the current playlist order
+    List<MediaItem> songs = playlist.songIds
+        .map((id) => allSongsMap[id])
+        .whereType<MediaItem>()
+        .toList();
+
+    if (songs.isEmpty) return; // nothing to sort
+
+    // Sort the songs using the utility function
+    final sortedSongs = sort(song: songs, sortType: sortTypePlaylists.value);
+
+    // Extract the new ordered list of IDs
+    final newSongIds = sortedSongs.map((s) => s.id).toList();
+
+    // Update the playlist object
+    playlist.songIds.clear();
+    playlist.songIds.addAll(newSongIds);
+
+    // Save to storage
+    await AppPlaylistService.updatePlaylist(playlist);
+
+    // Reload the UI with the new order (force refresh)
+    await loadPlaylistSongs(playlistId, force: true);
+  }
+
   /// Reorder songs in current playlist
   Future<void> reorderPlaylistSongs(int oldIndex, int newIndex) async {
     try {
       final playlistId = currentPlaylistId.value;
-      if (playlistId.isEmpty) return;
+      if (playlistId.isEmpty) {
+        log('❌ No current playlist ID');
+        Get.snackbar('Error', 'No playlist selected');
+        return;
+      }
 
+      if (oldIndex < 0 || oldIndex >= currentPlaylistSongs.length) {
+        log('❌ Invalid oldIndex: $oldIndex');
+        Get.snackbar('Error', 'Invalid starting position');
+        return;
+      }
+      if (newIndex < 0 || newIndex >= currentPlaylistSongs.length) {
+        log('❌ Invalid newIndex: $newIndex');
+        Get.snackbar('Error', 'Invalid target position');
+        return;
+      }
+      if (oldIndex == newIndex) return;
+
+      final movedItem = currentPlaylistSongs[oldIndex];
+
+      // Optimistic UI update
+      currentPlaylistSongs.removeAt(oldIndex);
+      currentPlaylistSongs.insert(newIndex, movedItem);
+      currentPlaylistSongs.refresh();
+      update();
+
+      // Persist the change using the fixed service method
       final success = await AppPlaylistService.reorderPlaylistSongs(
         playlistId: playlistId,
         oldIndex: oldIndex,
         newIndex: newIndex,
       );
 
-      if (success) {
-        await loadPlaylistSongs(playlistId);
-      }
-    } catch (e) {
-      log('❌ Error reordering songs: $e');
-    }
-  }
-
-  /// REVERT: Load favorite map from Hive (old style)
-  Future<void> loadFavoritesFromHive() async {
-    try {
-      final favoriteMap = box.get("favorite");
-      if (favoriteMap != null && favoriteMap is Map) {
-        isfavorite = Map<dynamic, dynamic>.from(favoriteMap);
-        log(
-          '❤️ Loaded ${isfavorite.length} favorites from storage (old style)',
-        );
+      if (!success) {
+        // Rollback
+        currentPlaylistSongs.removeAt(newIndex);
+        currentPlaylistSongs.insert(oldIndex, movedItem);
+        currentPlaylistSongs.refresh();
+        update();
+        Get.snackbar('Error', 'Failed to save changes to storage');
       } else {
-        isfavorite = {};
+        log('✅ Reorder saved successfully!');
+        Get.snackbar(
+          'Success',
+          'Playlist order updated',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: Duration(seconds: 1),
+        );
       }
     } catch (e) {
-      log('❌ Error loading favorites map: $e');
-      isfavorite = {};
+      log('❌ Exception in reorderPlaylistSongs: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to reorder: ${e.toString().split('\n').first}',
+      );
     }
   }
 
-  /// CHANGED: Make these methods async and reload favorites
   Future<void> addToFavorites(MediaItem song) async {
-    isfavorite[song.id] = true;
-    await box.put("favorite", isfavorite);
-    await loadFavorites();
-    update();
+    if (!favoriteIds.contains(song.id)) {
+      favoriteIds.add(song.id);
+      await box.put("favorite", favoriteIds.toList());
+      await loadFavorites();
+      update();
+    }
   }
 
   Future<void> removeFromFavorites(MediaItem song) async {
-    isfavorite.remove(song.id);
-    await box.put("favorite", isfavorite);
+    if (favoriteIds.contains(song.id)) {
+      favoriteIds.remove(song.id);
+      await box.put("favorite", favoriteIds.toList());
+      await loadFavorites();
+      update();
+    }
+  }
+
+  void toggleFavorite(MediaItem song) {
+    if (favoriteIds.contains(song.id)) {
+      removeFromFavorites(song);
+      Get.snackbar('Removed', 'Removed from favorites');
+    } else {
+      addToFavorites(song);
+      Get.snackbar('Added', 'Added to favorites');
+    }
+  }
+
+  bool isSongFavorited(String songId) => favoriteIds.contains(songId);
+
+  /// Optimized: Load favorites using Map-based lookup for performance
+  Future<RxList<MediaItem>> loadFavorites() async {
+    try {
+      if (favoriteIds.isEmpty || songscontroller.songs.isEmpty) {
+        favorites.clear();
+        return favorites;
+      }
+
+      final Map<String, MediaItem> allSongsMap = {
+        for (var song in songscontroller.songs) song.id: song,
+      };
+
+      final List<MediaItem> temp = [];
+      for (var id in favoriteIds) {
+        final song = allSongsMap[id];
+        if (song != null) temp.add(song);
+      }
+
+      favorites.assignAll(temp);
+      log('❤️ Displayed ${favorites.length} favorites');
+      return favorites;
+    } catch (e) {
+      log('❌ Error loading favorites: $e');
+      return favorites;
+    }
+  }
+
+  Future<void> reorderFavorites(int oldIndex, int newIndex) async {
+    if (oldIndex < 0 || oldIndex >= favoriteIds.length) return;
+    if (newIndex < 0 || newIndex >= favoriteIds.length) return;
+    if (oldIndex == newIndex) return;
+
+    final movedId = favoriteIds.removeAt(oldIndex);
+    favoriteIds.insert(newIndex, movedId);
+
+    await box.put("favorite", favoriteIds.toList());
+    await loadFavorites(); // updates UI
+    update();
+  }
+
+  void updateFavoriteSortType(String type) {
+    sortTypeFavorites.value = type;
+    box.put("sortTypeFavorites", type);
+    if (favoriteIds.isNotEmpty) {
+      _sortFavoriteIds();
+    }
+  }
+
+  Future<void> _sortFavoriteIds() async {
+    // Map IDs to MediaItem objects
+    final Map<String, MediaItem> allSongsMap = {
+      for (var song in songscontroller.songs) song.id: song,
+    };
+
+    final List<MediaItem> songs = favoriteIds
+        .map((id) => allSongsMap[id])
+        .whereType<MediaItem>()
+        .toList();
+
+    if (songs.isEmpty) return;
+
+    // Sort using the existing utility
+    final sorted = sort(song: songs, sortType: sortTypeFavorites.value);
+
+    // Extract new ordered IDs
+    final newIds = sorted.map((s) => s.id).toList();
+
+    favoriteIds.value = newIds;
+    await box.put("favorite", favoriteIds.toList());
     await loadFavorites();
     update();
   }
 
-  Future<RxList<MediaItem>> loadFavorites() async {
-    try {
-      List keys = isfavorite.keys.toList();
-      List<MediaItem> tempFavorites = []; // Use temporary list
-      log('🔍 Checking songscontroller.songs IDs:');
-      for (var s in songscontroller.songs.take(3)) {
-        log('  - ${s.id} - ${s.title}');
-      }
-      log('🔍 Loading favorites: ${isfavorite.length} keys found');
-      log('🔍 Keys: $keys');
-
-      for (var i = 0; i < isfavorite.length; i++) {
-        try {
-          // Find the song in songscontroller.songs
-          MediaItem song = songscontroller.songs.firstWhere(
-            (element) => element.id == keys[i],
-          );
-          tempFavorites.add(song);
-          log('✅ Added favorite: ${song.title} (ID: ${keys[i]})');
-        } catch (e) {
-          log('❌ Could not find song with ID: ${keys[i]}');
-        }
-      }
-
-      log('🎵 Favorites before sorting: ${tempFavorites.length}');
-
-      // Sort favorites
-      if (tempFavorites.isNotEmpty) {
-        final sortedList = sort(
-          song: tempFavorites,
-          sortType: songscontroller.sortypeFavorite ?? "titleASC",
-        );
-        log('🎵 Sorted list length: ${sortedList.length}');
-        favorites.assignAll(sortedList);
-      } else {
-        favorites.clear();
-      }
-
-      log('🎵 Total favorites loaded: ${favorites.length}');
-      return favorites;
-    } catch (e) {
-      log('❌ Error loading favorites: $e');
-      return <MediaItem>[].obs;
-    }
-  }
-
-  // Update your toggleFavorite method:
-  Future<void> toggleFavorite(MediaItem song) async {
-    if (isfavorite.containsKey(song.id)) {
-      removefavorite(song);
-      Get.snackbar('Removed', 'Removed from favorites');
-    } else {
-      addfavorite(song);
-      Get.snackbar('Added', 'Added to favorites');
-    }
-    favoriteUpdated.toggle(); // This triggers Obx updates
-  }
-
-  // Update addfavorite and removefavorite:
-  void addfavorite(MediaItem song) {
-    isfavorite[song.id] = true;
-    box.put("favorite", isfavorite);
-    log('❤️ Added to favorites: ${song.title} (ID: ${song.id})');
-    loadFavorites();
-    favoriteUpdated.toggle(); // Trigger update
-  }
-
-  void removefavorite(MediaItem song) {
-    isfavorite.remove(song.id);
-    box.put("favorite", isfavorite);
-    log('💔 Removed from favorites: ${song.title} (ID: ${song.id})');
-    loadFavorites();
-    favoriteUpdated.toggle(); // Trigger update
-  }
-
-  /// REVERT: Use old method for handling favorites playback
-  Future<void> handleFavorites() async {
+  Future<void> handleFavorites({
+    bool restoreState = false,
+    bool showSnackbar = true,
+    int? initialIndex,
+  }) async {
     if (favorites.isEmpty) {
-      Get.snackbar('Info', 'No favorite songs found');
+      if (showSnackbar) Get.snackbar('Info', 'No favorite songs found');
       return;
     }
 
-    await songHandler.initSongs(songs: favorites);
-    animationController.reset();
-    Get.snackbar('Playing', 'Favorites playlist loaded');
-  }
-// Add these to Playlistcontroller class:
+    // Check if the current queue is already the favorites list (same order)
+    final currentQueue = songHandler.queue.value;
+    bool isSameQueue =
+        currentQueue.length == favorites.length &&
+        currentQueue.asMap().entries.every(
+          (entry) => entry.value.id == favorites[entry.key].id,
+        );
 
-/// Update song in favorites list
-void updateSongInFavorites(String songId, MediaItem updatedSong) {
-  final index = favorites.indexWhere((item) => item.id == songId);
-  if (index != -1) {
-    favorites[index] = updatedSong;
-    log('✅ Updated song in favorites: ${updatedSong.title}');
-    update();
-  }
-}
+    if (isSameQueue && !restoreState) {
+      // Queue already matches – just skip to the requested index
+      if (initialIndex != null) {
+        await songHandler.skipToQueueItem(initialIndex);
+        await songHandler.play();
+      }
+    } else {
+      // Queue differs – initialise the player with the favorites list
+      isPlayingFromPlaylist.value = false;
+      await _saveCurrentState();
+      await songHandler.initSongs(
+        songs: favorites,
+        restoreState: restoreState,
+        initialIndex: initialIndex ?? 0,
+      );
+      animationController.reset();
+    }
 
-/// Update song in current playlist
-void updateSongInCurrentPlaylist(String songId, MediaItem updatedSong) {
-  final index = currentPlaylistSongs.indexWhere((item) => item.id == songId);
-  if (index != -1) {
-    currentPlaylistSongs[index] = updatedSong;
-    log('✅ Updated song in current playlist: ${updatedSong.title}');
-    update();
+    // Only show snackbar if we actually loaded a new queue
+    if (showSnackbar && !isSameQueue) {
+      Get.snackbar('Playing', 'Favorites playlist loaded');
+    }
   }
-}
-  /// Helper method to check if a song is favorited
-  RxBool isSongFavorited(String songId) {
-    return isfavorite.containsKey(songId).obs;
+
+  /// Update song in current playlist
+  void updateSongInCurrentPlaylist(String songId, MediaItem updatedSong) {
+    final index = currentPlaylistSongs.indexWhere((item) => item.id == songId);
+    if (index != -1) {
+      currentPlaylistSongs[index] = updatedSong;
+      log('✅ Updated song in current playlist: ${updatedSong.title}');
+      update();
+    }
+  }
+
+  /// Get current playlist state for debugging
+  Map<String, dynamic> getCurrentPlaylistState() {
+    return {
+      'currentPlaylistId': currentPlaylistId.value,
+      'currentPlaylistName': currentPlaylistName.value,
+      'playlistSongCount': currentPlaylistSongs.length,
+      'isPlayingFromPlaylist': isPlayingFromPlaylist.value,
+      'favoriteCount': favorites.length,
+      'sortTypePlaylists': sortTypePlaylists.value,
+      'sortTypeFavorites': sortTypeFavorites.value,
+    };
+  }
+
+  /// Clear all saved playlist states
+  Future<void> clearAllSavedStates() async {
+    try {
+      // Clear saved playlist state
+      box.delete("currentPlaylistId");
+      box.delete("currentPlaylistName");
+      box.delete("sortTypePlaylists");
+      box.delete("sortTypeFavorites");
+      box.delete("isPlayingFromPlaylist");
+
+      // Reset current state
+      currentPlaylistId.value = '';
+      currentPlaylistName.value = '';
+      currentPlaylistSongs.clear();
+      isPlayingFromPlaylist.value = false;
+
+      log('✅ Cleared all playlist states');
+    } catch (e) {
+      log('❌ Error clearing playlist states: $e');
+    }
+  }
+
+  /// Check if current song is from playlist
+  bool isCurrentSongFromPlaylist() {
+    final currentSong = songHandler.mediaItem.value;
+    if (currentSong == null) return false;
+
+    return currentPlaylistSongs.any((song) => song.id == currentSong.id);
+  }
+
+  /// Navigate to next/previous song within playlist
+  Future<void> navigateInPlaylist(bool next) async {
+    if (!isCurrentSongFromPlaylist()) return;
+
+    final currentSong = songHandler.mediaItem.value;
+    if (currentSong == null) return;
+
+    final currentIndex = currentPlaylistSongs.indexWhere(
+      (song) => song.id == currentSong.id,
+    );
+    if (currentIndex == -1) return;
+
+    int newIndex;
+    if (next) {
+      newIndex = (currentIndex + 1) % currentPlaylistSongs.length;
+    } else {
+      newIndex = currentIndex > 0
+          ? currentIndex - 1
+          : currentPlaylistSongs.length - 1;
+    }
+
+    await songHandler.skipToQueueItem(newIndex);
   }
 }

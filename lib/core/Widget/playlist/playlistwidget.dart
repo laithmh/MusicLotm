@@ -92,10 +92,6 @@ class Playlistwidget extends StatelessWidget {
                             },
                             leading: Icon(Icons.playlist_play),
                             title: Text(playlist.name.toUpperCase()),
-                            subtitle: Text(
-                              '${playlist.songCount} songs',
-                              style: TextStyle(fontSize: 10.sp),
-                            ),
                           ),
                         ),
                       ),

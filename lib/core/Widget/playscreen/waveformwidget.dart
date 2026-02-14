@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_audio_waveforms/flutter_audio_waveforms.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
-import 'package:musiclotm/main.dart';
 
 class PolygonWaveformcustom extends StatelessWidget {
   final int? maxDuration;
@@ -13,6 +14,8 @@ class PolygonWaveformcustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GenerateRandomNumbers generateRandomNumbers = Get.find();
+    var box = Hive.box('music');
+    SongHandler songHandler = Get.find<SongHandler>();
 
     return StreamBuilder<Duration>(
       stream: AudioService.position,
@@ -30,7 +33,7 @@ class PolygonWaveformcustom extends StatelessWidget {
               children: [
                 RectangleWaveform(
                   samples: generateRandomNumbers.samples,
-                  height: 40.h,
+                  height: 35.h,
                   width: MediaQuery.of(context).size.width - 100,
                   maxDuration: Duration(seconds: maxDuration! + 1),
                   elapsedDuration: position ?? const Duration(seconds: 0),
@@ -44,7 +47,7 @@ class PolygonWaveformcustom extends StatelessWidget {
                 ),
                 RectangleWaveform(
                   samples: generateRandomNumbers.samples,
-                  height: 40.h,
+                  height: 35.h,
                   width: MediaQuery.of(context).size.width - 100,
                   maxDuration: Duration(seconds: maxDuration! + 1),
                   elapsedDuration: position ?? const Duration(seconds: 0),

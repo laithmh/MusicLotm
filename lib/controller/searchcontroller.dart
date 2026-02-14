@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
-import 'package:musiclotm/main.dart';
 
 class Searchcontroller extends GetxController {
   final Songscontroller songsController = Get.find();
+  SongHandler get songHandler => Get.find<SongHandler>();
   final TextEditingController textController = TextEditingController();
 
   final RxList<MediaItem> filteredSongs = <MediaItem>[].obs;

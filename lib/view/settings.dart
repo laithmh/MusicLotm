@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/settingscontroller.dart';
 import 'package:musiclotm/core/Widget/timer_dialog.dart';
+import 'package:musiclotm/core/const/routesname.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -188,7 +189,7 @@ class _SettingsState extends State<Settings> {
                   title: 'C O N T A C T  V I A  E M A I L',
                   icon: Icons.email_outlined,
                   onTap: () {
-                    // Get.toNamed(Approutes.contact);
+                    Get.toNamed(Approutes.contact);
                   },
                 ),
               ],

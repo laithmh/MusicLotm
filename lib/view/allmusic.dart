@@ -25,29 +25,36 @@ class Allmusicscreen extends StatelessWidget {
                 items: <Bubble>[
                   Bubble(
                     title: "Add to playlists",
+
                     iconColor: Colors.black,
                     bubbleColor: Theme.of(context).colorScheme.secondary,
                     icon: Icons.playlist_add,
                     titleStyle: TextStyle(
                       fontSize: 8.sp,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                     onPress: () {
                       if (playlistcontroller.selectedSongIds.isEmpty) {
                         Get.snackbar('Info', 'Please select songs first');
                         return;
                       }
-                      
+
                       showDialog(
                         context: context,
                         builder: (context) => CustomAlertDialog(
                           onPressed: () async {
-                            if (playlistcontroller.selectedPlaylistIds.isEmpty) {
-                              Get.snackbar('Info', 'Please select at least one playlist');
+                            if (playlistcontroller
+                                .selectedPlaylistIds
+                                .isEmpty) {
+                              Get.snackbar(
+                                'Info',
+                                'Please select at least one playlist',
+                              );
                               return;
                             }
-                            
-                            await playlistcontroller.addSelectedSongsToSelectedPlaylists();
+
+                            await playlistcontroller
+                                .addSelectedSongsToSelectedPlaylists();
                             Get.back();
                             animationControllerX.reverseAnimation();
                             playlistcontroller.toggleSelectionMode();
@@ -63,12 +70,14 @@ class Allmusicscreen extends StatelessWidget {
                     icon: Icons.select_all,
                     titleStyle: TextStyle(
                       fontSize: 8.sp,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                     onPress: () {
                       // Select all songs
                       for (var song in songscontroller.songs) {
-                        if (!playlistcontroller.selectedSongIds.contains(song.id)) {
+                        if (!playlistcontroller.selectedSongIds.contains(
+                          song.id,
+                        )) {
                           playlistcontroller.selectSong(song.id);
                         }
                       }
@@ -82,7 +91,7 @@ class Allmusicscreen extends StatelessWidget {
                     icon: Icons.clear_all,
                     titleStyle: TextStyle(
                       fontSize: 8.sp,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                     onPress: () {
                       playlistcontroller.clearSelections();
@@ -96,7 +105,7 @@ class Allmusicscreen extends StatelessWidget {
                     icon: Icons.close,
                     titleStyle: TextStyle(
                       fontSize: 8.sp,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.inversePrimary,
                     ),
                     onPress: () {
                       playlistcontroller.clearSelections();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:musiclotm/main.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 
 class Timerow extends StatelessWidget {
   final String currenttime;
@@ -20,6 +20,8 @@ class Timerow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SongHandler songHandler = Get.find<SongHandler>();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -32,25 +34,15 @@ class Timerow extends StatelessWidget {
         ),
         IconButton(
           onPressed: addtoplaylist,
-          icon: Icon(
-            Icons.playlist_add,
-            size: 22.w,
-          ),
+          icon: Icon(Icons.playlist_add, size: 22.w),
           tooltip: 'Add to playlist',
         ),
         Obx(() {
           return IconButton(
             onPressed: setloop,
             icon: songHandler.isloop.isFalse
-                ? Icon(
-                    Icons.repeat,
-                    size: 22.w,
-                  )
-                : Icon(
-                    Icons.repeat_one,
-                    size: 22.w,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                ? Icon(Icons.repeat, size: 22.w)
+                : Icon(Icons.repeat_one, size: 22.w),
             tooltip: songHandler.isloop.isFalse ? 'Repeat all' : 'Repeat one',
           );
         }),
@@ -58,11 +50,11 @@ class Timerow extends StatelessWidget {
           return IconButton(
             onPressed: shuffle,
             icon: Icon(
-              Icons.shuffle,
+              songHandler.isShuffel.value
+                  ? Icons.arrow_right_alt
+                  : Icons.shuffle,
               size: 22.w,
-              color: songHandler.isShuffel.value
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).iconTheme.color,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             tooltip: songHandler.isShuffel.value ? 'Shuffle on' : 'Shuffle off',
           );

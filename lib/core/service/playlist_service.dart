@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:hive/hive.dart';
 import 'package:musiclotm/core/model/playlist_model.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class AppPlaylistService {
@@ -19,8 +18,6 @@ class AppPlaylistService {
 
     try {
       // Initialize Hive with a valid directory
-      final appDir = await getApplicationDocumentsDirectory();
-      Hive.init(appDir.path);
 
       // Register adapters
       if (!Hive.isAdapterRegistered(0)) {
@@ -46,7 +43,7 @@ class AppPlaylistService {
   // static Future<void> _createDefaultPlaylists() async {
   //   if (_playlistBox.isEmpty) {
   //     final defaultPlaylists = [
-       
+
   //       AppPlaylist(
   //         name: 'Recently Added',
   //         description: 'Recently added songs',
@@ -236,21 +233,38 @@ class AppPlaylistService {
         .toList();
   }
 
-  /// Reorder songs in playlist
-  static Future<bool> reorderPlaylistSongs({
-    required String playlistId,
-    required int oldIndex,
-    required int newIndex,
-  }) async {
-    _ensureInitialized();
+  /// Reorder songs in playlist (following Flutter's onReorder convention)
+static Future<bool> reorderPlaylistSongs({
+  required String playlistId,
+  required int oldIndex,
+  required int newIndex,
+}) async {
+  _ensureInitialized();
 
-    final playlist = getPlaylist(playlistId);
-    if (playlist == null) return false;
+  try {
+    final playlist = _playlistBox.get(playlistId);
+    if (playlist == null) {
+      log('❌ Playlist not found: $playlistId');
+      return false;
+    }
 
-    playlist.reorderSongs(oldIndex, newIndex);
-    await updatePlaylist(playlist);
+    final songs = playlist.songIds;
+    if (oldIndex < 0 || oldIndex >= songs.length) return false;
+    if (newIndex < 0 || newIndex >= songs.length) return false;
+    if (oldIndex == newIndex) return true;
+
+    // Correct reorder: remove first, then insert at newIndex
+    final movedId = songs.removeAt(oldIndex);
+    songs.insert(newIndex, movedId);
+
+    await _playlistBox.put(playlistId, playlist);
+    log('✅ Reordered playlist: ${playlist.name}');
     return true;
+  } catch (e) {
+    log('❌ Error reordering: $e');
+    return false;
   }
+}
 
   /// Get playlist count
   static int get playlistCount {

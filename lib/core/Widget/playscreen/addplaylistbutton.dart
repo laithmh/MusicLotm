@@ -3,10 +3,11 @@ import 'dart:developer';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
+import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/Widget/showdialog.dart';
 import 'package:musiclotm/core/Widget/timeandshufell.dart';
-import 'package:musiclotm/main.dart';
 
 class Addtoplaylistbutton extends StatelessWidget {
   const Addtoplaylistbutton({super.key});
@@ -14,7 +15,8 @@ class Addtoplaylistbutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Playlistcontroller playlistcontroller = Get.find();
-
+    SongHandler songHandler = Get.find<SongHandler>();
+    AudioPlayer audioPlayer = Get.find<AudioPlayer>();
     return StreamBuilder<Duration>(
       stream: AudioService.position,
       builder: (context, snapshot) {
@@ -53,7 +55,7 @@ class Addtoplaylistbutton extends StatelessWidget {
                     }
 
                     final count = playlistcontroller.selectedPlaylistIds.length;
-                   
+
                     Get.snackbar(
                       'Success',
                       'Added to $count playlist${count > 1 ? 's' : ''}',

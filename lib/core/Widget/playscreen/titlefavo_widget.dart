@@ -17,6 +17,8 @@ class TitlefavoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final playlistcontroller = Get.find<Playlistcontroller>();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -46,22 +48,22 @@ class TitlefavoWidget extends StatelessWidget {
                   fontWeight: FontWeight.normal,
                   color: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.color?.withValues(alpha:  0.8),
+                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                 ),
               ),
             ],
           ),
         ),
         Obx(() {
-          final playlistcontroller = Get.find<Playlistcontroller>();
           final isFavorite = playlistcontroller.isSongFavorited(song.id);
+
           return IconButton(
             onPressed: () async {
-              await playlistcontroller.toggleFavorite(song);
+              playlistcontroller.toggleFavorite(song);
             },
             icon: Icon(
-              isFavorite.value ? Icons.favorite : Icons.favorite_border,
-              color: isFavorite.value
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite
                   ? Colors.red
                   : Theme.of(context).iconTheme.color,
               size: 24.w,

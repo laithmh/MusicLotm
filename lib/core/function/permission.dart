@@ -1,48 +1,50 @@
 // permission.dart - Update with better handling
 
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<bool> requestInitialPermissions() async {
   try {
-    // For Android 13+ we need READ_MEDIA_AUDIO instead of storage
-    // For older versions, we need storage permission
     final List<Permission> permissions = [];
-    
-    // Always request audio permission
-    permissions.add(Permission.audio);
-    
-    // For Android 13+ (SDK 33+)
-    if (await Permission.mediaLibrary.isGranted == false) {
-      permissions.add(Permission.mediaLibrary);
+
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      final sdkInt = androidInfo.version.sdkInt;
+
+      // 1. Storage/Audio logic
+      if (sdkInt >= 33) {
+        // Android 13+ uses granular permissions
+        permissions.add(Permission.audio);
+        permissions.add(Permission.notification); // Required for API 33+
+      } else {
+        // Android 12 and below use standard storage
+        permissions.add(Permission.storage);
+      }
     }
-    
-    // For Android 12 and below
-    if (await Permission.storage.isGranted == false) {
-      permissions.add(Permission.storage);
-    }
-    
-    // Optional permissions
-    permissions.add(Permission.notification);
+
+    // 2. Always request microphone for the visualizer
     permissions.add(Permission.microphone);
-    
-    final Map<Permission, PermissionStatus> statuses = await permissions.request();
-    
-    // Check if we have the essential permissions
-    bool hasAudioPermission = statuses[Permission.audio]?.isGranted ?? false;
-    bool hasMediaLibraryPermission = statuses[Permission.mediaLibrary]?.isGranted ?? false;
-    bool hasStoragePermission = statuses[Permission.storage]?.isGranted ?? false;
-    
-    // We need either media library (Android 13+) or storage (older)
-    bool hasEssentialPermission = hasAudioPermission && 
-                                  (hasMediaLibraryPermission || hasStoragePermission);
-    
-    log('Permission status: Audio: $hasAudioPermission, '
-        'MediaLibrary: $hasMediaLibraryPermission, '
-        'Storage: $hasStoragePermission');
-    
-    return hasEssentialPermission;
+
+    // Request everything in the list
+    final Map<Permission, PermissionStatus> statuses = await permissions
+        .request();
+
+    // 3. Validation Logic
+    bool isAudioOk = false;
+    if (Platform.isAndroid) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt >= 33) {
+        isAudioOk = statuses[Permission.audio]?.isGranted ?? false;
+      } else {
+        isAudioOk = statuses[Permission.storage]?.isGranted ?? false;
+      }
+    }
+
+    log('Permissions granted: $isAudioOk');
+    return isAudioOk;
   } catch (e) {
     log('Error in requestInitialPermissions: $e');
     return false;
@@ -56,7 +58,7 @@ Future<bool> arePermissionsPermanentlyDenied() async {
     Permission.mediaLibrary,
     Permission.storage,
   ];
-  
+
   for (var permission in permissions) {
     final status = await permission.status;
     if (status.isPermanentlyDenied) {

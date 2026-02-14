@@ -17,20 +17,20 @@ class NeumorphicLiquidPainter extends CustomPainter {
     this.intensity = 35.0,
   });
 
- @override
-void paint(Canvas canvas, Size size) {
-  if (fftData.isEmpty) return;
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (fftData.isEmpty) return;
 
-  final center = Offset(size.width / 2, size.height / 2);
-  final radius = size.width / 2;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
 
-  // We draw the shadow/glow slightly larger when the music is louder
-  // double avgAmplitude = fftData.reduce((a, b) => a + b) / fftData.length;
-  // double dynamicIntensity = intensity + (avgAmplitude * 20);
+    // We draw the shadow/glow slightly larger when the music is louder
+    // double avgAmplitude = fftData.reduce((a, b) => a + b) / fftData.length;
+    // double dynamicIntensity = intensity + (avgAmplitude * 20);
 
-  _drawContinuousWave(canvas, center, radius, isInward: true);
-  _drawContinuousWave(canvas, center, radius,  isInward: false);
-}
+    _drawContinuousWave(canvas, center, radius, isInward: true);
+    _drawContinuousWave(canvas, center, radius, isInward: false);
+  }
 
   void _drawContinuousWave(
     Canvas canvas,
@@ -90,7 +90,7 @@ void paint(Canvas canvas, Size size) {
   void _applyNeumorphicStroke(Canvas canvas, Path path, bool isInward) {
     // A. The Shadow Path (Bottom Right offset)
     final shadowPaint = Paint()
-      ..color = shadowColor.withValues(alpha:  isInward ? 0.2 : 0.5)
+      ..color = shadowColor.withValues(alpha: isInward ? 0.2 : 0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
@@ -102,7 +102,7 @@ void paint(Canvas canvas, Size size) {
 
     // B. The Highlight Path (Top Left offset)
     final highlightPaint = Paint()
-      ..color = highlightColor.withValues(alpha:  isInward ? 0.3 : 0.8)
+      ..color = highlightColor.withValues(alpha: isInward ? 0.3 : 0.8)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1);

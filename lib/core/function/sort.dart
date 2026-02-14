@@ -1,7 +1,12 @@
 import 'package:audio_service/audio_service.dart';
 
 import 'package:on_audio_query/on_audio_query.dart';
-
+List<String> dropdownItems = [
+      'titleASC',
+      'titleDESC',
+      'dateASC',
+      'dateDESC'
+    ];
 List<MediaItem> sort({
   required List<MediaItem> song,
   String sortType = "titleASC", // Changed default to match dropdown

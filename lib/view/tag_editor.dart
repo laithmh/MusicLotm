@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/tag_editor_controller.dart';
 
@@ -86,8 +87,8 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
-                width: 30,
-                height: 30,
+                width: 30.w,
+                height: 30.h,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   value: controller.saveProgress.value / 100,
@@ -134,10 +135,10 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
       }
 
       if (controller.selectedSong.value == null) {
-        return const Center(
+        return Center(
           child: Text(
             'Song not found',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
+            style: TextStyle(fontSize: 18.sp, color: Colors.grey),
           ),
         );
       }
@@ -156,15 +157,15 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
           children: [
             // Song info card
             _buildSongInfoCard(context),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
 
             // Album art section
             _buildAlbumArtSection(context),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
 
             // Filename preview (CRITICAL FOR USER CONFIDENCE)
             _buildFilenamePreview(context),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
 
             // Required fields with undo buttons
             _buildTextFieldWithUndo(
@@ -186,7 +187,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
 
             _buildTextFieldWithUndo(
               context: context,
@@ -201,7 +202,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
 
             // Optional fields
             _buildTextFieldWithUndo(
@@ -211,7 +212,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
               icon: Icons.album,
               originalValue: controller.original['album'] ?? '',
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
 
             _buildTextFieldWithUndo(
               context: context,
@@ -220,7 +221,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
               icon: Icons.category,
               originalValue: controller.original['genre'] ?? '',
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
 
             // Validation error display (global)
             Obx(() {
@@ -237,7 +238,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                   child: Row(
                     children: [
                       const Icon(Icons.error, color: Colors.red, size: 20),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Expanded(
                         child: Text(
                           controller.validationError.value,
@@ -253,11 +254,11 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
               }
               return const SizedBox.shrink();
             }),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
 
             // Action buttons
             _buildActionButtons(context),
-            const SizedBox(height: 40), // Bottom padding for keyboard
+            SizedBox(height: 40.h), // Bottom padding for keyboard
           ],
         ),
       ),
@@ -294,7 +295,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                         : Colors.orange,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16.w),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +309,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(
                         controller.selectedSong.value?.artist ??
                             'Unknown Artist',
@@ -323,9 +324,9 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Divider(height: 1),
-            const SizedBox(height: 12),
+            SizedBox(height: 16.h),
+            Divider(height: 1.h),
+            SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -467,7 +468,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             Container(
               height: 180,
               width: double.infinity,
@@ -498,7 +499,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 }
               }),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             Text(
               'Tap + to add JPG/PNG artwork (300x300 to 1000x1000 recommended)',
               style: Theme.of(
@@ -522,10 +523,10 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
         children: [
           Icon(
             isError ? Icons.broken_image : Icons.image_outlined,
-            size: 64,
+            size: 64.sp,
             color: isError ? Colors.red : Colors.grey[400],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Text(
             isError ? 'Failed to load artwork' : 'No artwork added',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -533,7 +534,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
             ),
           ),
           if (!isError) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: 4.h),
             Text(
               'Tap + to add album art',
               style: Theme.of(
@@ -567,9 +568,9 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 Icon(
                   Icons.smart_display_outlined,
                   color: Theme.of(context).colorScheme.primary,
-                  size: 20,
+                  size: 20.sp,
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text(
                   'Filename Preview',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -579,7 +580,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -600,7 +601,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6.h),
             Text(
               'This will be the actual filename after saving',
               style: Theme.of(
@@ -636,7 +637,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
             ),
             suffixIcon: isModified
                 ? IconButton(
-                    icon: const Icon(Icons.undo, size: 18, color: Colors.blue),
+                    icon: Icon(Icons.undo, size: 18.sp, color: Colors.blue),
                     onPressed: () {
                       controller.text = originalValue;
                     },
@@ -674,22 +675,22 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 16,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 14.w,
+              vertical: 16.h,
             ),
           ),
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
         ),
         if (isModified) ...[
-          const SizedBox(height: 4),
+          SizedBox(height: 4.h),
           Padding(
             padding: const EdgeInsets.only(left: 14),
             child: Text(
               'Changed from: "$originalValue"',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 12.sp,
                 color: Theme.of(context).colorScheme.primary,
                 fontStyle: FontStyle.italic,
               ),
@@ -711,7 +712,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                   ? null
                   : controller.resetToOriginal,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
                 side: BorderSide(
                   color: controller.hasChanges.value
                       ? Theme.of(context).colorScheme.error
@@ -747,7 +748,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                       }
                     },
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
                 backgroundColor: controller.hasChanges.value
                     ? Theme.of(context).colorScheme.primary
                     : Colors.grey,
@@ -758,8 +759,8 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
-                          width: 20,
-                          height: 20,
+                          width: 20.w,
+                          height: 20.h,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             valueColor: const AlwaysStoppedAnimation(
@@ -767,7 +768,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8.w),
                         Text(
                           'Saving... ${controller.saveProgress.value}%',
                           style: const TextStyle(fontWeight: FontWeight.bold),
@@ -778,9 +779,9 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                       controller.hasChanges.value
                           ? 'SAVE CHANGES (${_getChangedFieldsCount()})'
                           : 'ALL SAVED',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontSize: 15.sp,
                       ),
                     ),
             ),
