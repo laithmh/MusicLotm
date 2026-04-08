@@ -38,12 +38,14 @@ class Songlistwidget extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
                 margin: EdgeInsets.only(bottom: 12.h),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.3),
+                    ).colorScheme.primary.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -68,7 +70,7 @@ class Songlistwidget extends StatelessWidget {
                             fontSize: 12.sp,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withOpacity(0.8),
+                            ).colorScheme.onSurface.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -200,44 +202,6 @@ class Songlistwidget extends StatelessWidget {
                                     SizedBox(width: 8.w),
                                     Text(
                                       "Newest",
-                                      style: TextStyle(fontSize: 12.sp),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: "durationASC",
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.timer,
-                                      size: 16.sp,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      "Shortest",
-                                      style: TextStyle(fontSize: 12.sp),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: "durationDESC",
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.timer,
-                                      size: 16.sp,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurface,
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      "Longest",
                                       style: TextStyle(fontSize: 12.sp),
                                     ),
                                   ],
@@ -475,10 +439,12 @@ class Songlistwidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11.sp,
                   color: isPlaying
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.8)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.8)
                       : Theme.of(
                           context,
-                        ).colorScheme.onSurface.withOpacity(0.6),
+                        ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               trailing: SizedBox(
@@ -510,9 +476,8 @@ class Songlistwidget extends StatelessWidget {
                             child: MiniMusicVisualizer(
                               color: isSongPlaying
                                   ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface.withOpacity(0.4),
+                                  : Theme.of(context).colorScheme.onSurface
+                                        .withValues(alpha: 0.4),
                               width: 3,
                               height: 18,
                               radius: 1.5,
@@ -536,7 +501,7 @@ class Songlistwidget extends StatelessWidget {
                           size: 14.sp,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurface.withOpacity(0.7),
+                          ).colorScheme.onSurface.withValues(alpha: 0.7),
                         ),
                       ),
                   ],
@@ -557,7 +522,7 @@ class Songlistwidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),

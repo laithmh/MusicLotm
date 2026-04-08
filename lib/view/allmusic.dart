@@ -130,7 +130,7 @@ class Allmusicscreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 25.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.inversePrimary,
           ),
         ),
         centerTitle: true,
