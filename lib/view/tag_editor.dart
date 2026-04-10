@@ -13,24 +13,28 @@ class TagEditorScreen extends StatefulWidget {
 }
 
 class _TagEditorScreenState extends State<TagEditorScreen> {
-  late final TagEditorController controller = Get.find<TagEditorController>();
+  late TagEditorController controller;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    controller = Get.put(TagEditorController());
     // ✅ FIXED: Use widget.songId directly (not Get.parameters)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadSong(widget.songId);
     });
   }
 
-  @override
+   @override
   void dispose() {
-    // Cleanup controller state when leaving screen
-    controller.resetToOriginal();
+    // Reset controller state when leaving screen to prevent stale data on next open
+    controller.resetState();
+    // Remove the controller from memory
+    Get.delete<TagEditorController>();
     super.dispose();
   }
+
 
   // Fetch metadata by songId and populate form
   Future<void> _loadSong(String songId) async {

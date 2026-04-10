@@ -484,7 +484,7 @@ class _PlaylistpageState extends State<Playlistpage> {
                     fontSize: 11.sp,
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withOpacity(0.6),
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
                 trailing: SizedBox(
@@ -523,7 +523,7 @@ class _PlaylistpageState extends State<Playlistpage> {
           return MiniMusicVisualizer(
             color: isSongPlaying
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
             width: 3,
             height: 18,
             radius: 1.5,
@@ -545,7 +545,7 @@ class _PlaylistpageState extends State<Playlistpage> {
       child: Icon(
         Icons.play_arrow_rounded,
         size: 14.sp,
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
       ),
     );
   }
@@ -558,7 +558,7 @@ class _PlaylistpageState extends State<Playlistpage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
+            color: Colors.black.withValues(alpha: 
               0.1,
             ), // Fixed invalid .withValues(alpha:)
             blurRadius: 4,
@@ -661,7 +661,7 @@ class _PlaylistpageState extends State<Playlistpage> {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),
@@ -708,7 +708,7 @@ class _PlaylistpageState extends State<Playlistpage> {
           message,
           style: TextStyle(
             fontSize: 14.sp,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
         actions: [
@@ -717,7 +717,7 @@ class _PlaylistpageState extends State<Playlistpage> {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),

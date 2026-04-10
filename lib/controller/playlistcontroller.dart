@@ -5,6 +5,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:media_store_plus/media_store_plus.dart';
 import 'package:musiclotm/controller/animationcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
@@ -531,7 +532,6 @@ class Playlistcontroller extends GetxController {
     }
   }
 
-  // Modify updatePlaylistSortType to call the above method
   void updatePlaylistSortType(String type) {
     sortTypePlaylists.value = type;
     box.put("sortTypePlaylists", type);
@@ -572,6 +572,67 @@ class Playlistcontroller extends GetxController {
     selectedPlaylistIds.clear();
   }
 
+  /// Adds a specific song to all currently selected playlists
+  /// Handles duplicate checking and UI feedback
+  Future<void> addSongToSelectedPlaylists(String songId) async {
+    if (selectedPlaylistIds.isEmpty) {
+      Get.snackbar('Info', 'Please select at least one playlist');
+      return;
+    }
+
+    int addedCount = 0;
+    int duplicateCount = 0;
+
+    try {
+      for (final playlistId in selectedPlaylistIds) {
+        // 1. Check for duplicates to avoid unnecessary DB writes
+        final playlist = playlists.firstWhereOrNull((p) => p.id == playlistId);
+        
+        if (playlist != null && playlist.songIds.contains(songId)) {
+          duplicateCount++;
+          continue; // Skip this playlist if song already exists
+        }
+
+        // 2. Add to local storage via service
+        final success = await AppPlaylistService.addSongToPlaylist(
+          playlistId: playlistId,
+          songId: songId,
+        );
+
+        if (success) {
+          addedCount++;
+          
+          // 3. Update current UI state if the user is currently viewing this playlist
+          if (currentPlaylistId.value == playlistId) {
+            final song = songscontroller.songs.firstWhereOrNull((s) => s.id == songId);
+            if (song != null && !currentPlaylistSongs.any((s) => s.id == songId)) {
+              currentPlaylistSongs.add(song);
+              await _saveCurrentState();
+            }
+          }
+        }
+      }
+
+      // 4. Handle UI navigation and clean up
+      clearSelections();
+
+      // 5. Dynamic SnackBar feedback based on the result
+      if (addedCount > 0) {
+        String msg = 'Added to $addedCount playlist${addedCount > 1 ? 's' : ''}';
+        if (duplicateCount > 0) {
+          msg += ' ($duplicateCount already existed)';
+        }
+        Get.snackbar('Success', msg);
+      } else if (duplicateCount > 0) {
+        Get.snackbar('Info', 'Song already exists in the selected playlist(s)');
+      }
+
+    } catch (e) {
+      log('❌ Error adding song to multiple playlists: $e');
+      Get.snackbar('Error', 'Failed to add song to playlists');
+    }
+  }
+
   /// Add selected songs to selected playlists
   Future<void> addSelectedSongsToSelectedPlaylists() async {
     if (selectedSongIds.isEmpty || selectedPlaylistIds.isEmpty) {
@@ -600,7 +661,68 @@ class Playlistcontroller extends GetxController {
     }
   }
 
-  // Add this method
+  /// Delete selected songs from device
+  Future<void> deleteSelectedSongs() async {
+    if (selectedSongIds.isEmpty) {
+      Get.snackbar('Info', 'Please select songs to delete');
+      return;
+    }
+
+    try {
+      // Confirm deletion
+      final confirmed = await Get.dialog<bool>(
+        AlertDialog(
+          backgroundColor: ThemeData().colorScheme.surface,
+          title: const Text('Delete Songs'),
+          content: Text(
+            'Are you sure you want to delete ${selectedSongIds.length} song(s)? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Get.back(result: true),
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) return;
+
+      final mediaStore = MediaStore();
+      int deletedCount = 0;
+
+      for (final songId in selectedSongIds) {
+        try {
+          await mediaStore.deleteFileUsingUri(uriString: songId);
+          log('✅ Deleted song: $songId');
+          deletedCount++;
+        } catch (e) {
+          log('❌ Failed to delete song $songId: $e');
+        }
+      }
+
+      // Clear selections and exit selection mode
+      clearSelections();
+      isSelectionMode.value = false;
+
+      // Reload songs to reflect deletions
+      await songscontroller.loadSongs();
+
+      Get.snackbar(
+        'Success',
+        'Successfully deleted $deletedCount song(s)',
+      );
+    } catch (e) {
+      log('❌ Error deleting songs: $e');
+      Get.snackbar('Error', 'Failed to delete songs');
+    }
+  }
+
   Future<void> _reorderCurrentPlaylistBySortType() async {
     final playlistId = currentPlaylistId.value;
     if (playlistId.isEmpty) return;
@@ -688,7 +810,7 @@ class Playlistcontroller extends GetxController {
           'Success',
           'Playlist order updated',
           snackPosition: SnackPosition.BOTTOM,
-          duration: Duration(seconds: 1),
+          duration: const Duration(seconds: 1),
         );
       }
     } catch (e) {

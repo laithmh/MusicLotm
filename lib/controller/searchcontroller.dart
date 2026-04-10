@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,25 +11,27 @@ class Searchcontroller extends GetxController {
 
   final RxList<MediaItem> filteredSongs = <MediaItem>[].obs;
   final RxString _searchQuery = ''.obs;
-  final RxBool _isSearching = false.obs;
-  final RxBool _hasError = false.obs;
+  
+  // Expose observables directly for simpler UI binding
+  final RxBool isSearching = false.obs;
+  final RxBool hasError = false.obs;
 
   String get searchQuery => _searchQuery.value;
-  bool get isSearching => _isSearching.value;
-  bool get hasError => _hasError.value;
   bool get hasResults => filteredSongs.isNotEmpty;
   int get resultCount => filteredSongs.length;
-
-  Timer? _debounceTimer;
-  static const Duration debounceDelay = Duration(milliseconds: 300);
 
   @override
   void onInit() {
     super.onInit();
-    _setupSearchListener();
-  }
-
-  void _setupSearchListener() {
+    
+    // 1. Native GetX Debounce: Automatically waits 300ms after the user stops typing
+    debounce(
+      _searchQuery,
+      performSearch,
+      time: const Duration(milliseconds: 300),
+    );
+    
+    // 2. Re-filter if the main song list changes while searching
     ever(songsController.songs, (_) => _reFilterIfNeeded());
   }
 
@@ -42,55 +42,55 @@ class Searchcontroller extends GetxController {
   }
 
   void search(String query) {
-    _debounceTimer?.cancel();
-
-    _searchQuery.value = query.trim();
-
-    if (query.isEmpty) {
-      filteredSongs.clear();
-      _isSearching.value = false;
+    final trimmedQuery = query.trim();
+    
+    if (trimmedQuery.isEmpty) {
+      clear();
       return;
     }
 
-    _isSearching.value = true;
-    _hasError.value = false;
-
-    _debounceTimer = Timer(debounceDelay, () {
-      performSearch(query);
-    });
+    isSearching.value = true;
+    hasError.value = false;
+    _searchQuery.value = trimmedQuery; // This automatically triggers the debounce
   }
 
   void performSearch(String query) {
+    if (query.isEmpty) return;
+
     try {
       final searchTerm = query.toLowerCase();
 
+      // 3. Optimized filtering with short-circuit evaluation
       final results = songsController.songs.where((song) {
-        return song.title.toLowerCase().contains(searchTerm) ||
-            (song.artist?.toLowerCase().contains(searchTerm) ?? false) ||
-            (song.album?.toLowerCase().contains(searchTerm) ?? false);
+        // If title matches, skip checking artist and album (faster processing)
+        if (song.title.toLowerCase().contains(searchTerm)) return true;
+        
+        if (song.artist != null && song.artist!.toLowerCase().contains(searchTerm)) return true;
+        
+        if (song.album != null && song.album!.toLowerCase().contains(searchTerm)) return true;
+
+        return false;
       }).toList();
 
       filteredSongs.assignAll(results);
-      _isSearching.value = false;
     } catch (e) {
       debugPrint('Search error: $e');
       filteredSongs.clear();
-      _hasError.value = true;
-      _isSearching.value = false;
+      hasError.value = true;
+    } finally {
+      isSearching.value = false;
     }
   }
 
   Future<void> playSongFromSearch(MediaItem song) async {
     try {
-      // Find index in all songs
       final allSongs = songsController.songs;
       final songIndex = allSongs.indexWhere((s) => s.id == song.id);
 
       if (songIndex != -1) {
-        // Play the song
         await songsController.handleAllSongs();
         await songHandler.skipToQueueItem(songIndex);
-        songHandler.play();
+        await songHandler.play();
       }
     } catch (e) {
       debugPrint('Error playing song from search: $e');
@@ -104,35 +104,14 @@ class Searchcontroller extends GetxController {
 
   void clear() {
     _searchQuery.value = '';
-    filteredSongs.clear();
     textController.clear();
-    _isSearching.value = false;
-    _hasError.value = false;
-  }
-
-  // Optional: Get search suggestions
-  List<String> getSearchSuggestions(String query, {int limit = 5}) {
-    if (query.isEmpty) return [];
-
-    final searchTerm = query.toLowerCase();
-    final suggestions = <String>{};
-
-    for (final song in songsController.songs) {
-      if (song.title.toLowerCase().contains(searchTerm)) {
-        suggestions.add(song.title);
-      }
-      if (song.artist?.toLowerCase().contains(searchTerm) ?? false) {
-        suggestions.add(song.artist!);
-      }
-      if (suggestions.length >= limit) break;
-    }
-
-    return suggestions.toList();
+    filteredSongs.clear();
+    isSearching.value = false;
+    hasError.value = false;
   }
 
   @override
   void onClose() {
-    _debounceTimer?.cancel();
     textController.dispose();
     super.onClose();
   }

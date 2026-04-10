@@ -4,14 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
-import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
 
   final Searchcontroller searchController = Get.find();
-  final Songscontroller songsController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +31,17 @@ class SearchScreen extends StatelessWidget {
       ),
       actions: [
         Obx(() {
-          if (searchController.isSearching) {
+          if (searchController.isSearching.value) {
             return Padding(
               padding: EdgeInsets.only(right: 16.w),
-              child: const CircularProgressIndicator(),
+              // Fixed size to prevent layout jumping when indicator appears
+              child: const Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ),
             );
           }
           if (searchController.searchQuery.isNotEmpty) {
@@ -63,7 +68,8 @@ class SearchScreen extends StatelessWidget {
       ),
       style: TextStyle(fontSize: 16.sp),
       onChanged: searchController.search,
-      onSubmitted: searchController.search,
+      // Hide keyboard if user hits "search" on their keyboard
+      onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
     );
   }
 
@@ -71,11 +77,13 @@ class SearchScreen extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Obx(() {
-        if (searchController.hasError) {
+        if (searchController.hasError.value) {
           return _buildErrorState();
         }
 
-        if (searchController.isSearching) {
+        // Only show loading if we are searching AND have no previous results
+        if (searchController.isSearching.value &&
+            searchController.filteredSongs.isEmpty) {
           return _buildLoadingState();
         }
 
@@ -106,8 +114,6 @@ class SearchScreen extends StatelessWidget {
           'Find your favorite songs, artists, or albums',
           style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade600),
         ),
-        SizedBox(height: 30.h),
-        // Optional: Add recent searches or popular tags
       ],
     );
   }
@@ -188,10 +194,15 @@ class SearchScreen extends StatelessWidget {
         ),
         Expanded(
           child: ListView.builder(
+            // UX optimization: Drops keyboard when user starts scrolling
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             itemCount: searchController.filteredSongs.length,
             itemBuilder: (context, index) {
               final song = searchController.filteredSongs[index];
-              return _buildSongTile(song);
+              return Padding(
+                padding: EdgeInsets.only(bottom: 8.h), // Spacing for Neubox
+                child: _buildSongTile(context, song),
+              );
             },
           ),
         ),
@@ -199,15 +210,14 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSongTile(MediaItem song) {
+  Widget _buildSongTile(BuildContext context, MediaItem song) {
     return Neubox(
       borderRadius: BorderRadius.circular(12),
-
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
         leading: Container(
-          width: 50.w,
-          height: 50.w,
+          width: 40.w, // Standardized touch target size
+          height: 40.h,
           decoration: BoxDecoration(
             color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(8),
@@ -236,7 +246,7 @@ class SearchScreen extends StatelessWidget {
         ),
         trailing: Icon(
           Icons.play_arrow,
-          color: Theme.of(Get.context!).primaryColor,
+          color: Theme.of(context).primaryColor, // Safe context usage
         ),
         onTap: () => _onSongTap(song),
       ),
@@ -244,6 +254,9 @@ class SearchScreen extends StatelessWidget {
   }
 
   void _onSongTap(MediaItem song) async {
+    // Drop the keyboard before navigating
+    FocusManager.instance.primaryFocus?.unfocus();
+
     Navigatorcontroller navigator = Get.find();
     await searchController.playSongFromSearch(song);
     navigator.changepage(2);

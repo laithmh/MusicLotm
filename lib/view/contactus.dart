@@ -257,23 +257,23 @@ class ContactUsScreen extends StatelessWidget {
                   onTap: () => _showBugReportDialog(context),
                 ),
 
-                _buildActionCard(
-                  context,
-                  icon: Icons.share,
-                  title: 'Share App',
-                  subtitle: 'Share with friends',
-                  color: Colors.green,
-                  onTap: settingsController.shareApp,
-                ),
+                // _buildActionCard(
+                //   context,
+                //   icon: Icons.share,
+                //   title: 'Share App',
+                //   subtitle: 'Share with friends',
+                //   color: Colors.green,
+                //   onTap: settingsController.shareApp,
+                // ),
 
-                _buildActionCard(
-                  context,
-                  icon: Icons.star,
-                  title: 'Rate App',
-                  subtitle: 'Rate us on app store',
-                  color: Colors.amber,
-                  onTap: settingsController.rateApp,
-                ),
+                // _buildActionCard(
+                //   context,
+                //   icon: Icons.star,
+                //   title: 'Rate App',
+                //   subtitle: 'Rate us on app store',
+                //   color: Colors.amber,
+                //   onTap: settingsController.rateApp,
+                // ),
 
                 SizedBox(height: 24.h),
 

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,8 +13,9 @@ class Addtoplaylistbutton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Playlistcontroller playlistcontroller = Get.find();
-    SongHandler songHandler = Get.find<SongHandler>();
-    AudioPlayer audioPlayer = Get.find<AudioPlayer>();
+    final SongHandler songHandler = Get.find<SongHandler>();
+    final AudioPlayer audioPlayer = Get.find<AudioPlayer>();
+
     return StreamBuilder<Duration>(
       stream: AudioService.position,
       builder: (context, snapshot) {
@@ -30,7 +29,7 @@ class Addtoplaylistbutton extends StatelessWidget {
               return;
             }
 
-            // Clear previous selections
+            // Clear previous selections before opening the dialog
             playlistcontroller.clearSelections();
 
             // Show the playlist selection dialog
@@ -38,35 +37,11 @@ class Addtoplaylistbutton extends StatelessWidget {
               context: context,
               builder: (context) => CustomAlertDialog(
                 onPressed: () async {
-                  if (playlistcontroller.selectedPlaylistIds.isEmpty) {
-                    Get.snackbar('Info', 'Please select at least one playlist');
-                    return;
-                  }
-
-                  try {
-                    // Add current song to selected playlists
-                    for (final playlistId
-                        in playlistcontroller.selectedPlaylistIds) {
-                      await playlistcontroller.addSongToPlaylist(
-                        playlistId: playlistId,
-                        songId: currentSong.id,
-                        showNotification: false,
-                      );
-                    }
-
-                    final count = playlistcontroller.selectedPlaylistIds.length;
-
-                    Get.snackbar(
-                      'Success',
-                      'Added to $count playlist${count > 1 ? 's' : ''}',
-                    );
-
-                    playlistcontroller.clearSelections();
-                    Get.back();
-                  } catch (e) {
-                    log('Error adding song to playlists: $e');
-                    Get.snackbar('Error', 'Failed to add song to playlists');
-                  }
+                  // The controller handles validations, duplicates, and closing the dialog
+                  await playlistcontroller.addSongToSelectedPlaylists(
+                    currentSong.id,
+                  );
+                  Get.back(); // Close the dialog
                 },
               ),
             );
@@ -92,12 +67,9 @@ class Addtoplaylistbutton extends StatelessWidget {
     final seconds = duration.inSeconds.remainder(60);
 
     if (hours > 0) {
-      return '${hours.toString().padLeft(2, '0')}:'
-          '${minutes.toString().padLeft(2, '0')}:'
-          '${seconds.toString().padLeft(2, '0')}';
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     } else {
-      return '${minutes.toString().padLeft(2, '0')}:'
-          '${seconds.toString().padLeft(2, '0')}';
+      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
     }
   }
 }

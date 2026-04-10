@@ -18,7 +18,7 @@ class Songlistwidget extends StatelessWidget {
   const Songlistwidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     final navigator = Get.find<Navigatorcontroller>();
     final songscontroller = Get.find<Songscontroller>();
     final playlistcontroller = Get.find<Playlistcontroller>();

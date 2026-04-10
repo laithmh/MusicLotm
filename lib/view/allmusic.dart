@@ -99,6 +99,21 @@ class Allmusicscreen extends StatelessWidget {
                     },
                   ),
                   Bubble(
+                    title: "Delete",
+
+                    iconColor: Colors.black,
+                    bubbleColor: Theme.of(context).colorScheme.secondary,
+                    icon: Icons.delete,
+                    titleStyle: TextStyle(
+                      fontSize: 8.sp,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                    onPress: () {
+                      playlistcontroller.deleteSelectedSongs();
+                      animationControllerX.reverseAnimation();
+                    },
+                  ),
+                  Bubble(
                     title: "Cancel",
                     iconColor: Colors.black,
                     bubbleColor: Theme.of(context).colorScheme.secondary,

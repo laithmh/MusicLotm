@@ -53,10 +53,27 @@ class TagEditorController extends GetxController {
   void onInit() {
     super.onInit();
 
+    // Add listeners for change detection
     titleController.addListener(_detectChanges);
     artistController.addListener(_detectChanges);
     albumController.addListener(_detectChanges);
     genreController.addListener(_detectChanges);
+  }
+
+  /// Reset controller state for fresh use
+  void resetState() {
+    isLoading.value = false;
+    hasChanges.value = false;
+    saveProgress.value = 0;
+    selectedSong.value = null;
+    currentFilePath.value = '';
+    albumArtBytes.value = null;
+    validationError.value = '';
+    original.clear();
+    titleController.clear();
+    artistController.clear();
+    albumController.clear();
+    genreController.clear();
   }
 
   /// LOAD SONG
@@ -438,25 +455,27 @@ class TagEditorController extends GetxController {
           .toString(); // ✅ CORRECT WAY TO GET URI IN 0.1.3
       log("Saved to URI: $newUri");
 
-      // ===== PROGRESS 90%: Delete original =====
+      // ===== PROGRESS 90%: Clean up temporary file =====
       saveProgress.value = 90;
       try {
-        await mediaStore.deleteFileUsingUri(uriString: originalUri);
-        log("Original file deleted successfully");
+        // Delete the temporary file we created
+        if (await tempFile.exists()) {
+          await tempFile.delete();
+          log("Temporary file deleted successfully");
+        }
       } catch (e) {
-        log("Delete original warning: $e");
-        // Continue anyway - we have the new file
+        log("Delete temp file warning: $e");
+        // Continue anyway - not critical
       }
 
       // ===== PROGRESS 100%: Refresh & update state =====
       saveProgress.value = 100;
-      
+
       await Future.delayed(
         const Duration(milliseconds: 200),
       ); // Smooth progress finish
 
-     
-
+      // Reload songs to reflect changes
       await songsController.loadSongs();
 
       // Update state

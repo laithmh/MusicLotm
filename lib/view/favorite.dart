@@ -328,7 +328,7 @@ class Favorite extends StatelessWidget {
                   fontSize: 11.sp,
                   color: Theme.of(
                     context,
-                  ).colorScheme.onSurface.withOpacity(0.6),
+                  ).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
               trailing: SizedBox(
@@ -365,7 +365,7 @@ class Favorite extends StatelessWidget {
           child: MiniMusicVisualizer(
             color: isSongPlaying
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
             width: 3,
             height: 18,
             radius: 1.5,
@@ -387,7 +387,7 @@ class Favorite extends StatelessWidget {
       child: Icon(
         Icons.play_arrow_rounded,
         size: 14.sp,
-        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
       ),
     );
   }
@@ -400,7 +400,7 @@ class Favorite extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(
+            color: Colors.black.withValues(alpha: 
               0.1,
             ), // Fixed: .withValues(alpha:) is invalid
             blurRadius: 4,

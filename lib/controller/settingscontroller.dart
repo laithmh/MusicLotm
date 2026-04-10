@@ -49,11 +49,11 @@ class Settingscontroller extends GetxController {
   final String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.yourapp'; // Replace with actual
   final String privacyPolicyUrl =
-      'https://yourapp.com/privacy'; // Replace with actual
+      'https://sites.google.com/view/musiclotm-privacy-policy/home'; // Replaced with actual
   final String termsOfServiceUrl =
-      'https://yourapp.com/terms'; // Replace with actual
+      'https://sites.google.com/view/termsofserviceformusiclotm/home'; // Replaced with actual
   final String githubUrl =
-      'https://github.com/yourusername/musiclotm'; // Replace with actual
+      'https://github.com/laithmh/MusicLotm'; // Replaced with actual
 
   final GlobalKey<FormState> contactFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> timerFormKey = GlobalKey<FormState>();
