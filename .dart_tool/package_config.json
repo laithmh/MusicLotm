@@ -15,7 +15,7 @@
     },
     {
       "name": "archive",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/archive-4.0.9",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/archive-4.0.7",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -27,7 +27,7 @@
     },
     {
       "name": "async",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.13.1",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/async-2.12.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -57,9 +57,9 @@
     },
     {
       "name": "audio_session",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/audio_session-0.2.3",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/audio_session-0.1.25",
       "packageUri": "lib/",
-      "languageVersion": "3.6"
+      "languageVersion": "3.4"
     },
     {
       "name": "boolean_selector",
@@ -111,7 +111,7 @@
     },
     {
       "name": "built_value",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.12.5",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/built_value-8.12.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -123,9 +123,9 @@
     },
     {
       "name": "checked_yaml",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/checked_yaml-2.0.4",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/checked_yaml-2.0.3",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "2.19"
     },
     {
       "name": "cli_util",
@@ -138,12 +138,6 @@
       "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/clock-1.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
-    },
-    {
-      "name": "code_assets",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/code_assets-1.0.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.9"
     },
     {
       "name": "code_builder",
@@ -207,7 +201,7 @@
     },
     {
       "name": "ffi",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/ffi-2.2.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/ffi-2.1.5",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -362,12 +356,6 @@
       "languageVersion": "2.12"
     },
     {
-      "name": "hooks",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/hooks-1.0.2",
-      "packageUri": "lib/",
-      "languageVersion": "3.10"
-    },
-    {
       "name": "http",
       "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/http-1.6.0",
       "packageUri": "lib/",
@@ -393,7 +381,7 @@
     },
     {
       "name": "image",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.8.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/image-4.7.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -405,7 +393,7 @@
     },
     {
       "name": "image_picker_android",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_android-0.8.13+15",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/image_picker_android-0.8.13+16",
       "packageUri": "lib/",
       "languageVersion": "3.9"
     },
@@ -459,9 +447,9 @@
     },
     {
       "name": "json_annotation",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/json_annotation-4.11.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/json_annotation-4.9.0",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.0"
     },
     {
       "name": "just_audio",
@@ -548,18 +536,6 @@
       "languageVersion": "3.0"
     },
     {
-      "name": "native_toolchain_c",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/native_toolchain_c-0.17.6",
-      "packageUri": "lib/",
-      "languageVersion": "3.10"
-    },
-    {
-      "name": "objective_c",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/objective_c-9.3.0",
-      "packageUri": "lib/",
-      "languageVersion": "3.10"
-    },
-    {
       "name": "on_audio_query",
       "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/on_audio_query-2.9.0",
       "packageUri": "lib/",
@@ -597,7 +573,7 @@
     },
     {
       "name": "package_info_plus",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/package_info_plus-9.0.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/package_info_plus-9.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -621,15 +597,15 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.23",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_android-2.2.19",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.7"
     },
     {
       "name": "path_provider_foundation",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.6.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/path_provider_foundation-2.4.2",
       "packageUri": "lib/",
-      "languageVersion": "3.10"
+      "languageVersion": "3.7"
     },
     {
       "name": "path_provider_linux",
@@ -687,9 +663,9 @@
     },
     {
       "name": "petitparser",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-7.0.2",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/petitparser-6.1.0",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.5"
     },
     {
       "name": "platform",
@@ -711,7 +687,7 @@
     },
     {
       "name": "posix",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/posix-6.5.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/posix-6.0.3",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -783,7 +759,7 @@
     },
     {
       "name": "source_span",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/source_span-1.10.2",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/source_span-1.10.1",
       "packageUri": "lib/",
       "languageVersion": "3.1"
     },
@@ -795,15 +771,15 @@
     },
     {
       "name": "sqflite_android",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/sqflite_android-2.4.2+3",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/sqflite_android-2.4.1",
       "packageUri": "lib/",
-      "languageVersion": "3.10"
+      "languageVersion": "3.7"
     },
     {
       "name": "sqflite_common",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/sqflite_common-2.5.6",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/sqflite_common-2.5.5",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.7"
     },
     {
       "name": "sqflite_darwin",
@@ -843,9 +819,9 @@
     },
     {
       "name": "synchronized",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/synchronized-3.4.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/synchronized-3.3.1",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.7"
     },
     {
       "name": "term_glyph",
@@ -885,27 +861,27 @@
     },
     {
       "name": "url_launcher_android",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_android-6.3.29",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_android-6.3.20",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.7"
     },
     {
       "name": "url_launcher_ios",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_ios-6.4.1",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_ios-6.3.4",
       "packageUri": "lib/",
-      "languageVersion": "3.10"
+      "languageVersion": "3.7"
     },
     {
       "name": "url_launcher_linux",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_linux-3.2.2",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_linux-3.2.1",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.3"
     },
     {
       "name": "url_launcher_macos",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_macos-3.2.5",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_macos-3.2.3",
       "packageUri": "lib/",
-      "languageVersion": "3.9"
+      "languageVersion": "3.7"
     },
     {
       "name": "url_launcher_platform_interface",
@@ -915,19 +891,19 @@
     },
     {
       "name": "url_launcher_web",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.4.2",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_web-2.4.1",
       "packageUri": "lib/",
-      "languageVersion": "3.10"
+      "languageVersion": "3.6"
     },
     {
       "name": "url_launcher_windows",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_windows-3.1.5",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/url_launcher_windows-3.1.4",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.4"
     },
     {
       "name": "uuid",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/uuid-4.5.3",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/uuid-4.5.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -939,9 +915,9 @@
     },
     {
       "name": "vm_service",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/vm_service-15.0.2",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/vm_service-14.3.1",
       "packageUri": "lib/",
-      "languageVersion": "3.5"
+      "languageVersion": "3.3"
     },
     {
       "name": "watcher",
@@ -969,9 +945,9 @@
     },
     {
       "name": "win32",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.15.0",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/win32-5.13.0",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.7"
     },
     {
       "name": "win32_registry",
@@ -987,9 +963,9 @@
     },
     {
       "name": "xml",
-      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/xml-6.6.1",
+      "rootUri": "file:///C:/Users/Acer/AppData/Local/Pub/Cache/hosted/pub.dev/xml-6.5.0",
       "packageUri": "lib/",
-      "languageVersion": "3.8"
+      "languageVersion": "3.2"
     },
     {
       "name": "yaml",
