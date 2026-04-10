@@ -2,7 +2,6 @@
 MusicLotm is a high-performance, offline-first music player for Android, designed with a focus on minimalist aesthetics and robust state management. Originally built with GetX, the project has been architecturally refactored to Riverpod to ensure scalability and predictable state handling.
 
 ✨ What’s New in v1.1.0
-Architectural Migration: Fully transitioned from GetX to Riverpod for cleaner dependency injection and state management.
 
 Neumorphic UI Design: A fresh, modern interface leveraging soft shadows and minimalist components for a premium tactile feel.
 
@@ -22,7 +21,7 @@ Dynamic Theming: Responsive Dark Mode and Light Mode support.
 🛠️ Tech Stack
 Framework: Flutter
 
-State Management: Riverpod
+State Management: getx
 
 Local Database: Hive (for ultra-fast local storage)
 
