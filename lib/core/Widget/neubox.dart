@@ -5,8 +5,10 @@ class Neubox extends StatelessWidget {
   final Widget child;
   final BorderRadiusGeometry? borderRadius;
   final bool? index;
+  final double? height;
+  final double? width;
   const Neubox(
-      {super.key, required this.child, required this.borderRadius, this.index});
+      {super.key, required this.child, required this.borderRadius, this.index, this.height, this.width});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,7 @@ class Neubox extends StatelessWidget {
       decoration: BoxDecoration(
         color: index ?? false
             ? Theme.of(context).colorScheme.primary
-            : Theme.of(context).colorScheme.background,
+            : Theme.of(context).colorScheme.onPrimary,
         borderRadius: borderRadius,
         boxShadow: [
           BoxShadow(
@@ -31,7 +33,9 @@ class Neubox extends StatelessWidget {
         ],
       ),
       padding: const EdgeInsets.all(5),
-      child: child,
+      height:height ,
+  width:width ,  
+    child: child,
     );
   }
 }

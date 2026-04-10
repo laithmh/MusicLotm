@@ -14,26 +14,27 @@ class Navigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: Theme.of(context).colorScheme.background,
-      statusBarColor: Theme.of(context).colorScheme.background,
-      systemNavigationBarContrastEnforced: true,
-    ));
-    return GetBuilder<Navigatorcontroller>(
-      builder: (controller) => PopScope(
-        child: SafeArea(
-          child: Scaffold(
-            bottomNavigationBar: const Navigationbarwidget(),
-            body: IndexedStack(
-              index: controller.currentindex,
-              children: const [
-                Allmusicscreen(),
-                Playlistscreen(),
-                Playscreen(),
-                Search(),
-                Srttings(),
-              ],
-            ),
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Theme.of(context).colorScheme.onPrimary,
+        statusBarColor: Theme.of(context).colorScheme.onPrimary,
+        systemNavigationBarContrastEnforced: true,
+      ),
+    );
+    Navigatorcontroller controller = Get.find<Navigatorcontroller>();
+    return Obx(
+      () => SafeArea(
+        child: Scaffold(
+          bottomNavigationBar: const Navigationbarwidget(),
+          body: IndexedStack(
+            index: controller.currentindex.value,
+            children: [
+              Allmusicscreen(),
+              Playlistscreen(),
+              Playscreen(),
+              SearchScreen(),
+              Settings(),
+            ],
           ),
         ),
       ),

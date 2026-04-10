@@ -13,61 +13,55 @@ class Navigationbarwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<Navigatorcontroller>(builder: (navigatorcontroller) {
-      return CurvedNavigationBar(
-        height: 200.h,
+    Navigatorcontroller navigatorcontroller = Get.find<Navigatorcontroller>();
+    return Obx(
+      () => CurvedNavigationBar(
+        height: 50.h,
         animationCurve: Curves.easeOut,
-        backgroundColor: Theme.of(context).colorScheme.background,
-        color: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).colorScheme.onPrimary,
         animationDuration: const Duration(milliseconds: 400),
-        index: navigatorcontroller.currentindex,
+        index: navigatorcontroller.currentindex.value,
         iconPadding: 0,
         items: [
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(
-                Icons.queue_music,
-                size: 100.w,
-              ),
+              child: Icon(Icons.queue_music, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(
-                Icons.library_music,
-                size: 100.w,
-              ),
+              child: Icon(Icons.library_music, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(Icons.music_note, size: 100.w),
+              child: Icon(Icons.music_note, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(Icons.search, size: 100.w),
+              child: Icon(Icons.search, size: 25.w),
             ),
           ),
           CurvedNavigationBarItem(
             child: Neubox(
               borderRadius: BorderRadius.circular(12),
-              child: Icon(Icons.settings, size: 100.w),
+              child: Icon(Icons.settings, size: 25.w),
             ),
           ),
         ],
         onTap: (index) {
-          
           navigatorcontroller.changepage(index);
 
-          log(navigatorcontroller.currentindex);
+          log(navigatorcontroller.currentindex.value);
           Get.back();
         },
-      );
-    });
+      ),
+    );
   }
 }

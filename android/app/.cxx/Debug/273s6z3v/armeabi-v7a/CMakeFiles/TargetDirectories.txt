@@ -1,0 +1,2 @@
+D:/flutter project/MusicLotm/android/app/.cxx/Debug/273s6z3v/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/flutter project/MusicLotm/android/app/.cxx/Debug/273s6z3v/armeabi-v7a/CMakeFiles/rebuild_cache.dir

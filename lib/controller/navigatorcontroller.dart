@@ -6,19 +6,19 @@ import 'package:musiclotm/core/const/routesname.dart';
 
 class Navigatorcontroller extends GetxController {
   Songscontroller songscontroller = Get.find();
-  int currentindex = 0;
+  RxInt currentindex = 0.obs;
 
   changepage(int i) {
     if (i == 0) {
-      songscontroller.scroll();
+      songscontroller.scrollToCurrentSong();
     }
-    currentindex = i;
+    currentindex.value = i;
 
-    update();
+    
   }
 
   timer() {
-    Timer(const Duration(seconds: 5), () {
+    Timer(const Duration(seconds: 3), () {
       Get.offAllNamed(
         Approutes.navbar,
       );
@@ -29,6 +29,6 @@ class Navigatorcontroller extends GetxController {
   void onInit() async {
     super.onInit();
     timer();
-    currentindex = 2;
+    currentindex.value = 2;
   }
 }
