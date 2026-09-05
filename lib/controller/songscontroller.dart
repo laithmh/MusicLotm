@@ -34,9 +34,17 @@ class Songscontroller extends GetxController {
   RxBool issearch = true.obs;
   RxBool isLoading = false.obs;
   RxBool haspermission = false.obs;
+
+  // Clean Code Aliases
+  RxBool get isPlaylist => isplaylist;
+  RxBool get isFavorite => isfavorite;
+  RxBool get isAllMusic => isallmusic;
+  RxBool get isSearch => issearch;
+  RxBool get hasPermission => haspermission;
+
   RxList<MediaItem> songs = <MediaItem>[].obs;
   RxInt currentSongPlayingIndex = 0.obs;
-Rx<MediaItem?> currentMediaItem = Rx<MediaItem?>(null);
+  Rx<MediaItem?> currentMediaItem = Rx<MediaItem?>(null);
   // Sorting
   RxString sortTypeAllMusic = "titleASC".obs;
   RxString sortTypePlaylists = "titleASC".obs;
@@ -413,8 +421,8 @@ Rx<MediaItem?> currentMediaItem = Rx<MediaItem?>(null);
       'currentSong': songHandler.mediaItem.value?.title ?? 'No song playing',
       'currentIndex': songHandler.audioPlayer.currentIndex ?? 0,
       'isPlaying': songHandler.audioPlayer.playing,
-      'isLooping': songHandler.isloop.value,
-      'isShuffling': songHandler.isShuffel.value,
+      'isLooping': songHandler.isLoop.value,
+      'isShuffling': songHandler.isShuffle.value,
     };
   }
 

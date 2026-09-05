@@ -48,45 +48,6 @@ List<MediaItem> sort({
   return songs;
 }
 
-// Also update the SongModel version to match
-List<SongModel> sortSongModel({
-  required List<SongModel> song,
-  String sortType = "titleASC", // Changed default
-}) {
-  List<SongModel> songs = List.from(song);
-
-  switch (sortType) {
-    case 'titleASC': // Changed
-      songs.sort(
-        (a, b) => a.displayNameWOExt.toLowerCase().compareTo(
-          b.displayNameWOExt.toLowerCase(),
-        ),
-      );
-      break;
-    case 'titleDESC': // Changed
-      songs.sort(
-        (a, b) => b.displayNameWOExt.toLowerCase().compareTo(
-          a.displayNameWOExt.toLowerCase(),
-        ),
-      );
-      break;
-    case 'dateASC': // Changed
-      songs.sort((a, b) {
-        return (a.dateAdded ?? 0).compareTo(b.dateAdded ?? 0);
-      });
-      break;
-    case 'dateDESC': // Changed
-      songs.sort((a, b) {
-        return (b.dateAdded ?? 0).compareTo(a.dateAdded ?? 0);
-      });
-      break;
-    default:
-      break;
-  }
-
-  return songs;
-}
-
 // Also update these helper functions to match new names
 SongSortType audioQuerySongSortType(String sorttype) {
   switch (sorttype) {

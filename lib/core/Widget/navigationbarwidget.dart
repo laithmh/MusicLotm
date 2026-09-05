@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 
-class Navigationbarwidget extends StatelessWidget {
-  const Navigationbarwidget({super.key});
+class NavigationBarWidget extends StatelessWidget {
+  const NavigationBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

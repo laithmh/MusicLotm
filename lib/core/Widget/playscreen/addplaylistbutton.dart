@@ -5,10 +5,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/Widget/showdialog.dart';
-import 'package:musiclotm/core/Widget/timeandshufell.dart';
+import 'package:musiclotm/core/Widget/time_and_shuffle.dart';
 
-class Addtoplaylistbutton extends StatelessWidget {
-  const Addtoplaylistbutton({super.key});
+class AddToPlaylistButton extends StatelessWidget {
+  const AddToPlaylistButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +22,8 @@ class Addtoplaylistbutton extends StatelessWidget {
         final Duration? position = snapshot.data;
         final currentSong = songHandler.mediaItem.value;
 
-        return Timerow(
-          addtoplaylist: () {
+        return TimeAndShuffleRow(
+          onAddToPlaylist: () {
             if (currentSong == null) {
               Get.snackbar('No Song', 'No song is currently playing');
               return;
@@ -46,14 +46,14 @@ class Addtoplaylistbutton extends StatelessWidget {
               ),
             );
           },
-          currenttime: position == null ? "0:00:00" : _formatDuration(position),
-          duraion: audioPlayer.duration == null
+          currentTime: position == null ? "0:00:00" : _formatDuration(position),
+          duration: audioPlayer.duration == null
               ? "0:00:00"
               : _formatDuration(audioPlayer.duration!),
-          setloop: () async {
+          onToggleLoop: () async {
             await songHandler.toggleLoop();
           },
-          shuffle: () async {
+          onToggleShuffle: () async {
             await songHandler.toggleShuffle();
           },
         );

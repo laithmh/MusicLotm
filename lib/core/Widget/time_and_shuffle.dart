@@ -3,19 +3,20 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 
-class Timerow extends StatelessWidget {
-  final String currenttime;
-  final String duraion;
-  final void Function()? addtoplaylist;
-  final void Function()? setloop;
-  final void Function()? shuffle;
-  const Timerow({
+class TimeAndShuffleRow extends StatelessWidget {
+  final String currentTime;
+  final String duration;
+  final VoidCallback? onAddToPlaylist;
+  final VoidCallback? onToggleLoop;
+  final VoidCallback? onToggleShuffle;
+
+  const TimeAndShuffleRow({
     super.key,
-    required this.currenttime,
-    required this.duraion,
-    required this.addtoplaylist,
-    required this.setloop,
-    required this.shuffle,
+    required this.currentTime,
+    required this.duration,
+    required this.onAddToPlaylist,
+    required this.onToggleLoop,
+    required this.onToggleShuffle,
   });
 
   @override
@@ -27,7 +28,7 @@ class Timerow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text(
-          currenttime,
+          currentTime,
           style: TextStyle(
             fontSize: 12.sp,
             fontWeight: FontWeight.w600,
@@ -35,14 +36,14 @@ class Timerow extends StatelessWidget {
           ),
         ),
         IconButton(
-          onPressed: addtoplaylist,
+          onPressed: onAddToPlaylist,
           icon: Icon(Icons.playlist_add, size: 24.sp, color: colorScheme.primary),
           tooltip: 'Add to playlist',
         ),
         Obx(() {
-          final isLooping = songHandler.isloop.value;
+          final isLooping = songHandler.isLoop.value;
           return IconButton(
-            onPressed: setloop,
+            onPressed: onToggleLoop,
             icon: Icon(
               isLooping ? Icons.repeat_one : Icons.repeat,
               size: 22.sp,
@@ -54,21 +55,21 @@ class Timerow extends StatelessWidget {
           );
         }),
         Obx(() {
-          final isShuffle = songHandler.isShuffel.value;
+          final isShuffling = songHandler.isShuffle.value;
           return IconButton(
-            onPressed: shuffle,
+            onPressed: onToggleShuffle,
             icon: Icon(
               Icons.shuffle,
               size: 22.sp,
-              color: isShuffle
+              color: isShuffling
                   ? colorScheme.inversePrimary
                   : colorScheme.primary.withValues(alpha: 0.5),
             ),
-            tooltip: isShuffle ? 'Shuffle on' : 'Shuffle off',
+            tooltip: isShuffling ? 'Shuffle on' : 'Shuffle off',
           );
         }),
         Text(
-          duraion,
+          duration,
           style: TextStyle(
             fontSize: 12.sp,
             fontWeight: FontWeight.w600,

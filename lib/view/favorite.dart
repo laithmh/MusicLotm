@@ -137,7 +137,7 @@ class Favorite extends StatelessWidget {
           navigator,
         ),
       ),
-      bottomNavigationBar: const Navigationbarwidget(),
+      bottomNavigationBar: const NavigationBarWidget(),
     );
   }
 

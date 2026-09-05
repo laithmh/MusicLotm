@@ -245,7 +245,7 @@ class _PlayscreenState extends State<Playscreen> {
                             // Album Art with Visualizer
                             VisualizerImageWrapper(
                               diskSize: 300.w,
-                              imageChild: Customaudioimage(
+                              imageChild: CustomAudioImage(
                                 artUri: currentSong.artUri,
                                 song: currentSong,
                               ),
@@ -278,7 +278,7 @@ class _PlayscreenState extends State<Playscreen> {
                                   SizedBox(height: 16.h),
 
                                   // Time and Playlist Button
-                                  const Addtoplaylistbutton(),
+                                  const AddToPlaylistButton(),
 
                                   SizedBox(height: 20.h),
 

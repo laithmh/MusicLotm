@@ -9,7 +9,7 @@ class Playlistscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: const Floatingbuttonwidget(),
+      floatingActionButton: const FloatingButtonWidget(),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(

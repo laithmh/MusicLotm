@@ -32,7 +32,7 @@ class Navigator extends StatelessWidget {
             children: [
               if (controller.currentindex.value != 2)
                 const MiniPlayerWidget(),
-              const Navigationbarwidget(),
+              const NavigationBarWidget(),
             ],
           ),
           body: IndexedStack(

@@ -4,14 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:musiclotm/core/Widget/neubox.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 
-class Customaudioimage extends StatelessWidget {
- 
+class CustomAudioImage extends StatelessWidget {
   final Uri? artUri;
   final MediaItem song;
 
-  const Customaudioimage({
+  const CustomAudioImage({
     super.key,
-    
     required this.artUri,
     required this.song,
   });

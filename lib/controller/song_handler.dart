@@ -17,8 +17,8 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   AudioPlayer get audioPlayer => Get.find<AudioPlayer>();
 
   final Box _box = Hive.box("music");
-  RxBool isloop = false.obs;
-  RxBool isShuffel = false.obs;
+  RxBool isLoop = false.obs;
+  RxBool isShuffle = false.obs;
   late List<UriAudioSource> songSources;
   late List<MediaItem> _currentQueue;
 
@@ -176,8 +176,8 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
     // Load saved state if restoring
     final savedState = _loadSavedState();
-    isloop.value = savedState['isLooping'];
-    isShuffel.value = savedState['isShuffling'];
+    isLoop.value = savedState['isLooping'];
+    isShuffle.value = savedState['isShuffling'];
 
     // Determine initial index and position
     int actualInitialIndex = initialIndex;
@@ -261,13 +261,13 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   }
 
   Future<void> _applyCurrentRepeatAndShuffleModes() async {
-    LoopMode loopMode = isloop.isTrue ? LoopMode.one : LoopMode.all;
+    LoopMode loopMode = isLoop.isTrue ? LoopMode.one : LoopMode.all;
     await audioPlayer.setLoopMode(loopMode);
-    await audioPlayer.setShuffleModeEnabled(isShuffel.value);
+    await audioPlayer.setShuffleModeEnabled(isShuffle.value);
 
     // Save current modes
-    _box.put("isLooping", isloop.value);
-    _box.put("isShuffling", isShuffel.value);
+    _box.put("isLooping", isLoop.value);
+    _box.put("isShuffling", isShuffle.value);
   }
 
   @override
@@ -335,25 +335,25 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
     await audioPlayer.setLoopMode(loopMode);
 
     // Update and save loop state
-    isloop.value = loopMode == LoopMode.one;
-    _box.put("isLooping", isloop.value);
+    isLoop.value = loopMode == LoopMode.one;
+    _box.put("isLooping", isLoop.value);
   }
 
   Future<void> toggleLoop() async {
-    isloop.value = !isloop.value;
-    _box.put("isLooping", isloop.value); // PERSIST
+    isLoop.value = !isLoop.value;
+    _box.put("isLooping", isLoop.value); // PERSIST
     await _applyCurrentRepeatAndShuffleModes();
 
-    String message = isloop.value ? "Loop ON" : "Loop OFF";
+    String message = isLoop.value ? "Loop ON" : "Loop OFF";
     Get.snackbar("Loop Mode", message, snackPosition: SnackPosition.BOTTOM);
   }
 
   Future<void> toggleShuffle() async {
-    isShuffel.value = !isShuffel.value;
-    _box.put("isShuffling", isShuffel.value); // PERSIST
-    await audioPlayer.setShuffleModeEnabled(isShuffel.value);
+    isShuffle.value = !isShuffle.value;
+    _box.put("isShuffling", isShuffle.value); // PERSIST
+    await audioPlayer.setShuffleModeEnabled(isShuffle.value);
 
-    if (isShuffel.value) {
+    if (isShuffle.value) {
       await audioPlayer.shuffle();
       Get.snackbar(
         "Shuffle",
@@ -522,8 +522,8 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
       'currentIndex': audioPlayer.currentIndex,
       'currentPosition': audioPlayer.position.inMilliseconds,
       'isPlaying': audioPlayer.playing,
-      'isLooping': isloop.value,
-      'isShuffling': isShuffel.value,
+      'isLooping': isLoop.value,
+      'isShuffling': isShuffle.value,
       'queueLength': _currentQueue.length,
       'savedState': _loadSavedState(),
     };

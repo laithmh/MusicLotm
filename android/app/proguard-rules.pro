@@ -29,3 +29,7 @@
 # AndroidX Media & Multidex
 -keep class androidx.media.** { *; }
 -keep class androidx.multidex.** { *; }
+
+# Flutter Deferred Components & Play Core (R8 suppressions)
+-dontwarn com.google.android.play.core.**
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**

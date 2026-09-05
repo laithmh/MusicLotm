@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 
-class Floatingbuttonwidget extends StatelessWidget {
-  const Floatingbuttonwidget({super.key});
+class FloatingButtonWidget extends StatelessWidget {
+  const FloatingButtonWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

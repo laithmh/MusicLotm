@@ -264,7 +264,7 @@ class _PlaylistpageState extends State<Playlistpage> {
           navigator,
         ),
       ),
-      bottomNavigationBar: const Navigationbarwidget(),
+      bottomNavigationBar: const NavigationBarWidget(),
     );
   }
 
