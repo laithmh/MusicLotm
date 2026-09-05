@@ -3,8 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_audio_tagger/flutter_audio_tagger.dart';
-import 'package:flutter_audio_tagger/tag.dart';
+import 'package:audiotags/audiotags.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:media_store_plus/media_store_plus.dart';
@@ -429,15 +428,22 @@ class TagEditorController extends GetxController {
 
       // ===== PROGRESS 50%: Apply tags =====
       saveProgress.value = 50;
-      final tagger = FlutterAudioTagger();
       final tag = Tag(
         title: titleController.text.trim(),
-        artist: artistController.text.trim(),
+        trackArtist: artistController.text.trim(),
         album: albumController.text.trim(),
         genre: genreController.text.trim(),
-        artwork: albumArtBytes.value,
+        pictures: albumArtBytes.value != null
+            ? [
+                Picture(
+                  bytes: albumArtBytes.value!,
+                  mimeType: null,
+                  pictureType: PictureType.coverFront,
+                )
+              ]
+            : [],
       );
-      await tagger.editTagsAndArtwork(tag, tempFile.path);
+      await AudioTags.write(tempFile.path, tag);
 
       // ===== PROGRESS 75%: Save to MediaStore =====
       saveProgress.value = 75;

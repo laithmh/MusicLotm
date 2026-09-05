@@ -50,7 +50,6 @@ dependencies:
   audify: ^1.1.0
   path_provider: ^2.1.3
   path: ^1.8.3
-  flutter_audio_tagger: 5.0.1
   media_store_plus: ^0.1.3  
   image_picker: ^1.0.4 
   url_launcher: ^6.3.0
@@ -58,6 +57,7 @@ dependencies:
   package_info_plus: ^9.0.0
   share_plus: ^7.2.1
   uuid: ^4.4.0
+  audiotags: ^1.4.5
   
   
 
