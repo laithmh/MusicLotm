@@ -22,7 +22,7 @@ Engineered with fluid 60 FPS audio visualizers, background playback, ID3 tag edi
 
 - 🎧 **Offline-First Excellence**: Instant scanning and playback of local storage tracks with zero internet required.
 - 🎨 **Tactile Neumorphic Design**: Custom soft-shadow surfaces, recessed buttons, and smooth responsive animations built with `flutter_screenutil`.
-- 📊 **60 FPS Visualizer Engine**: Isolated real-time frequency analysis powered by `audify`, featuring 3 visual styles (Radial Bars, Liquid Wave, and Eclipse Nova).
+- 📊 **60 FPS Visualizer Engine**: Native real-time frequency analysis powered by our custom in-tree `just_audio` engine with zero microphone permissions, featuring 3 visual styles (Radial Bars, Liquid Wave, and Eclipse Nova).
 - 🎛️ **Floating Mini-Player**: Persistent player pinned across library, playlist, and favorite tabs with live progress scrubbing.
 - 🏷️ **Built-in Tag Editor**: Edit ID3 metadata (Song title, Artist, Album, Genre) locally with instantaneous state synchronization.
 - ⏱️ **Smart Sleep Timer**: Battery-preserving timer with preset chips and a custom slider that fades out and terminates playback gracefully.
@@ -61,16 +61,18 @@ Engineered with fluid 60 FPS audio visualizers, background playback, ID3 tag edi
 ## 🛠️ Architecture & Tech Stack
 
 ```
-lib/
-├── controller/         # GetX controllers (SongsController, VisualizerController, etc.)
-├── core/
-│   ├── Widget/         # Reusable Neumorphic widgets, Mini-Player, Visualizers, Sheets
-│   ├── constant/       # App colors, theme data, typography, dimensions
-│   ├── function/       # Audio conversion, sorting, formatters, permission handlers
-│   ├── middleware/     # Navigation & routing guards
-│   ├── model/          # Song, Playlist, and Favorite data models
-│   └── routes/         # Centralized named routing
-└── view/               # Application views (Player, Playlists, Favorites, Navigation)
+├── packages/
+│   └── just_audio/     # Custom in-tree audio engine with native ExoPlayer TeeAudioProcessor FFT tap
+├── lib/
+│   ├── controller/     # GetX controllers (SongsController, VisualizerController, etc.)
+│   ├── core/
+│   │   ├── Widget/     # Reusable Neumorphic widgets, Mini-Player, Visualizers, Sheets
+│   │   ├── constant/   # App colors, theme data, typography, dimensions
+│   │   ├── function/   # Audio conversion, sorting, formatters, permission handlers
+│   │   ├── middleware/ # Navigation & routing guards
+│   │   ├── model/      # Song, Playlist, and Favorite data models
+│   │   └── routes/     # Centralized named routing
+│   └── view/           # Application views (Player, Playlists, Favorites, Navigation)
 ```
 
 | Component | Technology | Description |
@@ -79,7 +81,7 @@ lib/
 | **Language** | [Dart](https://dart.dev) | Strongly-typed object-oriented language |
 | **State Management** | [GetX](https://pub.dev/packages/get) | High-performance reactive state management & dependency injection |
 | **Audio Engine** | [just_audio](https://pub.dev/packages/just_audio) & [audio_service](https://pub.dev/packages/audio_service) | Low-latency audio playback with lockscreen & notification support |
-| **Visualizer DSP** | [audify](https://pub.dev/packages/audify) | Fast Fourier Transform (FFT) real-time audio analysis |
+| **Visualizer DSP** | [Custom just_audio (In-Tree)](packages/just_audio) | Native ExoPlayer `TeeAudioProcessor` PCM buffer tap (32 frequency bands, zero mic permission required) |
 | **Local Storage** | [Hive](https://pub.dev/packages/hive) | Ultra-fast lightweight key-value database |
 | **Tag Editing** | [audiotags](https://pub.dev/packages/audiotags) | Native ID3 metadata reader and writer |
 | **UI Scaling** | [flutter_screenutil](https://pub.dev/packages/flutter_screenutil) | Multi-device responsive adaptation |
@@ -131,12 +133,12 @@ lib/
 
 ## 🔒 Permissions & Privacy
 
-MusicLotm strictly requests only the permissions necessary for offline playback:
-- `READ_MEDIA_AUDIO` / `READ_EXTERNAL_STORAGE`: To index and play audio files stored locally.
-- `FOREGROUND_SERVICE` & `WAKE_LOCK`: To allow uninterrupted playback when the app is in the background or device is locked.
-- `RECORD_AUDIO`: Required exclusively for the FFT real-time audio visualizer to analyze output frequency amplitudes.
+MusicLotm strictly requests only the minimal permissions necessary for offline playback:
+- `READ_MEDIA_AUDIO` / `READ_EXTERNAL_STORAGE`: To index and play audio files stored locally on the device.
+- `FOREGROUND_SERVICE` & `WAKE_LOCK`: To allow uninterrupted playback and media notification controls when the app is in the background or screen is locked.
+- **Zero Microphone Permissions**: Unlike traditional visualizer apps that require `RECORD_AUDIO`, our custom in-tree `just_audio` engine taps directly into the decoded ExoPlayer PCM audio buffer via a native `TeeAudioProcessor`. No microphone access is ever requested!
 
-No network permissions are used to upload personal data. Your listening history and playlists remain 100% private.
+No network permissions are used to upload personal data. Your listening history and playlists remain 100% private and on-device.
 
 ---
 
