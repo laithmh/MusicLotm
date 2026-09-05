@@ -11,16 +11,17 @@ class CustomAlertDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Playlistcontroller playlistcontroller = Get.find();
+    final colorScheme = Theme.of(context).colorScheme;
 
     return AlertDialog(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: colorScheme.onPrimary,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
         'Add to Playlist',
         style: TextStyle(
           fontSize: 20.sp,
           fontWeight: FontWeight.bold,
-          color: Theme.of(context).colorScheme.primary,
+          color: colorScheme.inversePrimary,
         ),
       ),
       content: SizedBox(
@@ -33,7 +34,7 @@ class CustomAlertDialog extends StatelessWidget {
               'Select playlists to add songs:',
               style: TextStyle(
                 fontSize: 14.sp,
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.primary,
               ),
             ),
             SizedBox(height: 16.h),
@@ -49,14 +50,14 @@ class CustomAlertDialog extends StatelessWidget {
                           Icon(
                             Icons.playlist_add,
                             size: 60.w,
-                            color: Theme.of(context).disabledColor,
+                            color: colorScheme.primary.withValues(alpha: 0.5),
                           ),
                           SizedBox(height: 16.h),
                           Text(
                             'No playlists yet',
                             style: TextStyle(
                               fontSize: 16.sp,
-                              color: Theme.of(context).disabledColor,
+                              color: colorScheme.primary,
                             ),
                           ),
                           SizedBox(height: 8.h),
@@ -64,7 +65,7 @@ class CustomAlertDialog extends StatelessWidget {
                             'Create a playlist first',
                             style: TextStyle(
                               fontSize: 12.sp,
-                              color: Theme.of(context).disabledColor,
+                              color: colorScheme.primary.withValues(alpha: 0.7),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -89,14 +90,12 @@ class CustomAlertDialog extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           color: isSelected
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha:  0.1)
-                              : Colors.transparent,
+                              ? colorScheme.primary.withValues(alpha: 0.15)
+                              : colorScheme.secondary.withValues(alpha: 0.5),
                           border: Border.all(
                             color: isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.grey.shade300,
+                                ? colorScheme.inversePrimary
+                                : colorScheme.primary.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -110,21 +109,17 @@ class CustomAlertDialog extends StatelessWidget {
                               vertical: 8.h,
                             ),
                             leading: Container(
-                              width: 50.w,
-                              height: 50.w,
+                              width: 44.w,
+                              height: 44.w,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: isSelected
-                                    ? Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withValues(alpha:  0.2)
-                                    : Colors.grey.shade200,
+                                color: colorScheme.secondary,
                               ),
                               child: Icon(
                                 Icons.queue_music,
                                 color: isSelected
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Colors.grey.shade600,
+                                    ? colorScheme.inversePrimary
+                                    : colorScheme.primary,
                                 size: 24.w,
                               ),
                             ),
@@ -133,7 +128,7 @@ class CustomAlertDialog extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: colorScheme.inversePrimary,
                               ),
                             ),
                             subtitle: playlist.description!.isNotEmpty
@@ -141,9 +136,7 @@ class CustomAlertDialog extends StatelessWidget {
                                     playlist.description!,
                                     style: TextStyle(
                                       fontSize: 12.sp,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.secondary,
+                                      color: colorScheme.primary,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   )
@@ -156,12 +149,8 @@ class CustomAlertDialog extends StatelessWidget {
                                   // Update the selection
                                   controller.selectPlaylist(playlist.id);
                                 },
-                                activeColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                checkColor: Theme.of(
-                                  context,
-                                ).colorScheme.inversePrimary,
+                                activeColor: colorScheme.inversePrimary,
+                                checkColor: colorScheme.onPrimary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(6),
                                 ),
@@ -189,7 +178,7 @@ class CustomAlertDialog extends StatelessWidget {
             playlistcontroller.clearSelections();
           },
           style: TextButton.styleFrom(
-            foregroundColor: Colors.grey.shade600,
+            foregroundColor: colorScheme.primary,
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
           ),
           child: const Text('Cancel'),
@@ -197,8 +186,8 @@ class CustomAlertDialog extends StatelessWidget {
         ElevatedButton(
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+            backgroundColor: colorScheme.inversePrimary,
+            foregroundColor: colorScheme.onPrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),

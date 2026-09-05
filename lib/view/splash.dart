@@ -14,8 +14,9 @@ class SplashScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       body: Center(
         child: Icon(
-          Icons.music_note,
+          Icons.music_note_rounded,
           size: 175.h,
+          color: Theme.of(context).colorScheme.inversePrimary,
         ),
       ),
     );

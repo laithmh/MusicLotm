@@ -81,10 +81,17 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      foregroundColor: Theme.of(context).colorScheme.onSurface,
-      title: const Text('Edit Audio Tags'),
+      backgroundColor: colorScheme.onPrimary,
+      foregroundColor: colorScheme.inversePrimary,
+      title: Text(
+        'Edit Audio Tags',
+        style: TextStyle(
+          color: colorScheme.inversePrimary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       actions: [
         Obx(() {
           if (controller.isLoading.value) {
@@ -270,10 +277,14 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
   }
 
   Widget _buildSongInfoCard(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.onPrimary,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.secondary,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.15)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -285,7 +296,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: controller.isFormatSupported()
-                        ? Colors.blue.withValues(alpha: 0.1)
+                        ? colorScheme.primary.withValues(alpha: 0.15)
                         : Colors.orange.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
@@ -295,7 +306,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                         : Icons.warning,
                     size: 32,
                     color: controller.isFormatSupported()
-                        ? Theme.of(context).colorScheme.primary
+                        ? colorScheme.inversePrimary
                         : Colors.orange,
                   ),
                 ),
@@ -306,9 +317,10 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                     children: [
                       Text(
                         controller.selectedSong.value?.title ?? 'Unknown',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: TextStyle(
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: colorScheme.inversePrimary,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -317,8 +329,9 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
                       Text(
                         controller.selectedSong.value?.artist ??
                             'Unknown Artist',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: colorScheme.primary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -329,7 +342,7 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
               ],
             ),
             SizedBox(height: 16.h),
-            Divider(height: 1.h),
+            Divider(height: 1.h, color: colorScheme.primary.withValues(alpha: 0.2)),
             SizedBox(height: 12.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -379,6 +392,8 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
     required String value,
     bool isWarning = false,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         Icon(
@@ -386,22 +401,21 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
           size: 20,
           color: isWarning
               ? Colors.orange
-              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              : colorScheme.primary,
         ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+          style: TextStyle(fontSize: 12.sp, color: colorScheme.primary),
         ),
         Text(
           value,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          style: TextStyle(
+            fontSize: 12.sp,
             fontWeight: FontWeight.w600,
             color: isWarning
                 ? Colors.orange
-                : Theme.of(context).colorScheme.onSurface,
+                : colorScheme.inversePrimary,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -411,10 +425,14 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
   }
 
   Widget _buildAlbumArtSection(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.onPrimary,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colorScheme.secondary,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.15)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -425,9 +443,10 @@ class _TagEditorScreenState extends State<TagEditorScreen> {
               children: [
                 Text(
                   'Album Artwork',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  style: TextStyle(
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: colorScheme.inversePrimary,
                   ),
                 ),
                 Row(

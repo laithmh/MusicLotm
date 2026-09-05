@@ -41,8 +41,8 @@ class VisualizerImageWrapper extends StatelessWidget {
           'Switched to: $styleName',
           snackPosition: SnackPosition.BOTTOM,
           duration: const Duration(seconds: 1),
-          backgroundColor: colorScheme.surface.withValues(alpha: 0.85),
-          colorText: colorScheme.onSurface,
+          backgroundColor: colorScheme.secondary,
+          colorText: colorScheme.inversePrimary,
           margin: const EdgeInsets.all(16),
         );
       },

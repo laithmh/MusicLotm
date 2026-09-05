@@ -19,6 +19,8 @@ class TitlefavoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final playlistcontroller = Get.find<Playlistcontroller>();
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -36,6 +38,7 @@ class TitlefavoWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20.sp,
                     fontWeight: FontWeight.bold,
+                    color: colorScheme.inversePrimary,
                   ),
                 ),
               ),
@@ -46,9 +49,7 @@ class TitlefavoWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15.sp,
                   fontWeight: FontWeight.normal,
-                  color: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                  color: colorScheme.primary,
                 ),
               ),
             ],
@@ -64,8 +65,8 @@ class TitlefavoWidget extends StatelessWidget {
             icon: Icon(
               isFavorite ? Icons.favorite : Icons.favorite_border,
               color: isFavorite
-                  ? Colors.red
-                  : Theme.of(context).iconTheme.color,
+                  ? Colors.redAccent
+                  : colorScheme.primary,
               size: 24.w,
             ),
           );

@@ -546,7 +546,7 @@ class _PlaylistpageState extends State<Playlistpage> {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -557,7 +557,7 @@ class _PlaylistpageState extends State<Playlistpage> {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
               foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -579,6 +579,7 @@ class _PlaylistpageState extends State<Playlistpage> {
     return await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(
           title,
           style: TextStyle(
@@ -586,14 +587,14 @@ class _PlaylistpageState extends State<Playlistpage> {
             fontWeight: FontWeight.w600,
             color: isDestructive
                 ? Theme.of(context).colorScheme.error
-                : Theme.of(context).colorScheme.onSurface,
+                : Theme.of(context).colorScheme.inversePrimary,
           ),
         ),
         content: Text(
           message,
           style: TextStyle(
             fontSize: 14.sp,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+            color: Theme.of(context).colorScheme.inversePrimary.withValues(alpha: 0.8),
           ),
         ),
         actions: [
@@ -602,7 +603,7 @@ class _PlaylistpageState extends State<Playlistpage> {
             child: Text(
               'Cancel',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -613,7 +614,8 @@ class _PlaylistpageState extends State<Playlistpage> {
               style: TextStyle(
                 color: isDestructive
                     ? Theme.of(context).colorScheme.error
-                    : Theme.of(context).colorScheme.primary,
+                    : Theme.of(context).colorScheme.inversePrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),

@@ -10,28 +10,32 @@ class Floatingbuttonwidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return FloatingActionButton(
+      backgroundColor: colorScheme.inversePrimary,
       onPressed: () {
         showCreatePlaylistDialog(context);
       },
-      child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
+      child: Icon(Icons.add, color: colorScheme.onPrimary),
     );
   }
 
   void showCreatePlaylistDialog(BuildContext context) {
     final controller = Get.find<Playlistcontroller>();
+    final colorScheme = Theme.of(context).colorScheme;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: colorScheme.onPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Create New Playlist',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
+            color: colorScheme.inversePrimary,
           ),
         ),
         content: SizedBox(
@@ -41,13 +45,27 @@ class Floatingbuttonwidget extends StatelessWidget {
             children: [
               TextField(
                 controller: controller.playlistNameController,
+                style: TextStyle(color: colorScheme.inversePrimary),
                 decoration: InputDecoration(
                   labelText: 'Playlist Name',
+                  labelStyle: TextStyle(color: colorScheme.primary),
                   hintText: 'Enter playlist name',
+                  hintStyle: TextStyle(color: colorScheme.primary.withValues(alpha: 0.5)),
+                  filled: true,
+                  fillColor: colorScheme.secondary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary.withValues(alpha: 0.3)),
                   ),
-                  prefixIcon: const Icon(Icons.queue_music),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary.withValues(alpha: 0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.inversePrimary),
+                  ),
+                  prefixIcon: Icon(Icons.queue_music, color: colorScheme.primary),
                   contentPadding: EdgeInsets.symmetric(
                     vertical: 12.h,
                     horizontal: 16.w,
@@ -59,13 +77,27 @@ class Floatingbuttonwidget extends StatelessWidget {
               SizedBox(height: 16.h),
               TextField(
                 controller: controller.playlistDescriptionController,
+                style: TextStyle(color: colorScheme.inversePrimary),
                 decoration: InputDecoration(
                   labelText: 'Description (optional)',
+                  labelStyle: TextStyle(color: colorScheme.primary),
                   hintText: 'Add a description',
+                  hintStyle: TextStyle(color: colorScheme.primary.withValues(alpha: 0.5)),
+                  filled: true,
+                  fillColor: colorScheme.secondary,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary.withValues(alpha: 0.3)),
                   ),
-                  prefixIcon: const Icon(Icons.description),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.primary.withValues(alpha: 0.3)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.inversePrimary),
+                  ),
+                  prefixIcon: Icon(Icons.description, color: colorScheme.primary),
                   contentPadding: EdgeInsets.symmetric(
                     vertical: 12.h,
                     horizontal: 16.w,
@@ -83,7 +115,7 @@ class Floatingbuttonwidget extends StatelessWidget {
               controller.playlistNameController.clear();
               controller.playlistDescriptionController.clear();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.grey.shade600),
+            style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
@@ -107,12 +139,6 @@ class Floatingbuttonwidget extends StatelessWidget {
                   Get.back();
                   controller.playlistNameController.clear();
                   controller.playlistDescriptionController.clear();
-
-                  // Optional: Navigate to the new playlist
-                  // Get.to(() => Playlistpage(
-                  //   playlistId: playlist.id,
-                  //   playlistName: playlist.name,
-                  // ));
                 }
               } catch (e) {
                 log('Error creating playlist: $e');
@@ -120,15 +146,16 @@ class Floatingbuttonwidget extends StatelessWidget {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              backgroundColor: colorScheme.inversePrimary,
+              foregroundColor: colorScheme.onPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Create',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.inversePrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
