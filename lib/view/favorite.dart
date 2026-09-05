@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
-import 'package:musiclotm/core/Widget/neubox.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:musiclotm/core/Widget/song_options_sheet.dart';
+import 'package:musiclotm/core/Widget/unified_song_tile.dart';
 
 class Favorite extends StatelessWidget {
   const Favorite({super.key});
@@ -36,7 +35,7 @@ class Favorite extends StatelessWidget {
           style: TextStyle(
             fontSize: 24.sp,
             fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: Theme.of(context).colorScheme.inversePrimary,
           ),
         ),
         actions: [
@@ -69,7 +68,7 @@ class Favorite extends StatelessWidget {
                           Icon(
                             Icons.sort_by_alpha,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("A → Z", style: TextStyle(fontSize: 12.sp)),
@@ -83,7 +82,7 @@ class Favorite extends StatelessWidget {
                           Icon(
                             Icons.sort_by_alpha,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("Z → A", style: TextStyle(fontSize: 12.sp)),
@@ -97,7 +96,7 @@ class Favorite extends StatelessWidget {
                           Icon(
                             Icons.access_time,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("Oldest", style: TextStyle(fontSize: 12.sp)),
@@ -111,7 +110,7 @@ class Favorite extends StatelessWidget {
                           Icon(
                             Icons.access_time,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("Newest", style: TextStyle(fontSize: 12.sp)),
@@ -203,7 +202,7 @@ class Favorite extends StatelessWidget {
             child: CircularProgressIndicator(
               strokeWidth: 3,
               valueColor: AlwaysStoppedAnimation<Color>(
-                Theme.of(context).colorScheme.onSurface,
+                Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
           ),
@@ -212,7 +211,7 @@ class Favorite extends StatelessWidget {
             'Loading favorites...',
             style: TextStyle(
               fontSize: 12.sp,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
             ),
           ),
         ],
@@ -236,7 +235,7 @@ class Favorite extends StatelessWidget {
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
             ),
           ),
           SizedBox(height: 10.h),
@@ -247,7 +246,7 @@ class Favorite extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.sp,
-                color: Theme.of(context).colorScheme.onSurface,
+                color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
           ),
@@ -284,10 +283,14 @@ class Favorite extends StatelessWidget {
     Navigatorcontroller navigator,
     Key key,
   ) {
-    return Padding(
-      key: key,
-      padding: EdgeInsets.only(bottom: 10.h),
-      child: GestureDetector(
+    return Obx(() {
+      final isPlaying =
+          songscontroller.currentMediaItem.value?.id == song.id;
+
+      return UnifiedSongTile(
+        key: key,
+        song: song,
+        isPlaying: isPlaying,
         onTap: () async {
           await _playFavoriteSong(
             songscontroller,
@@ -299,137 +302,17 @@ class Favorite extends StatelessWidget {
             index,
           );
         },
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 4.w),
-          child: Neubox(
-            borderRadius: BorderRadius.circular(16),
-            child: ListTile(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 12.w,
-                vertical: 8.h,
-              ),
-              leading: _buildArtwork(song, context),
-              title: Text(
-                song.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              subtitle: Text(
-                song.artist ?? 'Unknown Artist',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-              trailing: SizedBox(
-                width: 60.w,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    // ✅ ISOLATED Obx: ONLY rebuilds the visualizer when playing state changes
-                    // Prevents entire list item rebuild → maintains reorder animations
-                    Obx(() {
-                      final isPlaying =
-                          songscontroller.currentMediaItem.value?.id == song.id;
-                      return isPlaying
-                          ? _buildPlayingIndicator(context, songHandler)
-                          : _buildPlayButton(context);
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPlayingIndicator(BuildContext context, SongHandler songHandler) {
-    return StreamBuilder<PlaybackState>(
-      stream: songHandler.playbackState,
-      builder: (context, snapshot) {
-        final isSongPlaying = snapshot.data?.playing ?? false;
-        return SizedBox(
-          width: 30.w,
-          child: MiniMusicVisualizer(
-            color: isSongPlaying
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-            width: 3,
-            height: 18,
-            radius: 1.5,
-            animate: isSongPlaying,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPlayButton(BuildContext context) {
-    return Container(
-      width: 24.w,
-      height: 24.w,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      ),
-      child: Icon(
-        Icons.play_arrow_rounded,
-        size: 14.sp,
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-      ),
-    );
-  }
-
-  Widget _buildArtwork(MediaItem song, BuildContext context) {
-    return Container(
-      width: 52.w,
-      height: 52.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 
-              0.1,
-            ), // Fixed: .withValues(alpha:) is invalid
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: QueryArtworkWidget(
-          id: int.tryParse(song.extras?['song_id']?.toString() ?? "0") ?? 0,
-          keepOldArtwork: true,
-          type: ArtworkType.AUDIO,
-          artworkWidth: 52.w,
-          artworkHeight: 52.h,
-          artworkFit: BoxFit.cover,
-          artworkQuality: FilterQuality.medium,
-          nullArtworkWidget: Container(
-            color: Theme.of(context).colorScheme.primary,
-            child: Center(
-              child: Icon(
-                Icons.music_note,
-                size: 24.sp,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+        onMoreOptions: () {
+          SongOptionsSheet.show(
+            context: context,
+            song: song,
+            onDelete: () async {
+              await playlistcontroller.deleteSong(song.id);
+            },
+          );
+        },
+      );
+    });
   }
 
   Future<void> _playFavoriteSong(

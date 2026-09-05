@@ -15,43 +15,105 @@ class Playlistwidget extends StatelessWidget {
     Navigatorcontroller navigatorcontroller = Get.find();
     Playlistcontroller playlistcontroller = Get.find();
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
-      color: Theme.of(context).colorScheme.onPrimary,
+      color: colorScheme.onPrimary,
       child: Padding(
-        padding: EdgeInsets.only(left: 15.w, right: 15.w, bottom: 14.h),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Divider(),
-            ListTile(
-              leading: Icon(Icons.music_note, size: 30.w),
-              title: Text(
-                "A L L  M U S I C",
-                style: TextStyle(fontSize: 20.sp),
+            // Quick Navigation shortcuts
+            Neubox(
+              borderRadius: BorderRadius.circular(16),
+              child: ListTile(
+                leading: Icon(Icons.music_note, size: 26.sp, color: colorScheme.primary),
+                title: Text(
+                  "All Music",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.inversePrimary,
+                  ),
+                ),
+                trailing: Icon(Icons.chevron_right, color: colorScheme.primary),
+                onTap: () {
+                  navigatorcontroller.changepage(0);
+                },
               ),
-              onTap: () {
-                navigatorcontroller.changepage(0);
-              },
             ),
             SizedBox(height: 10.h),
-            ListTile(
-              leading: Icon(Icons.favorite, size: 30.w),
-              title: Text("F A V O R I T E", style: TextStyle(fontSize: 20.sp)),
-              onTap: () async {
-                await playlistcontroller.loadFavorites();
-                Get.toNamed(Approutes.favorite);
-              },
+            Neubox(
+              borderRadius: BorderRadius.circular(16),
+              child: ListTile(
+                leading: Icon(Icons.favorite, size: 26.sp, color: Colors.redAccent),
+                title: Text(
+                  "Favorites",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.inversePrimary,
+                  ),
+                ),
+                trailing: Icon(Icons.chevron_right, color: colorScheme.primary),
+                onTap: () async {
+                  await playlistcontroller.loadFavorites();
+                  Get.toNamed(Approutes.favorite);
+                },
+              ),
             ),
             SizedBox(height: 20.h),
-            const Divider(),
-            SizedBox(height: 20.w),
             Text(
-              "Y O U R   P L A Y L I S T S:",
-              style: TextStyle(fontSize: 20.sp),
+              "Your Playlists",
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.inversePrimary,
+              ),
             ),
+            SizedBox(height: 10.h),
             Obx(() {
               if (playlistcontroller.isLoading.value) {
-                return Center(child: CircularProgressIndicator());
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                  ),
+                );
+              }
+
+              if (playlistcontroller.playlists.isEmpty) {
+                return Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.queue_music,
+                          size: 54.sp,
+                          color: colorScheme.primary,
+                        ),
+                        SizedBox(height: 12.h),
+                        Text(
+                          'No playlists yet',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.inversePrimary,
+                          ),
+                        ),
+                        SizedBox(height: 6.h),
+                        Text(
+                          'Tap + to create your first playlist',
+                          style: TextStyle(
+                            fontSize: 12.sp,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               }
 
               return Expanded(
@@ -59,10 +121,12 @@ class Playlistwidget extends StatelessWidget {
                   itemCount: playlistcontroller.playlists.length,
                   itemBuilder: (BuildContext context, int index) {
                     final playlist = playlistcontroller.playlists[index];
+                    final songCount = playlist.songIds.length;
+
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 7),
+                      padding: EdgeInsets.symmetric(vertical: 6.h),
                       child: Neubox(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         child: Slidable(
                           endActionPane: ActionPane(
                             motion: const StretchMotion(),
@@ -73,11 +137,10 @@ class Playlistwidget extends StatelessWidget {
                                     playlist.id,
                                   );
                                 },
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 icon: Icons.delete,
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.inversePrimary,
+                                backgroundColor: Theme.of(context).colorScheme.error,
+                                foregroundColor: Colors.white,
                               ),
                             ],
                           ),
@@ -90,8 +153,38 @@ class Playlistwidget extends StatelessWidget {
                                   playlist.id;
                               Get.toNamed(Approutes.playlistscreen);
                             },
-                            leading: Icon(Icons.playlist_play),
-                            title: Text(playlist.name.toUpperCase()),
+                            leading: Container(
+                              width: 44.w,
+                              height: 44.w,
+                              decoration: BoxDecoration(
+                                color: colorScheme.secondary,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.playlist_play,
+                                size: 26.sp,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            title: Text(
+                              playlist.name,
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.inversePrimary,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '$songCount ${songCount == 1 ? 'song' : 'songs'}',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.chevron_right,
+                              color: colorScheme.primary,
+                            ),
                           ),
                         ),
                       ),

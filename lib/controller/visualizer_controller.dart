@@ -3,11 +3,16 @@ import 'dart:developer';
 import 'dart:math' hide log;
 
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 
 enum VisualizerStyle { radialBars, liquid, eclipseNova }
+
+class VisualizerNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
 
 class VisualizerController extends GetxController {
   // Dependencies
@@ -24,6 +29,12 @@ class VisualizerController extends GetxController {
 
   Box? get _box => Hive.isBoxOpen('music') ? Hive.box('music') : null;
   final List<Worker> _persistenceWorkers = [];
+
+  /// High-performance notifier for 60 FPS CustomPaint canvas isolation
+  final VisualizerNotifier visualizerNotifier = VisualizerNotifier();
+  List<double> rawFftData = List.filled(64, 0.0);
+  List<double> rawPeakHoldData = List.filled(64, 0.0);
+  double rawBassValue = 0.0;
 
   // Observables for UI
   final RxList<double> fftData = <double>[].obs;
@@ -237,18 +248,17 @@ class VisualizerController extends GetxController {
         return;
       }
       bool hasValue = false;
-      final List<double> decayed = List.filled(barCount, 0.0);
       for (int i = 0; i < barCount; i++) {
-        final double current = (i < fftData.length) ? fftData[i] : 0.0;
+        final double current = rawFftData[i];
         if (current > 0.005) {
-          decayed[i] = current * 0.80;
+          rawFftData[i] = current * 0.80;
           hasValue = true;
         } else {
-          decayed[i] = 0.0;
+          rawFftData[i] = 0.0;
         }
       }
-      fftData.value = decayed;
-      bassValue.value = (bassValue.value * 0.80).clamp(0.0, 1.0);
+      rawBassValue = (rawBassValue * 0.80).clamp(0.0, 1.0);
+      visualizerNotifier.notify();
       if (!hasValue) {
         timer.cancel();
       }
@@ -302,32 +312,25 @@ class VisualizerController extends GetxController {
     // 3. Fluid Ballistics (responsive attack + natural exponential recoil)
     final double curAttack = attack.value;
     final double curDecay = decay.value;
-    final List<double> processed = List.filled(barCount, 0.0);
     for (int i = 0; i < barCount; i++) {
       final double target = targetData[i];
-      final double previous = (i < fftData.length) ? fftData[i] : 0.0;
+      final double previous = rawFftData[i];
 
       if (target > previous) {
-        processed[i] = previous + (target - previous) * curAttack;
+        rawFftData[i] = previous + (target - previous) * curAttack;
       } else {
-        processed[i] = previous * curDecay;
+        rawFftData[i] = previous * curDecay;
       }
     }
-
-    fftData.value = processed;
 
     // Peak-hold tracker with studio rack gravity falloff
-    final List<double> currentPeaks = List<double>.from(
-      peakHoldData.length == barCount ? peakHoldData : List.filled(barCount, 0.0),
-    );
     for (int i = 0; i < barCount; i++) {
-      if (processed[i] >= currentPeaks[i]) {
-        currentPeaks[i] = processed[i];
+      if (rawFftData[i] >= rawPeakHoldData[i]) {
+        rawPeakHoldData[i] = rawFftData[i];
       } else {
-        currentPeaks[i] = max(0.0, currentPeaks[i] - 0.015);
+        rawPeakHoldData[i] = max(0.0, rawPeakHoldData[i] - 0.015);
       }
     }
-    peakHoldData.value = currentPeaks;
 
     // 4. Spectral-Flux Beat & Kick Onset Detector (Sub-bass, punch kicks, 808s: bands 0-3)
     final double b0 = frequencies.isNotEmpty ? frequencies[0] : 0.0;
@@ -344,19 +347,21 @@ class VisualizerController extends GetxController {
 
     // Dynamic proportional kick transient
     if (energyDelta > 0.04 && kickEnergy > 0.12) {
-      // Scales proportionally with the actual loudness and suddenness of the beat
       final double hitStrength = (kickEnergy * 0.75 + energyDelta * 1.5).clamp(0.0, 1.0);
       _beatPulse = max(_beatPulse, hitStrength);
     } else {
-      _beatPulse = _beatPulse * 0.70; // Natural exponential spring recoil
+      _beatPulse = _beatPulse * 0.70;
     }
 
     final double targetBass = max(_beatPulse, kickEnergy);
-    if (targetBass > bassValue.value) {
-      bassValue.value = bassValue.value + (targetBass - bassValue.value) * 0.80;
+    if (targetBass > rawBassValue) {
+      rawBassValue = rawBassValue + (targetBass - rawBassValue) * 0.80;
     } else {
-      bassValue.value = (bassValue.value * 0.74).clamp(0.0, 1.0);
+      rawBassValue = (rawBassValue * 0.74).clamp(0.0, 1.0);
     }
+
+    // Fast batch notification strictly for CustomPaint without widget tree rebuilds
+    visualizerNotifier.notify();
   }
 
   void _stopCapture() {
@@ -387,6 +392,7 @@ class VisualizerController extends GetxController {
     _persistenceWorkers.clear();
     _saveSettings();
     _stopCapture();
+    visualizerNotifier.dispose();
     super.onClose();
   }
 }

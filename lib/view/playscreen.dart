@@ -84,12 +84,12 @@ class _PlayscreenState extends State<Playscreen> {
             appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
             title: Text(
-              "NOW PLAYING",
+              "Now Playing",
               style: TextStyle(
-                fontSize: 25.sp,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.5,
-                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+                color: Theme.of(context).colorScheme.inversePrimary,
               ),
             ),
             centerTitle: true,
@@ -142,7 +142,7 @@ class _PlayscreenState extends State<Playscreen> {
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
                       SizedBox(height: 8.h),
@@ -150,7 +150,7 @@ class _PlayscreenState extends State<Playscreen> {
                         "Please wait a moment",
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
                     ],
@@ -167,7 +167,7 @@ class _PlayscreenState extends State<Playscreen> {
                       Icon(
                         Icons.music_off_rounded,
                         size: 80.sp,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.inversePrimary,
                       ),
                       SizedBox(height: 20.h),
                       Text(
@@ -175,7 +175,7 @@ class _PlayscreenState extends State<Playscreen> {
                         style: TextStyle(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.w700,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
                       SizedBox(height: 10.h),
@@ -186,7 +186,7 @@ class _PlayscreenState extends State<Playscreen> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                         ),
                       ),

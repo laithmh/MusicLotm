@@ -141,10 +141,11 @@ class Allmusicscreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(
-          "A L L  M U S I C",
+          "All Music",
           style: TextStyle(
-            fontSize: 25.sp,
+            fontSize: 22.sp,
             fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
             color: Theme.of(context).colorScheme.inversePrimary,
           ),
         ),

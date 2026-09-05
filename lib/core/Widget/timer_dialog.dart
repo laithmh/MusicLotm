@@ -29,9 +29,9 @@ class _TimerDialogState extends State<TimerDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.r),
       ),
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       child: Container(
-        constraints: BoxConstraints(maxHeight: 500.h),
+        constraints: BoxConstraints(maxHeight: 520.h),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -49,9 +49,10 @@ class _TimerDialogState extends State<TimerDialog> {
                 child: Text(
                   'SLEEP TIMER',
                   style: TextStyle(
-                    fontSize: 20.sp,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSecondary,
+                    letterSpacing: 1.5,
+                    color: Theme.of(context).colorScheme.inversePrimary,
                   ),
                 ),
               ),
@@ -80,13 +81,14 @@ class _TimerDialogState extends State<TimerDialog> {
   }
 
   Widget _buildActiveTimerView(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           Icons.timer,
           size: 60.sp,
-          color: Theme.of(context).colorScheme.inversePrimary,
+          color: colorScheme.inversePrimary,
         ),
         SizedBox(height: 20.h),
         Text(
@@ -94,7 +96,7 @@ class _TimerDialogState extends State<TimerDialog> {
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.inversePrimary,
+            color: colorScheme.inversePrimary,
           ),
         ),
         SizedBox(height: 10.h),
@@ -102,19 +104,19 @@ class _TimerDialogState extends State<TimerDialog> {
           'Time remaining:',
           style: TextStyle(
             fontSize: 14.sp,
-            color: Theme.of(context).colorScheme.secondary,
+            color: colorScheme.primary,
           ),
         ),
         SizedBox(height: 15.h),
         // Timer display
         Container(
-          padding: EdgeInsets.all(20.h),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary.withValues(alpha:  0.3),
+            color: colorScheme.secondary,
             borderRadius: BorderRadius.circular(15.r),
             border: Border.all(
-              color: Theme.of(context).colorScheme.inversePrimary,
-              width: 2,
+              color: colorScheme.inversePrimary.withValues(alpha: 0.3),
+              width: 1.5,
             ),
           ),
           child: Text(
@@ -122,19 +124,21 @@ class _TimerDialogState extends State<TimerDialog> {
             style: TextStyle(
               fontSize: 32.sp,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.inversePrimary,
+              color: colorScheme.inversePrimary,
               letterSpacing: 2,
             ),
           ),
         ),
         SizedBox(height: 20.h),
         // Progress indicator
-        LinearProgressIndicator(
-          value: _calculateProgress(),
-          backgroundColor:
-              Theme.of(context).colorScheme.secondary.withValues(alpha:  0.3),
-          color: Theme.of(context).colorScheme.inversePrimary,
-          minHeight: 8.h,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4.r),
+          child: LinearProgressIndicator(
+            value: _calculateProgress(),
+            backgroundColor: colorScheme.secondary,
+            color: colorScheme.inversePrimary,
+            minHeight: 8.h,
+          ),
         ),
         SizedBox(height: 20.h),
         // Action buttons
@@ -147,14 +151,15 @@ class _TimerDialogState extends State<TimerDialog> {
                 },
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: colorScheme.primary,
                   ),
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 child: Text(
                   'HIDE',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: colorScheme.inversePrimary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -167,10 +172,14 @@ class _TimerDialogState extends State<TimerDialog> {
                   Navigator.of(context).pop();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
+                  backgroundColor: Colors.redAccent.shade700,
+                  foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
-                child: const Text('CANCEL'),
+                child: const Text(
+                  'CANCEL',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ],
@@ -181,7 +190,7 @@ class _TimerDialogState extends State<TimerDialog> {
           'Add more time:',
           style: TextStyle(
             fontSize: 12.sp,
-            color: Theme.of(context).colorScheme.secondary,
+            color: colorScheme.primary,
           ),
         ),
         SizedBox(height: 10.h),
@@ -194,11 +203,14 @@ class _TimerDialogState extends State<TimerDialog> {
                 '+$minutes min',
                 style: TextStyle(
                   fontSize: 12.sp,
-                  color: Theme.of(context).colorScheme.inversePrimary,
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.inversePrimary,
                 ),
               ),
-              backgroundColor:
-                  Theme.of(context).colorScheme.secondary.withValues(alpha:  0.5),
+              backgroundColor: colorScheme.secondary,
+              side: BorderSide(
+                color: colorScheme.primary.withValues(alpha: 0.3),
+              ),
               onPressed: () {
                 final currentEndTime = settingscontroller.timerEndTime.value;
                 if (currentEndTime != null) {
@@ -211,7 +223,9 @@ class _TimerDialogState extends State<TimerDialog> {
                     'Time Added',
                     'Added $minutes minutes',
                     snackPosition: SnackPosition.BOTTOM,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: colorScheme.secondary,
+                    colorText: colorScheme.inversePrimary,
                   );
                 }
               },
@@ -223,16 +237,17 @@ class _TimerDialogState extends State<TimerDialog> {
   }
 
   Widget _buildTimerSetupView(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Quick presets
         Text(
-          'Quick Settings:',
+          'Quick Presets',
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.inversePrimary,
+            color: colorScheme.inversePrimary,
           ),
         ),
         SizedBox(height: 15.h),
@@ -240,35 +255,38 @@ class _TimerDialogState extends State<TimerDialog> {
           spacing: 10.w,
           runSpacing: 10.h,
           children: [5, 10, 15, 30, 45, 60].map((minutes) {
-            return ChoiceChip(
-              label: Text('${minutes}m'),
-              selected: false,
-              onSelected: (_) {
+            return ActionChip(
+              label: Text(
+                '${minutes}m',
+                style: TextStyle(
+                  color: colorScheme.inversePrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              onPressed: () {
                 settingscontroller.startTimer(minutes);
                 Navigator.of(context).pop();
               },
-              backgroundColor:
-                  Theme.of(context).colorScheme.secondary.withValues(alpha:  0.3),
-              selectedColor: Theme.of(context).colorScheme.inversePrimary,
-              labelStyle: TextStyle(
-                color: Theme.of(context).colorScheme.inversePrimary,
+              backgroundColor: colorScheme.secondary,
+              side: BorderSide(
+                color: colorScheme.primary.withValues(alpha: 0.3),
               ),
             );
           }).toList(),
         ),
-        SizedBox(height: 25.h),
+        SizedBox(height: 20.h),
         Divider(
-          color: Theme.of(context).colorScheme.secondary,
+          color: colorScheme.primary.withValues(alpha: 0.3),
           thickness: 1,
         ),
-        SizedBox(height: 25.h),
+        SizedBox(height: 15.h),
         // Custom time
         Text(
-          'Custom Time:',
+          'Custom Time',
           style: TextStyle(
             fontSize: 16.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.inversePrimary,
+            color: colorScheme.inversePrimary,
           ),
         ),
         SizedBox(height: 15.h),
@@ -280,42 +298,41 @@ class _TimerDialogState extends State<TimerDialog> {
               children: [
                 Container(
                   width: 100.w,
-                  height: 80.h,
+                  height: 70.h,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
-                    borderRadius: BorderRadius.circular(10.r),
+                    color: colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.inversePrimary,
+                      color: colorScheme.primary.withValues(alpha: 0.4),
                     ),
                   ),
-                  child: TextField(
-                    controller: settingscontroller.hourController,
-                    focusNode: _hourFocusNode,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: '00',
-                      hintStyle: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondary
-                            .withValues(alpha:  0.5),
+                  child: Center(
+                    child: TextField(
+                      controller: settingscontroller.hourController,
+                      focusNode: _hourFocusNode,
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.inversePrimary,
                       ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
+                      decoration: InputDecoration(
+                        hintText: '00',
+                        hintStyle: TextStyle(
+                          color: colorScheme.primary.withValues(alpha: 0.5),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(2),
+                      ],
+                      onTapOutside: (_) {
+                        _hourFocusNode.unfocus();
+                      },
                     ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(2),
-                    ],
-                    onTapOutside: (_) {
-                      _hourFocusNode.unfocus();
-                    },
                   ),
                 ),
                 SizedBox(height: 5.h),
@@ -323,62 +340,62 @@ class _TimerDialogState extends State<TimerDialog> {
                   'Hours',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
             ),
-            SizedBox(width: 15.w),
-            Text(
-              ':',
-              style: TextStyle(
-                fontSize: 24.sp,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.inversePrimary,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              child: Text(
+                ':',
+                style: TextStyle(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.inversePrimary,
+                ),
               ),
             ),
-            SizedBox(width: 15.w),
             // Minutes
             Column(
               children: [
                 Container(
                   width: 100.w,
-                  height: 80.h,
+                  height: 70.h,
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
-                    borderRadius: BorderRadius.circular(10.r),
+                    color: colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.inversePrimary,
+                      color: colorScheme.primary.withValues(alpha: 0.4),
                     ),
                   ),
-                  child: TextField(
-                    controller: settingscontroller.minuteController,
-                    focusNode: _minuteFocusNode,
-                    textAlign: TextAlign.center,
-                    keyboardType: TextInputType.number,
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSecondary,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: '00',
-                      hintStyle: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSecondary
-                            .withValues(alpha:  0.5),
+                  child: Center(
+                    child: TextField(
+                      controller: settingscontroller.minuteController,
+                      focusNode: _minuteFocusNode,
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.inversePrimary,
                       ),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.zero,
+                      decoration: InputDecoration(
+                        hintText: '00',
+                        hintStyle: TextStyle(
+                          color: colorScheme.primary.withValues(alpha: 0.5),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(2),
+                      ],
+                      onTapOutside: (_) {
+                        _minuteFocusNode.unfocus();
+                      },
                     ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(2),
-                    ],
-                    onTapOutside: (_) {
-                      _minuteFocusNode.unfocus();
-                    },
                   ),
                 ),
                 SizedBox(height: 5.h),
@@ -386,14 +403,14 @@ class _TimerDialogState extends State<TimerDialog> {
                   'Minutes',
                   style: TextStyle(
                     fontSize: 12.sp,
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: colorScheme.primary,
                   ),
                 ),
               ],
             ),
           ],
         ),
-        SizedBox(height: 30.h),
+        SizedBox(height: 25.h),
         // Action buttons
         Row(
           children: [
@@ -405,14 +422,15 @@ class _TimerDialogState extends State<TimerDialog> {
                 },
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: colorScheme.primary,
                   ),
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
                 child: Text(
                   'CANCEL',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: colorScheme.inversePrimary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -431,18 +449,21 @@ class _TimerDialogState extends State<TimerDialog> {
                       'Error',
                       'Please enter a valid time',
                       snackPosition: SnackPosition.BOTTOM,
-                      duration: Duration(seconds: 2),
+                      duration: const Duration(seconds: 2),
+                      backgroundColor: colorScheme.secondary,
+                      colorText: colorScheme.inversePrimary,
                     );
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  backgroundColor: colorScheme.inversePrimary,
+                  foregroundColor: colorScheme.onPrimary,
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
-                child: Text(
+                child: const Text(
                   'START',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

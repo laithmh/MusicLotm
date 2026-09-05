@@ -723,6 +723,57 @@ class Playlistcontroller extends GetxController {
     }
   }
 
+  /// Delete a single song from device
+  Future<void> deleteSong(String songId) async {
+    try {
+      final confirmed = await Get.dialog<bool>(
+        Builder(
+          builder: (context) {
+            final colorScheme = Theme.of(context).colorScheme;
+            return AlertDialog(
+              backgroundColor: colorScheme.onPrimary,
+              title: Text(
+                'Delete Song',
+                style: TextStyle(color: colorScheme.inversePrimary),
+              ),
+              content: Text(
+                'Are you sure you want to delete this song from device? This action cannot be undone.',
+                style: TextStyle(color: colorScheme.primary),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(result: false),
+                  child: Text('Cancel', style: TextStyle(color: colorScheme.primary)),
+                ),
+                TextButton(
+                  onPressed: () => Get.back(result: true),
+                  style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+                  child: const Text('Delete'),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+
+      if (confirmed != true) return;
+
+      final mediaStore = MediaStore();
+      await mediaStore.deleteFileUsingUri(uriString: songId);
+      log('✅ Deleted song: $songId');
+
+      await songscontroller.loadSongs();
+      Get.snackbar(
+        'Success',
+        'Successfully deleted song',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      log('❌ Error deleting song: $e');
+      Get.snackbar('Error', 'Failed to delete song');
+    }
+  }
+
   Future<void> _reorderCurrentPlaylistBySortType() async {
     final playlistId = currentPlaylistId.value;
     if (playlistId.isEmpty) return;

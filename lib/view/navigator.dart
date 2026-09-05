@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
+import 'package:musiclotm/core/Widget/mini_player_widget.dart';
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
 import 'package:musiclotm/view/allmusic.dart';
 import 'package:musiclotm/view/playlist.dart';
@@ -21,11 +22,19 @@ class Navigator extends StatelessWidget {
         systemNavigationBarContrastEnforced: true,
       ),
     );
-    Navigatorcontroller controller = Get.find<Navigatorcontroller>();
+    final Navigatorcontroller controller = Get.find<Navigatorcontroller>();
+
     return Obx(
       () => SafeArea(
         child: Scaffold(
-          bottomNavigationBar: const Navigationbarwidget(),
+          bottomNavigationBar: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (controller.currentindex.value != 2)
+                const MiniPlayerWidget(),
+              const Navigationbarwidget(),
+            ],
+          ),
           body: IndexedStack(
             index: controller.currentindex.value,
             children: [

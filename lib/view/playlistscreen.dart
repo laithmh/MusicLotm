@@ -6,14 +6,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
 import 'package:musiclotm/core/Widget/navigationbarwidget.dart';
-import 'package:musiclotm/core/Widget/neubox.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:musiclotm/core/Widget/song_options_sheet.dart';
+import 'package:musiclotm/core/Widget/unified_song_tile.dart';
 
 class Playlistpage extends StatefulWidget {
   const Playlistpage({super.key});
@@ -64,7 +63,7 @@ class _PlaylistpageState extends State<Playlistpage> {
             style: TextStyle(
               fontSize: 24.sp,
               fontWeight: FontWeight.w700,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
             ),
           );
         }),
@@ -97,7 +96,7 @@ class _PlaylistpageState extends State<Playlistpage> {
                           Icon(
                             Icons.sort_by_alpha,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("A → Z", style: TextStyle(fontSize: 12.sp)),
@@ -111,7 +110,7 @@ class _PlaylistpageState extends State<Playlistpage> {
                           Icon(
                             Icons.sort_by_alpha,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("Z → A", style: TextStyle(fontSize: 12.sp)),
@@ -125,7 +124,7 @@ class _PlaylistpageState extends State<Playlistpage> {
                           Icon(
                             Icons.access_time,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("Oldest", style: TextStyle(fontSize: 12.sp)),
@@ -139,7 +138,7 @@ class _PlaylistpageState extends State<Playlistpage> {
                           Icon(
                             Icons.access_time,
                             size: 16.sp,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Theme.of(context).colorScheme.inversePrimary,
                           ),
                           SizedBox(width: 8.w),
                           Text("Newest", style: TextStyle(fontSize: 12.sp)),
@@ -203,14 +202,14 @@ class _PlaylistpageState extends State<Playlistpage> {
                       Icon(
                         Icons.edit,
                         size: 20.sp,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.inversePrimary,
                       ),
                       SizedBox(width: 12.w),
                       Text(
                         'Rename',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
                     ],
@@ -223,14 +222,14 @@ class _PlaylistpageState extends State<Playlistpage> {
                       Icon(
                         Icons.clear_all,
                         size: 20.sp,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.inversePrimary,
                       ),
                       SizedBox(width: 12.w),
                       Text(
                         'Clear All',
                         style: TextStyle(
                           fontSize: 13.sp,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
                     ],
@@ -341,7 +340,7 @@ class _PlaylistpageState extends State<Playlistpage> {
             'Loading playlist...',
             style: TextStyle(
               fontSize: 12.sp,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
             ),
           ),
         ],
@@ -415,10 +414,8 @@ class _PlaylistpageState extends State<Playlistpage> {
   ) {
     return Padding(
       key: key,
-      padding: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.only(bottom: 6.h),
       child: Slidable(
-        // ✅ CRITICAL: Slidable requires stable child identity
-        // Wrapping entire child in Obx breaks swipe animations
         endActionPane: ActionPane(
           motion: const StretchMotion(),
           children: [
@@ -443,149 +440,38 @@ class _PlaylistpageState extends State<Playlistpage> {
             ),
           ],
         ),
-        child: GestureDetector(
-          onTap: () async {
-            await _playPlaylistSong(
-              songscontroller,
-              playlistcontroller,
-              songHandler,
-              box,
-              navigator,
-              song,
-              index,
-            );
-          },
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 4.w),
-            child: Neubox(
-              borderRadius: BorderRadius.circular(16),
-              child: ListTile(
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 12.w,
-                  vertical: 8.h,
-                ),
-                leading: _buildArtwork(song, context),
-                title: Text(
-                  song.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
-                  ),
-                ),
-                subtitle: Text(
-                  song.artist ?? 'Unknown Artist',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
-                ),
-                trailing: SizedBox(
-                  width: 80.w,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      // ✅ ISOLATED Obx: ONLY rebuilds visualizer when playback state changes
-                      // Prevents entire item rebuild → maintains reorder/swipe animations
-                      Obx(() {
-                        final isPlaying =
-                            songscontroller.currentMediaItem.value?.id ==
-                            song.id;
-                        return isPlaying
-                            ? _buildPlayingIndicator(context, songHandler)
-                            : _buildPlayButton(context);
-                      }),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+        child: Obx(() {
+          final isPlaying =
+              songscontroller.currentMediaItem.value?.id == song.id;
 
-  Widget _buildPlayingIndicator(BuildContext context, SongHandler songHandler) {
-    return SizedBox(
-      width: 30.w,
-      child: StreamBuilder<PlaybackState>(
-        stream: songHandler.playbackState,
-        builder: (context, snapshot) {
-          final isSongPlaying = snapshot.data?.playing ?? false;
-          return MiniMusicVisualizer(
-            color: isSongPlaying
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-            width: 3,
-            height: 18,
-            radius: 1.5,
-            animate: isSongPlaying,
+          return UnifiedSongTile(
+            song: song,
+            isPlaying: isPlaying,
+            onTap: () async {
+              await _playPlaylistSong(
+                songscontroller,
+                playlistcontroller,
+                songHandler,
+                box,
+                navigator,
+                song,
+                index,
+              );
+            },
+            onMoreOptions: () {
+              SongOptionsSheet.show(
+                context: context,
+                song: song,
+                onDelete: () async {
+                  await playlistcontroller.removeSongFromPlaylist(
+                    playlistId: playlistcontroller.currentPlaylistId.value,
+                    songId: song.id,
+                  );
+                },
+              );
+            },
           );
-        },
-      ),
-    );
-  }
-
-  Widget _buildPlayButton(BuildContext context) {
-    return Container(
-      width: 24.w,
-      height: 24.w,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      ),
-      child: Icon(
-        Icons.play_arrow_rounded,
-        size: 14.sp,
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-      ),
-    );
-  }
-
-  Widget _buildArtwork(MediaItem song, BuildContext context) {
-    return Container(
-      width: 52.w,
-      height: 52.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 
-              0.1,
-            ), // Fixed invalid .withValues(alpha:)
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: QueryArtworkWidget(
-          id: int.tryParse(song.extras?['song_id']?.toString() ?? "0") ?? 0,
-          keepOldArtwork: true,
-          type: ArtworkType.AUDIO,
-          artworkWidth: 52.w,
-          artworkHeight: 52.h,
-          artworkFit: BoxFit.cover,
-          artworkQuality: FilterQuality.medium,
-          nullArtworkWidget: Container(
-            color: Theme.of(context).colorScheme.primary,
-            child: Center(
-              child: Icon(
-                Icons.music_note,
-                size: 24.sp,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
-        ),
+        }),
       ),
     );
   }

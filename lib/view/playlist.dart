@@ -13,8 +13,13 @@ class Playlistscreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(
-          "P L A Y  L I S T",
-          style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
+          "Playlists",
+          style: TextStyle(
+            fontSize: 22.sp,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+            color: Theme.of(context).colorScheme.inversePrimary,
+          ),
         ),
         centerTitle: true,
       ),

@@ -20,7 +20,8 @@ class Timerow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SongHandler songHandler = Get.find<SongHandler>();
+    final colorScheme = Theme.of(context).colorScheme;
+    final SongHandler songHandler = Get.find<SongHandler>();
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -29,41 +30,49 @@ class Timerow extends StatelessWidget {
           currenttime,
           style: TextStyle(
             fontSize: 12.sp,
-            color: Theme.of(context).textTheme.bodySmall?.color,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.inversePrimary,
           ),
         ),
         IconButton(
           onPressed: addtoplaylist,
-          icon: Icon(Icons.playlist_add, size: 22.w),
+          icon: Icon(Icons.playlist_add, size: 24.sp, color: colorScheme.primary),
           tooltip: 'Add to playlist',
         ),
         Obx(() {
+          final isLooping = songHandler.isloop.value;
           return IconButton(
             onPressed: setloop,
-            icon: songHandler.isloop.isFalse
-                ? Icon(Icons.repeat, size: 22.w)
-                : Icon(Icons.repeat_one, size: 22.w),
-            tooltip: songHandler.isloop.isFalse ? 'Repeat all' : 'Repeat one',
+            icon: Icon(
+              isLooping ? Icons.repeat_one : Icons.repeat,
+              size: 22.sp,
+              color: isLooping
+                  ? colorScheme.inversePrimary
+                  : colorScheme.primary.withValues(alpha: 0.5),
+            ),
+            tooltip: isLooping ? 'Repeat one' : 'Repeat all',
           );
         }),
         Obx(() {
+          final isShuffle = songHandler.isShuffel.value;
           return IconButton(
             onPressed: shuffle,
             icon: Icon(
-              songHandler.isShuffel.value
-                  ? Icons.arrow_right_alt
-                  : Icons.shuffle,
-              size: 22.w,
-              color: Theme.of(context).colorScheme.onSurface,
+              Icons.shuffle,
+              size: 22.sp,
+              color: isShuffle
+                  ? colorScheme.inversePrimary
+                  : colorScheme.primary.withValues(alpha: 0.5),
             ),
-            tooltip: songHandler.isShuffel.value ? 'Shuffle on' : 'Shuffle off',
+            tooltip: isShuffle ? 'Shuffle on' : 'Shuffle off',
           );
         }),
         Text(
           duraion,
           style: TextStyle(
             fontSize: 12.sp,
-            color: Theme.of(context).textTheme.bodySmall?.color,
+            fontWeight: FontWeight.w600,
+            color: colorScheme.inversePrimary,
           ),
         ),
       ],

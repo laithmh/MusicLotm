@@ -10,16 +10,18 @@ class ContactUsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: colorScheme.onPrimary,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: colorScheme.onPrimary,
         title: Text(
-          'CONTACT & SUPPORT',
+          'Contact & Support',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.primary,
+            color: colorScheme.inversePrimary,
           ),
         ),
         centerTitle: true,
@@ -27,7 +29,7 @@ class ContactUsScreen extends StatelessWidget {
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
-            color: Theme.of(context).colorScheme.primary,
+            color: colorScheme.inversePrimary,
           ),
           onPressed: () => Get.back(),
         ),
@@ -38,20 +40,22 @@ class ContactUsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // App Info Card
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            Container(
+              padding: EdgeInsets.all(20.w),
+              decoration: BoxDecoration(
+                color: colorScheme.secondary,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.2),
+                ),
               ),
-              color: Theme.of(context).colorScheme.secondary,
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
+              child: Center(
                 child: Column(
                   children: [
                     Icon(
-                      Icons.music_note,
-                      size: 50.sp,
-                      color: Theme.of(context).colorScheme.primary,
+                      Icons.music_note_rounded,
+                      size: 48.sp,
+                      color: colorScheme.inversePrimary,
                     ),
                     SizedBox(height: 12.h),
                     Obx(
@@ -60,29 +64,27 @@ class ContactUsScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 22.sp,
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: colorScheme.inversePrimary,
                         ),
                       ),
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 6.h),
                     Obx(
                       () => Text(
                         'Version ${settingsController.appVersion.value} (${settingsController.appBuildNumber.value})',
                         style: TextStyle(
                           fontSize: 12.sp,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSecondary.withValues(alpha: 0.8),
+                          color: colorScheme.primary,
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: 14.h),
                     Text(
                       'We value your feedback and are here to help you with any issues or suggestions.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Theme.of(context).colorScheme.onSecondary,
+                        fontSize: 13.sp,
+                        color: colorScheme.inversePrimary.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -98,7 +100,7 @@ class ContactUsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.inversePrimary,
               ),
             ),
             SizedBox(height: 16.h),
@@ -112,29 +114,37 @@ class ContactUsScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText: 'Your Name',
                       labelStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: colorScheme.primary,
                       ),
+                      filled: true,
+                      fillColor: colorScheme.secondary,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
+                          color: colorScheme.inversePrimary,
+                          width: 1.5,
                         ),
                       ),
                       prefixIcon: Icon(
-                        Icons.person,
-                        color: Theme.of(context).colorScheme.primary,
+                        Icons.person_rounded,
+                        color: colorScheme.primary,
                       ),
                     ),
                     validator: settingsController.validateName,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: colorScheme.inversePrimary,
                     ),
                   ),
                   SizedBox(height: 16.h),
@@ -144,30 +154,38 @@ class ContactUsScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText: 'Your Email',
                       labelStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: colorScheme.primary,
                       ),
+                      filled: true,
+                      fillColor: colorScheme.secondary,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
+                          color: colorScheme.inversePrimary,
+                          width: 1.5,
                         ),
                       ),
                       prefixIcon: Icon(
-                        Icons.email,
-                        color: Theme.of(context).colorScheme.primary,
+                        Icons.email_rounded,
+                        color: colorScheme.primary,
                       ),
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: settingsController.validateEmail,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: colorScheme.inversePrimary,
                     ),
                   ),
                   SizedBox(height: 16.h),
@@ -177,31 +195,39 @@ class ContactUsScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText: 'Your Message',
                       labelStyle: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: colorScheme.primary,
                       ),
+                      filled: true,
+                      fillColor: colorScheme.secondary,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
+                          color: colorScheme.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                        borderSide: BorderSide(
+                          color: colorScheme.primary.withValues(alpha: 0.3),
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         borderSide: BorderSide(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
+                          color: colorScheme.inversePrimary,
+                          width: 1.5,
                         ),
                       ),
                       prefixIcon: Icon(
-                        Icons.message,
-                        color: Theme.of(context).colorScheme.primary,
+                        Icons.message_rounded,
+                        color: colorScheme.primary,
                       ),
                       alignLabelWithHint: true,
                     ),
-                    maxLines: 5,
+                    maxLines: 4,
                     validator: settingsController.validateMessage,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: colorScheme.inversePrimary,
                     ),
                   ),
                   SizedBox(height: 24.h),
@@ -211,14 +237,12 @@ class ContactUsScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: settingsController.sendContactEmail,
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary,
+                        backgroundColor: colorScheme.inversePrimary,
+                        foregroundColor: colorScheme.onPrimary,
                       ),
                       child: Text(
                         'Send Message',
@@ -233,7 +257,7 @@ class ContactUsScreen extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 32.h),
+            SizedBox(height: 28.h),
 
             // Quick Actions
             Text(
@@ -241,7 +265,7 @@ class ContactUsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.primary,
+                color: colorScheme.inversePrimary,
               ),
             ),
             SizedBox(height: 16.h),
@@ -282,17 +306,17 @@ class ContactUsScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: colorScheme.inversePrimary,
                   ),
                 ),
                 SizedBox(height: 16.h),
 
                 _buildActionCard(
                   context,
-                  icon: Icons.privacy_tip,
+                  icon: Icons.privacy_tip_outlined,
                   title: 'Privacy Policy',
                   subtitle: 'Read our privacy policy',
-                  color: Colors.blue,
+                  color: colorScheme.primary,
                   onTap: () => settingsController.openUrl(
                     settingsController.privacyPolicyUrl,
                   ),
@@ -300,10 +324,10 @@ class ContactUsScreen extends StatelessWidget {
 
                 _buildActionCard(
                   context,
-                  icon: Icons.description,
+                  icon: Icons.description_outlined,
                   title: 'Terms of Service',
                   subtitle: 'Read our terms of service',
-                  color: Colors.purple,
+                  color: colorScheme.primary,
                   onTap: () => settingsController.openUrl(
                     settingsController.termsOfServiceUrl,
                   ),
@@ -311,175 +335,168 @@ class ContactUsScreen extends StatelessWidget {
 
                 _buildActionCard(
                   context,
-                  icon: Icons.code,
+                  icon: Icons.code_rounded,
                   title: 'GitHub',
                   subtitle: 'View source code',
-                  color: Colors.grey,
+                  color: colorScheme.primary,
                   onTap: () =>
                       settingsController.openUrl(settingsController.githubUrl),
                 ),
               ],
             ),
 
-            SizedBox(height: 32.h),
+            SizedBox(height: 28.h),
 
             // Developer Contact
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            Container(
+              padding: EdgeInsets.all(20.w),
+              decoration: BoxDecoration(
+                color: colorScheme.secondary,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.2),
+                ),
               ),
-              color: Theme.of(context).colorScheme.secondary,
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.contact_support_outlined,
+                        color: colorScheme.inversePrimary,
+                        size: 24.sp,
+                      ),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Developer Contact',
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.inversePrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    'Email: ${settingsController.developerEmail}',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: colorScheme.inversePrimary.withValues(alpha: 0.8),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  GestureDetector(
+                    onTap: () => settingsController.copyToClipboard(
+                      settingsController.developerEmail,
+                    ),
+                    child: Row(
                       children: [
                         Icon(
-                          Icons.contact_support,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 24.sp,
+                          Icons.content_copy_rounded,
+                          size: 16.sp,
+                          color: colorScheme.primary,
                         ),
-                        SizedBox(width: 12.w),
+                        SizedBox(width: 8.w),
                         Text(
-                          'Developer Contact',
+                          'Copy Email',
                           style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
+                            fontSize: 12.sp,
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.inversePrimary,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      'Email: ${settingsController.developerEmail}',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Theme.of(context).colorScheme.onSecondary,
-                      ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    'We typically respond within 24-48 hours.',
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontStyle: FontStyle.italic,
+                      color: colorScheme.primary,
                     ),
-                    SizedBox(height: 8.h),
-                    GestureDetector(
-                      onTap: () => settingsController.copyToClipboard(
-                        settingsController.developerEmail,
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.content_copy,
-                            size: 16.sp,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          SizedBox(width: 8.w),
-                          Text(
-                            'Copy Email',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Theme.of(context).colorScheme.primary,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      'We typically respond within 24-48 hours.',
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontStyle: FontStyle.italic,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSecondary.withValues(alpha: 0.8),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
             SizedBox(height: 24.h),
 
-            // Device Info (Optional - for debugging)
+            // Device Info
             Obx(
-              () => Card(
-                elevation: 2,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                color: Theme.of(
-                  context,
-                ).colorScheme.secondary.withValues(alpha: 0.5),
-                child: Padding(
-                  padding: EdgeInsets.all(16.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'App Information',
-                            style: TextStyle(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              final info = await settingsController
-                                  .getDeviceInfo();
-                              settingsController.copyToClipboard(
-                                info.toString(),
-                              );
-                            },
-                            child: Icon(
-                              Icons.content_copy,
-                              size: 16.sp,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        'Version: ${settingsController.appVersion.value}',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                      Text(
-                        'Build: ${settingsController.appBuildNumber.value}',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                      Text(
-                        'Package: ${settingsController.packageName.value}',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                      Text(
-                        'Platform: ${GetPlatform.isAndroid
-                            ? 'Android'
-                            : GetPlatform.isIOS
-                            ? 'iOS'
-                            : 'Other'}',
-                        style: TextStyle(
-                          fontSize: 12.sp,
-                          color: Theme.of(context).colorScheme.onSecondary,
-                        ),
-                      ),
-                    ],
+              () => Container(
+                padding: EdgeInsets.all(16.w),
+                decoration: BoxDecoration(
+                  color: colorScheme.secondary.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: colorScheme.primary.withValues(alpha: 0.15),
                   ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'App Information',
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.inversePrimary,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            final info = await settingsController
+                                .getDeviceInfo();
+                            settingsController.copyToClipboard(
+                              info.toString(),
+                            );
+                          },
+                          child: Icon(
+                            Icons.content_copy_rounded,
+                            size: 16.sp,
+                            color: colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Version: ${settingsController.appVersion.value}',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      'Build: ${settingsController.appBuildNumber.value}',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      'Package: ${settingsController.packageName.value}',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    Text(
+                      'Platform: ${GetPlatform.isAndroid ? 'Android' : GetPlatform.isIOS ? 'iOS' : 'Other'}',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -497,39 +514,46 @@ class ContactUsScreen extends StatelessWidget {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Card(
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
       margin: EdgeInsets.only(bottom: 12.h),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: colorScheme.secondary,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: colorScheme.primary.withValues(alpha: 0.15),
+        ),
+      ),
       child: ListTile(
         leading: Container(
           width: 40.w,
           height: 40.h,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(8),
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(8.r),
           ),
-          child: Icon(icon, color: color, size: 24.sp),
+          child: Icon(icon, color: color, size: 22.sp),
         ),
         title: Text(
           title,
           style: TextStyle(
-            fontSize: 16.sp,
+            fontSize: 15.sp,
             fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.primary,
+            color: colorScheme.inversePrimary,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
             fontSize: 12.sp,
-            color: Theme.of(context).colorScheme.onSecondary,
+            color: colorScheme.primary,
           ),
         ),
         trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 16.sp,
-          color: Theme.of(context).colorScheme.primary,
+          Icons.arrow_forward_ios_rounded,
+          size: 14.sp,
+          color: colorScheme.primary,
         ),
         onTap: onTap,
       ),
@@ -537,13 +561,21 @@ class ContactUsScreen extends StatelessWidget {
   }
 
   void _showBugReportDialog(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final bugDescriptionController = TextEditingController();
 
     Get.dialog(
       AlertDialog(
+        backgroundColor: colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
         title: Text(
           'Report a Bug',
-          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          style: TextStyle(
+            color: colorScheme.inversePrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -552,23 +584,34 @@ class ContactUsScreen extends StatelessWidget {
               Text(
                 'Please describe the bug you encountered in detail:',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSecondary,
+                  color: colorScheme.primary,
+                  fontSize: 13.sp,
                 ),
               ),
               SizedBox(height: 16.h),
               TextFormField(
                 controller: bugDescriptionController,
                 maxLines: 5,
+                style: TextStyle(color: colorScheme.inversePrimary),
                 decoration: InputDecoration(
                   hintText:
                       'What were you doing when the bug occurred?\nWhat happened?\nWhat did you expect to happen?',
+                  hintStyle: TextStyle(
+                    color: colorScheme.primary.withValues(alpha: 0.5),
+                    fontSize: 12.sp,
+                  ),
+                  filled: true,
+                  fillColor: colorScheme.secondary,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10.r),
+                    borderSide: BorderSide(
+                      color: colorScheme.primary.withValues(alpha: 0.3),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10.r),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
+                      color: colorScheme.inversePrimary,
                     ),
                   ),
                 ),
@@ -581,7 +624,7 @@ class ContactUsScreen extends StatelessWidget {
             onPressed: () => Get.back(),
             child: Text(
               'Cancel',
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              style: TextStyle(color: colorScheme.primary),
             ),
           ),
           ElevatedButton(
@@ -591,6 +634,8 @@ class ContactUsScreen extends StatelessWidget {
                   'Error',
                   'Please describe the bug',
                   snackPosition: SnackPosition.BOTTOM,
+                  backgroundColor: colorScheme.secondary,
+                  colorText: colorScheme.inversePrimary,
                 );
                 return;
               }
@@ -600,10 +645,10 @@ class ContactUsScreen extends StatelessWidget {
               Get.back();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              backgroundColor: colorScheme.inversePrimary,
+              foregroundColor: colorScheme.onPrimary,
             ),
-            child: Text('Send Report'),
+            child: const Text('Send Report'),
           ),
         ],
       ),

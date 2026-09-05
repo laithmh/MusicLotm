@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mini_music_visualizer/mini_music_visualizer.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
-import 'package:musiclotm/core/Widget/neubox.dart';
-import 'package:on_audio_query/on_audio_query.dart';
+import 'package:musiclotm/core/Widget/song_options_sheet.dart';
+import 'package:musiclotm/core/Widget/unified_song_tile.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class Songlistwidget extends StatelessWidget {
@@ -70,7 +69,7 @@ class Songlistwidget extends StatelessWidget {
                             fontSize: 12.sp,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onSurface.withValues(alpha: 0.8),
+                            ).colorScheme.inversePrimary.withValues(alpha: 0.8),
                           ),
                         ),
                       ],
@@ -103,7 +102,7 @@ class Songlistwidget extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.onSurface,
+                          color: Theme.of(context).colorScheme.inversePrimary,
                         ),
                       ),
                     ),
@@ -140,7 +139,7 @@ class Songlistwidget extends StatelessWidget {
                                       size: 16.sp,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onSurface,
+                                      ).colorScheme.inversePrimary,
                                     ),
                                     SizedBox(width: 8.w),
                                     Text(
@@ -159,7 +158,7 @@ class Songlistwidget extends StatelessWidget {
                                       size: 16.sp,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onSurface,
+                                      ).colorScheme.inversePrimary,
                                     ),
                                     SizedBox(width: 8.w),
                                     Text(
@@ -178,7 +177,7 @@ class Songlistwidget extends StatelessWidget {
                                       size: 16.sp,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onSurface,
+                                      ).colorScheme.inversePrimary,
                                     ),
                                     SizedBox(width: 8.w),
                                     Text(
@@ -197,7 +196,7 @@ class Songlistwidget extends StatelessWidget {
                                       size: 16.sp,
                                       color: Theme.of(
                                         context,
-                                      ).colorScheme.onSurface,
+                                      ).colorScheme.inversePrimary,
                                     ),
                                     SizedBox(width: 8.w),
                                     Text(
@@ -311,7 +310,7 @@ class Songlistwidget extends StatelessWidget {
             'Loading songs...',
             style: TextStyle(
               fontSize: 12.sp,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
             ),
           ),
         ],
@@ -330,14 +329,14 @@ class Songlistwidget extends StatelessWidget {
           Icon(
             Icons.music_off_rounded,
             size: 60.sp,
-            color: Theme.of(context).colorScheme.onSurface,
+            color: Theme.of(context).colorScheme.inversePrimary,
           ),
           SizedBox(height: 16.h),
           Text(
             'No songs found',
             style: TextStyle(
               fontSize: 14.sp,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -347,7 +346,7 @@ class Songlistwidget extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 11.sp,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).colorScheme.inversePrimary,
             ),
           ),
           SizedBox(height: 24.h),
@@ -385,171 +384,43 @@ class Songlistwidget extends StatelessWidget {
     Navigatorcontroller navigator,
     Key key,
   ) {
-    return Padding(
+    return UnifiedSongTile(
       key: key,
-      padding: EdgeInsets.only(bottom: 8.h),
-      child: GestureDetector(
-        onTap: () async {
-          if (isSelectionMode) {
-            playlistcontroller.selectSong(song.id);
-            return;
-          }
-          await _playSong(
-            songscontroller,
-            playlistcontroller,
-            songHandler,
-            box,
-            navigator,
-            song,
-            index,
-          );
-        },
-        onLongPress: () {
-          if (!isSelectionMode) {
-            playlistcontroller.toggleSelectionMode();
-          }
+      song: song,
+      isPlaying: isPlaying,
+      isSelectionMode: isSelectionMode,
+      isSelected: isSelected,
+      onTap: () async {
+        if (isSelectionMode) {
           playlistcontroller.selectSong(song.id);
-        },
-        child: Container(
-          margin: EdgeInsets.symmetric(horizontal: 4.w),
-          child: Neubox(
-            borderRadius: BorderRadius.circular(16),
-            child: ListTile(
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 12.w,
-                vertical: 8.h,
-              ),
-              leading: _buildArtwork(song, context),
-              title: Text(
-                song.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: isPlaying
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-              subtitle: Text(
-                song.artist ?? 'Unknown Artist',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  color: isPlaying
-                      ? Theme.of(
-                          context,
-                        ).colorScheme.primary.withValues(alpha: 0.8)
-                      : Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-              trailing: SizedBox(
-                width: 60.w,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (isSelectionMode)
-                      Transform.scale(
-                        scale: 0.9,
-                        child: Checkbox(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          checkColor: Colors.white,
-                          activeColor: Theme.of(context).colorScheme.primary,
-                          value: isSelected,
-                          onChanged: (_) =>
-                              playlistcontroller.selectSong(song.id),
-                        ),
-                      )
-                    else if (isPlaying)
-                      StreamBuilder<PlaybackState>(
-                        stream: songHandler.playbackState,
-                        builder: (context, snapshot) {
-                          final isSongPlaying = snapshot.data?.playing ?? false;
-                          return SizedBox(
-                            width: 30.w,
-                            child: MiniMusicVisualizer(
-                              color: isSongPlaying
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.onSurface
-                                        .withValues(alpha: 0.4),
-                              width: 3,
-                              height: 18,
-                              radius: 1.5,
-                              animate: isSongPlaying,
-                            ),
-                          );
-                        },
-                      )
-                    else
-                      Container(
-                        width: 24.w,
-                        height: 24.w,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainerHighest,
-                        ),
-                        child: Icon(
-                          Icons.play_arrow_rounded,
-                          size: 14.sp,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildArtwork(MediaItem song, BuildContext context) {
-    return Container(
-      width: 52.w,
-      height: 52.w,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: QueryArtworkWidget(
-          id: int.tryParse(song.extras?['song_id']?.toString() ?? "0") ?? 0,
-          keepOldArtwork: true,
-          type: ArtworkType.AUDIO,
-          artworkWidth: 52.w,
-          artworkHeight: 52.h,
-          artworkFit: BoxFit.cover,
-          artworkQuality: FilterQuality.medium,
-          nullArtworkWidget: Container(
-            color: Theme.of(context).colorScheme.primary,
-            child: Center(
-              child: Icon(
-                Icons.music_note,
-                size: 24.sp,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
-        ),
-      ),
+          return;
+        }
+        await _playSong(
+          songscontroller,
+          playlistcontroller,
+          songHandler,
+          box,
+          navigator,
+          song,
+          index,
+        );
+      },
+      onLongPress: () {
+        if (!isSelectionMode) {
+          playlistcontroller.toggleSelectionMode();
+        }
+        playlistcontroller.selectSong(song.id);
+      },
+      onSelectChanged: (_) => playlistcontroller.selectSong(song.id),
+      onMoreOptions: () {
+        SongOptionsSheet.show(
+          context: context,
+          song: song,
+          onDelete: () async {
+            await playlistcontroller.deleteSong(song.id);
+          },
+        );
+      },
     );
   }
 

@@ -51,8 +51,6 @@ class VisualizerImageWrapper extends StatelessWidget {
         controller.toggleStudio();
       },
       child: Obx(() {
-        final fftData = controller.fftData.toList();
-        final double kick = controller.bassValue.value;
         final style = controller.currentStyle.value;
         final isStudio = controller.isStudioOpen.value;
         final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -68,7 +66,6 @@ class VisualizerImageWrapper extends StatelessWidget {
         final double maxH = controller.maxHeight.value;
         final bool isDiskAnimationOn = controller.enableDiskAnimation.value;
         final double kickPump = isDiskAnimationOn ? controller.kickScale.value : 0.0;
-        final double bassScale = 1.0 + (kick * kickPump).clamp(0.0, 0.20);
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 250),
@@ -80,47 +77,58 @@ class VisualizerImageWrapper extends StatelessWidget {
               key: const ValueKey('active'),
               alignment: Alignment.center,
               children: [
-                // 1. Equalizer Visualizer Layer
-                if (style == VisualizerStyle.radialBars)
-                  CustomPaint(
-                    size: Size(currentDiskSize, currentDiskSize),
-                    painter: RadialBarsVisualizerPainter(
-                      fftData: fftData,
-                      primaryColor: colorScheme.primary,
-                      secondaryColor: colorScheme.inversePrimary,
-                      baseRadius: baseRadius,
-                      maxBarHeight: maxH + (kick * (maxH * 0.65)),
-                      barWidth: 3.5,
-                    ),
-                  )
-                else if (style == VisualizerStyle.liquid)
-                  CustomPaint(
-                    size: Size(artSize * 1.05, artSize * 1.05),
-                    painter: NeumorphicLiquidPainter(
-                      fftData: fftData,
-                      surfaceColor: colorScheme.inversePrimary,
-                      highlightColor: colorScheme.inversePrimary,
-                      shadowColor: colorScheme.surface,
-                      intensity: (maxH * 0.35) + (kick * (maxH * 0.40)),
-                    ),
-                  )
-                else // VisualizerStyle.eclipseNova
-                  CustomPaint(
-                    size: Size(currentDiskSize, currentDiskSize),
-                    painter: EclipseNovaVisualizerPainter(
-                      fftData: fftData,
-                      peakHoldData: controller.peakHoldData.toList(),
-                      bassValue: kick,
-                      primaryColor: colorScheme.primary,
-                      secondaryColor: colorScheme.inversePrimary,
-                      baseRadius: baseRadius,
-                      maxBarHeight: maxH + (kick * (maxH * 0.55)),
-                    ),
-                  ),
+                // 1. Equalizer Visualizer Layer (Hardware-accelerated, isolated canvas repaint)
+                RepaintBoundary(
+                  child: AnimatedBuilder(
+                    animation: controller.visualizerNotifier,
+                    builder: (context, _) {
+                      final fftData = controller.rawFftData;
+                      final kick = controller.rawBassValue;
 
-                // 2. Pulsing Neumorphic Album Art
-                Transform.scale(
-                  scale: bassScale,
+                      if (style == VisualizerStyle.radialBars) {
+                        return CustomPaint(
+                          size: Size(currentDiskSize, currentDiskSize),
+                          painter: RadialBarsVisualizerPainter(
+                            fftData: fftData,
+                            primaryColor: colorScheme.primary,
+                            secondaryColor: colorScheme.inversePrimary,
+                            baseRadius: baseRadius,
+                            maxBarHeight: maxH + (kick * (maxH * 0.65)),
+                            barWidth: 3.5,
+                          ),
+                        );
+                      } else if (style == VisualizerStyle.liquid) {
+                        return CustomPaint(
+                          size: Size(artSize * 1.05, artSize * 1.05),
+                          painter: NeumorphicLiquidPainter(
+                            fftData: fftData,
+                            surfaceColor: colorScheme.inversePrimary,
+                            highlightColor: colorScheme.inversePrimary,
+                            shadowColor: colorScheme.surface,
+                            intensity: (maxH * 0.35) + (kick * (maxH * 0.40)),
+                          ),
+                        );
+                      } else {
+                        return CustomPaint(
+                          size: Size(currentDiskSize, currentDiskSize),
+                          painter: EclipseNovaVisualizerPainter(
+                            fftData: fftData,
+                            peakHoldData: controller.rawPeakHoldData,
+                            bassValue: kick,
+                            primaryColor: colorScheme.primary,
+                            secondaryColor: colorScheme.inversePrimary,
+                            baseRadius: baseRadius,
+                            maxBarHeight: maxH + (kick * (maxH * 0.55)),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+
+                // 2. Pulsing Neumorphic Album Art (Image element cached, only Transform matrix updates)
+                AnimatedBuilder(
+                  animation: controller.visualizerNotifier,
                   child: Container(
                     width: artSize,
                     height: artSize,
@@ -129,17 +137,14 @@ class VisualizerImageWrapper extends StatelessWidget {
                       color: colorScheme.secondary,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(
-                            alpha: (0.45 + kick * 0.35).clamp(0.0, 0.9),
-                          ),
-                          offset: const Offset(5, 5),
-                          blurRadius: 10 + (kick * 8),
+                          color: Colors.black.withValues(alpha: isDarkMode ? 0.6 : 0.25),
+                          offset: const Offset(4, 4),
+                          blurRadius: 8,
                         ),
                         BoxShadow(
-                          color: (isDarkMode ? Colors.grey.shade700 : Colors.white)
-                              .withValues(alpha: 0.6),
-                          offset: const Offset(-4, -4),
-                          blurRadius: 8,
+                          color: (isDarkMode ? Colors.grey.shade800 : Colors.white).withValues(alpha: 0.7),
+                          offset: const Offset(-3, -3),
+                          blurRadius: 6,
                         ),
                       ],
                     ),
@@ -148,6 +153,16 @@ class VisualizerImageWrapper extends StatelessWidget {
                       child: ClipOval(child: imageChild),
                     ),
                   ),
+                  builder: (context, cachedDiskChild) {
+                    final kick = controller.rawBassValue;
+                    final bassScale = isDiskAnimationOn
+                        ? 1.0 + (kick * kickPump).clamp(0.0, 0.20)
+                        : 1.0;
+                    return Transform.scale(
+                      scale: bassScale,
+                      child: cachedDiskChild,
+                    );
+                  },
                 ),
               ],
             ),

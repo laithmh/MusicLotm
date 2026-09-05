@@ -18,6 +18,7 @@ class Customplaybutton extends StatelessWidget {
       stream: songHandler.playbackState.stream,
       builder: (context, snapshot) {
         bool playing = snapshot.data?.playing ?? false;
+        final iconColor = Theme.of(context).colorScheme.inversePrimary;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -28,7 +29,7 @@ class Customplaybutton extends StatelessWidget {
               },
               child: Neubox(
                 borderRadius: BorderRadius.circular(12),
-                child: Icon(Icons.skip_previous, size: 40.sp),
+                child: Icon(Icons.skip_previous, size: 40.sp, color: iconColor),
               ),
             ),
             SizedBox(width: 25.w),
@@ -43,8 +44,8 @@ class Customplaybutton extends StatelessWidget {
               child: Neubox(
                 borderRadius: BorderRadius.circular(250),
                 child: playing
-                    ? Icon(Icons.pause_rounded, size: 60.sp)
-                    : Icon(Icons.play_arrow_rounded, size: 60.sp),
+                    ? Icon(Icons.pause_rounded, size: 60.sp, color: iconColor)
+                    : Icon(Icons.play_arrow_rounded, size: 60.sp, color: iconColor),
               ),
             ),
             SizedBox(width: 25.w),
@@ -56,7 +57,7 @@ class Customplaybutton extends StatelessWidget {
               },
               child: Neubox(
                 borderRadius: BorderRadius.circular(12),
-                child: Icon(Icons.skip_next, size: 40.sp),
+                child: Icon(Icons.skip_next, size: 40.sp, color: iconColor),
               ),
             ),
           ],

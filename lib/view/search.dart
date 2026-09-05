@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/navigatorcontroller.dart';
 import 'package:musiclotm/controller/searchcontroller.dart';
-import 'package:musiclotm/core/Widget/neubox.dart';
+import 'package:musiclotm/controller/songscontroller.dart';
+import 'package:musiclotm/core/Widget/song_options_sheet.dart';
+import 'package:musiclotm/core/Widget/unified_song_tile.dart';
 
 class SearchScreen extends StatelessWidget {
   SearchScreen({super.key});
@@ -16,17 +18,19 @@ class SearchScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: _buildAppBar(context),
-      body: _buildBody(),
+      body: _buildBody(context),
     );
   }
 
   AppBar _buildAppBar(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: colorScheme.onPrimary,
       elevation: 0,
-      title: _buildSearchField(),
+      title: _buildSearchField(context),
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
+        icon: Icon(Icons.arrow_back, color: colorScheme.inversePrimary),
         onPressed: () => Get.back(),
       ),
       actions: [
@@ -34,19 +38,21 @@ class SearchScreen extends StatelessWidget {
           if (searchController.isSearching.value) {
             return Padding(
               padding: EdgeInsets.only(right: 16.w),
-              // Fixed size to prevent layout jumping when indicator appears
-              child: const Center(
+              child: Center(
                 child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  width: 20.w,
+                  height: 20.w,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+                  ),
                 ),
               ),
             );
           }
           if (searchController.searchQuery.isNotEmpty) {
             return IconButton(
-              icon: const Icon(Icons.clear),
+              icon: Icon(Icons.clear, color: colorScheme.primary),
               onPressed: searchController.clear,
             );
           }
@@ -56,119 +62,158 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSearchField() {
+  Widget _buildSearchField(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return TextField(
       controller: searchController.textController,
-      autofocus: true,
+      autofocus: false,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(
         hintText: 'Search songs, artists, albums...',
         border: InputBorder.none,
-        hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 16.sp),
+        hintStyle: TextStyle(
+          color: colorScheme.primary.withValues(alpha: 0.7),
+          fontSize: 16.sp,
+        ),
       ),
-      style: TextStyle(fontSize: 16.sp),
+      style: TextStyle(
+        fontSize: 16.sp,
+        color: colorScheme.inversePrimary,
+      ),
       onChanged: searchController.search,
-      // Hide keyboard if user hits "search" on their keyboard
       onSubmitted: (_) => FocusManager.instance.primaryFocus?.unfocus(),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: Obx(() {
         if (searchController.hasError.value) {
-          return _buildErrorState();
+          return _buildErrorState(context);
         }
 
-        // Only show loading if we are searching AND have no previous results
-        if (searchController.isSearching.value &&
-            searchController.filteredSongs.isEmpty) {
-          return _buildLoadingState();
+        if (searchController.isSearching.value && searchController.filteredSongs.isEmpty) {
+          return _buildLoadingState(context);
         }
 
         if (searchController.searchQuery.isEmpty) {
-          return _buildInitialState();
+          return _buildInitialState(context);
         }
 
-        if (searchController.resultCount == 0) {
-          return _buildEmptyState();
+        if (searchController.filteredSongs.isEmpty) {
+          return _buildEmptyState(context);
         }
 
-        return _buildResultsList();
+        return _buildResultsList(context);
       }),
     );
   }
 
-  Widget _buildInitialState() {
+  Widget _buildInitialState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 20.h),
         Text(
           'Search Music',
-          style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.bold,
+            color: colorScheme.inversePrimary,
+          ),
         ),
         SizedBox(height: 8.h),
         Text(
           'Find your favorite songs, artists, or albums',
-          style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade600),
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: colorScheme.primary,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildLoadingState() {
+  Widget _buildLoadingState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(),
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+          ),
           SizedBox(height: 16.h),
-          Text('Searching...', style: TextStyle(fontSize: 16.sp)),
+          Text(
+            'Searching...',
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: colorScheme.inversePrimary,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 64.sp, color: Colors.grey.shade400),
+          Icon(Icons.search_off_rounded, size: 64.sp, color: colorScheme.primary),
           SizedBox(height: 16.h),
           Text(
             'No results found',
-            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.inversePrimary,
+            ),
           ),
           SizedBox(height: 8.h),
           Text(
             'Try searching with different keywords',
-            style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade600),
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: colorScheme.primary,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64.sp, color: Colors.red.shade400),
+          Icon(Icons.error_outline, size: 64.sp, color: Colors.redAccent),
           SizedBox(height: 16.h),
           Text(
             'Search failed',
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.red.shade600,
+              color: Colors.redAccent,
             ),
           ),
-          SizedBox(height: 8.h),
+          SizedBox(height: 16.h),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              foregroundColor: colorScheme.onPrimary,
+            ),
             onPressed: () {
               if (searchController.searchQuery.isNotEmpty) {
                 searchController.performSearch(searchController.searchQuery);
@@ -181,7 +226,9 @@ class SearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildResultsList() {
+  Widget _buildResultsList(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,20 +236,20 @@ class SearchScreen extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 8.h),
           child: Text(
             'Found ${searchController.resultCount} results',
-            style: TextStyle(fontSize: 14.sp, color: Colors.grey.shade600),
+            style: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w500,
+              color: colorScheme.primary,
+            ),
           ),
         ),
         Expanded(
           child: ListView.builder(
-            // UX optimization: Drops keyboard when user starts scrolling
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             itemCount: searchController.filteredSongs.length,
             itemBuilder: (context, index) {
               final song = searchController.filteredSongs[index];
-              return Padding(
-                padding: EdgeInsets.only(bottom: 8.h), // Spacing for Neubox
-                child: _buildSongTile(context, song),
-              );
+              return _buildSongTile(context, song);
             },
           ),
         ),
@@ -211,50 +258,27 @@ class SearchScreen extends StatelessWidget {
   }
 
   Widget _buildSongTile(BuildContext context, MediaItem song) {
-    return Neubox(
-      borderRadius: BorderRadius.circular(12),
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
-        leading: Container(
-          width: 40.w, // Standardized touch target size
-          height: 40.h,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            Icons.music_note,
-            color: Colors.grey.shade600,
-            size: 24.sp,
-          ),
-        ),
-        title: Text(
-          song.title,
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w500,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        subtitle: Text(
-          song.artist ?? 'Unknown Artist',
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: Colors.grey.shade600,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        trailing: Icon(
-          Icons.play_arrow,
-          color: Theme.of(context).primaryColor, // Safe context usage
-        ),
+    final songscontroller = Get.find<Songscontroller>();
+
+    return Obx(() {
+      final isPlaying =
+          songscontroller.currentMediaItem.value?.id == song.id;
+
+      return UnifiedSongTile(
+        song: song,
+        isPlaying: isPlaying,
         onTap: () => _onSongTap(song),
-      ),
-    );
+        onMoreOptions: () {
+          SongOptionsSheet.show(
+            context: context,
+            song: song,
+          );
+        },
+      );
+    });
   }
 
   void _onSongTap(MediaItem song) async {
-    // Drop the keyboard before navigating
     FocusManager.instance.primaryFocus?.unfocus();
 
     Navigatorcontroller navigator = Get.find();
