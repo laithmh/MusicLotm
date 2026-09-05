@@ -41,14 +41,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.1"
-  audify:
-    dependency: "direct main"
-    description:
-      name: audify
-      sha256: "6a63971c1aa43f9f2d88b08527f8361f524bc6faf269b50a9c6d92840313f289"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.2"
   audio_service:
     dependency: "direct main"
     description:
@@ -659,10 +651,9 @@ packages:
   just_audio:
     dependency: "direct main"
     description:
-      name: just_audio
-      sha256: e60aa97b233ddea025e13dfac59195207f528fa5e9e4a4a49a8c0766701e5fe6
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/just_audio"
+      relative: true
+    source: path
     version: "0.10.6"
   just_audio_platform_interface:
     dependency: transitive

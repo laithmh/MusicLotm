@@ -8,15 +8,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:musiclotm/controller/playlistcontroller.dart';
 import 'package:musiclotm/controller/songscontroller.dart';
-import 'package:musiclotm/controller/visualizer_controller.dart';
 import 'package:musiclotm/core/function/find_current_index.dart';
 
 class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   // Get controllers lazily
   Songscontroller get songscontroller => Get.find<Songscontroller>();
   Playlistcontroller get playlistcontroller => Get.find<Playlistcontroller>();
-  VisualizerController get visualizerController =>
-      Get.find<VisualizerController>();
   AudioPlayer get audioPlayer => Get.find<AudioPlayer>();
 
   final Box _box = Hive.box("music");
@@ -34,6 +31,9 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   Stream<int?> get sessionIdStream => audioPlayer.androidAudioSessionIdStream;
   int? get sessionId => audioPlayer.androidAudioSessionId;
+
+  /// 60 FPS real-time 32-band audio frequency spectrum stream from Media3 TeeAudioProcessor
+  Stream<List<double>> get visualizerStream => audioPlayer.visualizerStream;
 
   // Timer for saving position periodically
   Timer? _positionSaveTimer;
@@ -60,13 +60,6 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
             await CurrentSongIndexFinder.findAndUpdateCurrentIndex(
               currentMediaItem.id,
             );
-
-            // Update visualizer session
-            if (sessionId != null) {
-              visualizerController.updateSessionId(
-                sessionId!,
-              ); // ✅ IMMEDIATE connection
-            }
           } catch (e) {
             log('Error updating current song index: $e');
           }

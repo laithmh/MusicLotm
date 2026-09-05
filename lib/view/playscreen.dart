@@ -10,6 +10,7 @@ import 'package:musiclotm/core/Widget/playscreen/addplaylistbutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/customaudioimage.dart';
 import 'package:musiclotm/core/Widget/playscreen/customplaybutton.dart';
 import 'package:musiclotm/core/Widget/playscreen/titlefavo_widget.dart';
+import 'package:musiclotm/core/Widget/playscreen/visualizer_settings_sheet.dart';
 import 'package:musiclotm/core/Widget/playscreen/visualizer_widget.dart';
 import 'package:musiclotm/core/Widget/playscreen/waveformwidget.dart';
 import 'package:musiclotm/core/const/routesname.dart';
@@ -48,6 +49,7 @@ class _PlayscreenState extends State<Playscreen> {
 
   @override
   void dispose() {
+    visualizerController.saveSettingsNow();
     visualizerController.stopVisualizer();
     super.dispose();
   }
@@ -69,9 +71,17 @@ class _PlayscreenState extends State<Playscreen> {
           _currentSong = songscontroller.songs.first;
         }
 
-        return Scaffold(
-          backgroundColor: Theme.of(context).colorScheme.onPrimary,
-          appBar: AppBar(
+        return PopScope(
+          canPop: !visualizerController.isStudioOpen.value,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop && visualizerController.isStudioOpen.value) {
+              visualizerController.saveSettingsNow();
+              visualizerController.isStudioOpen.value = false;
+            }
+          },
+          child: Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.onPrimary,
+            appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.onPrimary,
             title: Text(
               "NOW PLAYING",
@@ -241,34 +251,52 @@ class _PlayscreenState extends State<Playscreen> {
                               ),
                             ),
 
-                            SizedBox(height: 0.h),
+                            Obx(() {
+                              if (visualizerController.isStudioOpen.value) {
+                                return Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.only(top: 8.h),
+                                    child: VisualizerSettingsSheet(
+                                      isInline: true,
+                                      onClose: () => visualizerController.isStudioOpen.value = false,
+                                    ),
+                                  ),
+                                );
+                              }
 
-                            // Song Title and Artist
-                            TitlefavoWidget(
-                              song: currentSong,
-                              artist: currentSong.artist ?? "Unknown Artist",
-                              title: currentSong.title,
-                            ),
+                              return Column(
+                                children: [
+                                  SizedBox(height: 0.h),
 
-                            SizedBox(height: 16.h),
+                                  // Song Title and Artist
+                                  TitlefavoWidget(
+                                    song: currentSong,
+                                    artist: currentSong.artist ?? "Unknown Artist",
+                                    title: currentSong.title,
+                                  ),
 
-                            // Time and Playlist Button
-                            const Addtoplaylistbutton(),
+                                  SizedBox(height: 16.h),
 
-                            SizedBox(height: 20.h),
+                                  // Time and Playlist Button
+                                  const Addtoplaylistbutton(),
 
-                            // Waveform
-                            if (duration.inSeconds > 0)
-                              PolygonWaveformcustom(
-                                maxDuration: duration.inSeconds > 0
-                                    ? duration.inSeconds
-                                    : 300,
-                              ),
+                                  SizedBox(height: 20.h),
 
-                            SizedBox(height: 20.h),
+                                  // Waveform
+                                  if (duration.inSeconds > 0)
+                                    PolygonWaveformcustom(
+                                      maxDuration: duration.inSeconds > 0
+                                          ? duration.inSeconds
+                                          : 300,
+                                    ),
 
-                            // Playback Controls
-                            const Customplaybutton(),
+                                  SizedBox(height: 20.h),
+
+                                  // Playback Controls
+                                  const Customplaybutton(),
+                                ],
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -278,8 +306,9 @@ class _PlayscreenState extends State<Playscreen> {
               );
             }),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 }

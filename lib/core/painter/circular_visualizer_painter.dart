@@ -14,7 +14,7 @@ class NeumorphicLiquidPainter extends CustomPainter {
     required this.surfaceColor,
     required this.highlightColor,
     required this.shadowColor,
-    this.intensity = 35.0,
+    this.intensity = 14.0,
   });
 
   @override
@@ -23,10 +23,6 @@ class NeumorphicLiquidPainter extends CustomPainter {
 
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-
-    // We draw the shadow/glow slightly larger when the music is louder
-    // double avgAmplitude = fftData.reduce((a, b) => a + b) / fftData.length;
-    // double dynamicIntensity = intensity + (avgAmplitude * 20);
 
     _drawContinuousWave(canvas, center, radius, isInward: true);
     _drawContinuousWave(canvas, center, radius, isInward: false);
@@ -47,7 +43,7 @@ class NeumorphicLiquidPainter extends CustomPainter {
     // 1. Calculate points around the circle
     for (int i = 0; i < points; i++) {
       final double magnitude = isInward
-          ? (fftData[i] * intensity * 0.5) * -1
+          ? (fftData[i] * intensity * 0.45) * -1
           : (fftData[i] * intensity);
 
       final double angle = (i * angleStep) - pi / 2;
@@ -65,8 +61,8 @@ class NeumorphicLiquidPainter extends CustomPainter {
       final p2 = offsets[(i + 1) % points];
       final p3 = offsets[(i + 2) % points];
 
-      // Smoothing factor (0.2 is sweet for liquid, higher = more "loopy")
-      const double smoothing = 0.25;
+      // Smoothing factor
+      const double smoothing = 0.20;
 
       // Calculate control points for cubicTo
       final cp1 = Offset(
@@ -86,29 +82,28 @@ class NeumorphicLiquidPainter extends CustomPainter {
     _applyNeumorphicStroke(canvas, path, isInward);
   }
 
-  // DEFINITION OF THE MISSING METHOD
   void _applyNeumorphicStroke(Canvas canvas, Path path, bool isInward) {
     // A. The Shadow Path (Bottom Right offset)
     final shadowPaint = Paint()
-      ..color = shadowColor.withValues(alpha: isInward ? 0.2 : 0.5)
+      ..color = shadowColor.withValues(alpha: isInward ? 0.25 : 0.45)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+      ..strokeWidth = 3.5
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
 
     canvas.save();
-    canvas.translate(2, 2); // Offset for neumorphic depth
+    canvas.translate(1.5, 1.5); // Offset for neumorphic depth
     canvas.drawPath(path, shadowPaint);
     canvas.restore();
 
     // B. The Highlight Path (Top Left offset)
     final highlightPaint = Paint()
-      ..color = highlightColor.withValues(alpha: isInward ? 0.3 : 0.8)
+      ..color = highlightColor.withValues(alpha: isInward ? 0.35 : 0.75)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
+      ..strokeWidth = 2.0
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1);
 
     canvas.save();
-    canvas.translate(-1, -1); // Counter-offset for lighting
+    canvas.translate(-1.0, -1.0); // Counter-offset for lighting
     canvas.drawPath(path, highlightPaint);
     canvas.restore();
   }

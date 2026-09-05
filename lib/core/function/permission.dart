@@ -25,10 +25,7 @@ Future<bool> requestInitialPermissions() async {
       }
     }
 
-    // 2. Always request microphone for the visualizer
-    permissions.add(Permission.microphone);
-
-    // Request everything in the list
+    // Request permissions list
     final Map<Permission, PermissionStatus> statuses = await permissions
         .request();
 

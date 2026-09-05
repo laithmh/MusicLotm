@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:musiclotm/controller/visualizer_controller.dart';
 import 'package:musiclotm/core/painter/circular_visualizer_painter.dart';
+import 'package:musiclotm/core/painter/eclipse_nova_visualizer_painter.dart';
+import 'package:musiclotm/core/painter/radial_bars_visualizer_painter.dart';
 
 class VisualizerImageWrapper extends StatelessWidget {
   final Widget imageChild;
@@ -12,73 +15,143 @@ class VisualizerImageWrapper extends StatelessWidget {
     required this.imageChild,
     this.diskSize = 250,
   });
+
   @override
   Widget build(BuildContext context) {
     final VisualizerController controller = Get.find<VisualizerController>();
     final colorScheme = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      width: diskSize,
-      height: diskSize,
+    return GestureDetector(
+      onTap: () {
+        controller.toggleStyle();
+        final String styleName;
+        switch (controller.currentStyle.value) {
+          case VisualizerStyle.radialBars:
+            styleName = 'Trap Nation Radial Bars';
+            break;
+          case VisualizerStyle.liquid:
+            styleName = 'Neumorphic Liquid Wave';
+            break;
+          case VisualizerStyle.eclipseNova:
+            styleName = 'Eclipse Nova Corona';
+            break;
+        }
+        Get.snackbar(
+          'Visualizer Style',
+          'Switched to: $styleName',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 1),
+          backgroundColor: colorScheme.surface.withValues(alpha: 0.85),
+          colorText: colorScheme.onSurface,
+          margin: const EdgeInsets.all(16),
+        );
+      },
+      onLongPress: () {
+        HapticFeedback.mediumImpact();
+        controller.toggleStudio();
+      },
       child: Obx(() {
         final fftData = controller.fftData.toList();
+        final double kick = controller.bassValue.value;
+        final style = controller.currentStyle.value;
+        final isStudio = controller.isStudioOpen.value;
+        final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-        // Calculate Kick Intensity (first 10% of the bars)
-        final data = controller.fftData;
-        int kickEnd = (data.length * 0.1).toInt().clamp(1, data.length);
-        double kickAvg =
-            data.sublist(0, kickEnd).reduce((a, b) => a + b) / kickEnd;
+        // In studio mode, scale disk gracefully so radial bars have abundant headroom
+        final double currentDiskSize = isStudio ? diskSize * 0.76 : diskSize;
 
-        // Elastic scale: 1.0 to 1.18
-        double bassScale = 1.0 + (kickAvg * 0.18).clamp(0.0, 0.2);
+        // Album art diameter and bar starting radius
+        final double artSize = currentDiskSize * 0.58;
+        final double baseRadius = (artSize / 2) + 4.0;
 
-        return Stack(
-          key: const ValueKey('active'),
-          alignment: Alignment.center,
-          children: [
-            // 2. The Neumorphic Liquid Visualizer
-            CustomPaint(
-              size: Size(diskSize * 0.72, diskSize * 0.72),
-              painter: NeumorphicLiquidPainter(
-                fftData: fftData,
-                surfaceColor: colorScheme.inversePrimary,
-                highlightColor: colorScheme.inversePrimary,
-                shadowColor: colorScheme.surface,
-                intensity: 30 + (kickAvg * 20),
-              ),
-            ),
+        // Live configurable amplitude and kick pump
+        final double maxH = controller.maxHeight.value;
+        final bool isDiskAnimationOn = controller.enableDiskAnimation.value;
+        final double kickPump = isDiskAnimationOn ? controller.kickScale.value : 0.0;
+        final double bassScale = 1.0 + (kick * kickPump).clamp(0.0, 0.20);
 
-            // 3. Pulsing Neumorphic Album Art
-            AnimatedScale(
-              scale: bassScale,
-              duration: const Duration(milliseconds: 50),
-              curve: Curves.easeInOutBack,
-              child: Container(
-                width: diskSize * 0.65,
-                height: diskSize * 0.65,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colorScheme.secondary,
-                  boxShadow: [
-                    BoxShadow(
-                      color: colorScheme.primary.withValues(alpha: 0.4),
-                      offset: const Offset(8, 8),
-                      blurRadius: 16,
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          width: currentDiskSize,
+          height: currentDiskSize,
+          child: RepaintBoundary(
+            child: Stack(
+              key: const ValueKey('active'),
+              alignment: Alignment.center,
+              children: [
+                // 1. Equalizer Visualizer Layer
+                if (style == VisualizerStyle.radialBars)
+                  CustomPaint(
+                    size: Size(currentDiskSize, currentDiskSize),
+                    painter: RadialBarsVisualizerPainter(
+                      fftData: fftData,
+                      primaryColor: colorScheme.primary,
+                      secondaryColor: colorScheme.inversePrimary,
+                      baseRadius: baseRadius,
+                      maxBarHeight: maxH + (kick * (maxH * 0.65)),
+                      barWidth: 3.5,
                     ),
-                    BoxShadow(
-                      color: colorScheme.onPrimary.withValues(alpha: 0.8),
-                      offset: const Offset(-8, -8),
-                      blurRadius: 16,
+                  )
+                else if (style == VisualizerStyle.liquid)
+                  CustomPaint(
+                    size: Size(artSize * 1.05, artSize * 1.05),
+                    painter: NeumorphicLiquidPainter(
+                      fftData: fftData,
+                      surfaceColor: colorScheme.inversePrimary,
+                      highlightColor: colorScheme.inversePrimary,
+                      shadowColor: colorScheme.surface,
+                      intensity: (maxH * 0.35) + (kick * (maxH * 0.40)),
                     ),
-                  ],
+                  )
+                else // VisualizerStyle.eclipseNova
+                  CustomPaint(
+                    size: Size(currentDiskSize, currentDiskSize),
+                    painter: EclipseNovaVisualizerPainter(
+                      fftData: fftData,
+                      peakHoldData: controller.peakHoldData.toList(),
+                      bassValue: kick,
+                      primaryColor: colorScheme.primary,
+                      secondaryColor: colorScheme.inversePrimary,
+                      baseRadius: baseRadius,
+                      maxBarHeight: maxH + (kick * (maxH * 0.55)),
+                    ),
+                  ),
+
+                // 2. Pulsing Neumorphic Album Art
+                Transform.scale(
+                  scale: bassScale,
+                  child: Container(
+                    width: artSize,
+                    height: artSize,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colorScheme.secondary,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(
+                            alpha: (0.45 + kick * 0.35).clamp(0.0, 0.9),
+                          ),
+                          offset: const Offset(5, 5),
+                          blurRadius: 10 + (kick * 8),
+                        ),
+                        BoxShadow(
+                          color: (isDarkMode ? Colors.grey.shade700 : Colors.white)
+                              .withValues(alpha: 0.6),
+                          offset: const Offset(-4, -4),
+                          blurRadius: 8,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: ClipOval(child: imageChild),
+                    ),
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(3.0),
-                  child: ClipOval(child: imageChild),
-                ),
-              ),
+              ],
             ),
-          ],
+          ),
         );
       }),
     );

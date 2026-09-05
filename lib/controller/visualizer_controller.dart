@@ -2,174 +2,374 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:math' hide log;
 
-import 'package:audify/audify.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 
+enum VisualizerStyle { radialBars, liquid, eclipseNova }
+
 class VisualizerController extends GetxController {
-  // Get dependencies
+  // Dependencies
   SongHandler get songHandler => Get.find<SongHandler>();
-  // Visualizer properties
-  late AudifyController audify;
-  RxList<double> fftData = <double>[].obs;
-  RxList<double> peakData = <double>[].obs;
-  RxBool isInitialized = false.obs;
-  RxBool isCapturing = false.obs;
 
-  RxDouble bassValue = 0.0.obs; // Dedicated bass intensity for the UI
+  // Hive persistence keys
+  static const String hiveKeyStyle = 'visualizer_style';
+  static const String hiveKeyAttack = 'visualizer_attack';
+  static const String hiveKeyDecay = 'visualizer_decay';
+  static const String hiveKeyMaxHeight = 'visualizer_max_height';
+  static const String hiveKeyKickScale = 'visualizer_kick_scale';
+  static const String hiveKeySensitivityGamma = 'visualizer_sensitivity_gamma';
+  static const String hiveKeyEnableDiskAnimation = 'visualizer_enable_disk_animation';
 
-  // Adjusted Configuration for better "snap"
-  final int barCount = 100;
-  final double attackFactor = 1; // Faster rise for better reactivity
-  final double decayFactor =
-      0.8; // Slightly faster decay to prevent "mushiness"
-  final double noiseFloor = 0.5; // Increased to filter low-level noise
+  Box? get _box => Hive.isBoxOpen('music') ? Hive.box('music') : null;
+  final List<Worker> _persistenceWorkers = [];
 
-  // Stream subscriptions
-  StreamSubscription<List<double>>? _fftSubscription;
-  StreamSubscription<int?>? _sessionSubscription;
+  // Observables for UI
+  final RxList<double> fftData = <double>[].obs;
+  final RxList<double> peakHoldData = <double>[].obs;
+  final RxDouble bassValue = 0.0.obs;
+  final RxBool isInitialized = false.obs;
+  final RxBool isCapturing = false.obs;
+  final Rx<VisualizerStyle> currentStyle = VisualizerStyle.radialBars.obs;
+  final RxBool isStudioOpen = false.obs;
+
+  void toggleStyle() {
+    switch (currentStyle.value) {
+      case VisualizerStyle.radialBars:
+        currentStyle.value = VisualizerStyle.liquid;
+        break;
+      case VisualizerStyle.liquid:
+        currentStyle.value = VisualizerStyle.eclipseNova;
+        break;
+      case VisualizerStyle.eclipseNova:
+        currentStyle.value = VisualizerStyle.radialBars;
+        break;
+    }
+  }
+
+  void toggleStudio() {
+    isStudioOpen.value = !isStudioOpen.value;
+  }
+
+  // 64-point perimeter wave (32 bands symmetrical)
+  final int barCount = 64;
+  final double noiseFloor = 0.02;
+
+  // Spectral Flux Beat & Kick Onset Tracker
+  double _energyAvg = 0.0;
+  double _beatPulse = 0.0;
+
+  // Professional audio ballistics: responsive transient attack & fluid decay
+  final RxDouble attack = 0.55.obs;
+  final RxDouble decay = 0.78.obs;
+  final RxDouble maxHeight = 36.0.obs;
+  final RxDouble kickScale = 0.08.obs;
+  final RxDouble sensitivityGamma = 1.5.obs;
+  final RxBool enableDiskAnimation = true.obs;
+
+  void resetDefaults() {
+    attack.value = 0.55;
+    decay.value = 0.78;
+    maxHeight.value = 36.0;
+    kickScale.value = 0.08;
+    sensitivityGamma.value = 1.5;
+    enableDiskAnimation.value = true;
+    currentStyle.value = VisualizerStyle.radialBars;
+    _saveSettings();
+  }
+
+  void saveSettingsNow() {
+    _saveSettings();
+  }
+
+  void _loadSettings() {
+    try {
+      final box = _box;
+      if (box == null) return;
+
+      final savedStyle = box.get(hiveKeyStyle);
+      if (savedStyle != null) {
+        if (savedStyle is String) {
+          currentStyle.value = VisualizerStyle.values.firstWhere(
+            (e) => e.name == savedStyle,
+            orElse: () => VisualizerStyle.radialBars,
+          );
+        } else if (savedStyle is int && savedStyle >= 0 && savedStyle < VisualizerStyle.values.length) {
+          currentStyle.value = VisualizerStyle.values[savedStyle];
+        }
+      }
+
+      final savedAttack = box.get(hiveKeyAttack);
+      if (savedAttack is num) {
+        attack.value = savedAttack.toDouble();
+      }
+
+      final savedDecay = box.get(hiveKeyDecay);
+      if (savedDecay is num) {
+        decay.value = savedDecay.toDouble();
+      }
+
+      final savedMaxHeight = box.get(hiveKeyMaxHeight);
+      if (savedMaxHeight is num) {
+        maxHeight.value = savedMaxHeight.toDouble();
+      }
+
+      final savedKickScale = box.get(hiveKeyKickScale);
+      if (savedKickScale is num) {
+        kickScale.value = savedKickScale.toDouble();
+      }
+
+      final savedGamma = box.get(hiveKeySensitivityGamma);
+      if (savedGamma is num) {
+        sensitivityGamma.value = savedGamma.toDouble();
+      }
+
+      final savedDiskAnim = box.get(hiveKeyEnableDiskAnimation);
+      if (savedDiskAnim is bool) {
+        enableDiskAnimation.value = savedDiskAnim;
+      }
+    } catch (e) {
+      log('Error loading visualizer settings from Hive: $e');
+    }
+  }
+
+  void _saveSettings() {
+    try {
+      final box = _box;
+      if (box == null) return;
+
+      box.put(hiveKeyStyle, currentStyle.value.name);
+      box.put(hiveKeyAttack, attack.value);
+      box.put(hiveKeyDecay, decay.value);
+      box.put(hiveKeyMaxHeight, maxHeight.value);
+      box.put(hiveKeyKickScale, kickScale.value);
+      box.put(hiveKeySensitivityGamma, sensitivityGamma.value);
+      box.put(hiveKeyEnableDiskAnimation, enableDiskAnimation.value);
+    } catch (e) {
+      log('Error saving visualizer settings to Hive: $e');
+    }
+  }
+
+  void _setupPersistenceListeners() {
+    // Discrete immediate saves
+    _persistenceWorkers.add(ever(currentStyle, (_) => _saveSettings()));
+    _persistenceWorkers.add(ever(enableDiskAnimation, (_) => _saveSettings()));
+
+    // Debounced slider saves to prevent disk I/O thrashing during drag gestures
+    _persistenceWorkers.add(
+      debounce(attack, (_) => _saveSettings(), time: const Duration(milliseconds: 300)),
+    );
+    _persistenceWorkers.add(
+      debounce(decay, (_) => _saveSettings(), time: const Duration(milliseconds: 300)),
+    );
+    _persistenceWorkers.add(
+      debounce(maxHeight, (_) => _saveSettings(), time: const Duration(milliseconds: 300)),
+    );
+    _persistenceWorkers.add(
+      debounce(kickScale, (_) => _saveSettings(), time: const Duration(milliseconds: 300)),
+    );
+    _persistenceWorkers.add(
+      debounce(sensitivityGamma, (_) => _saveSettings(), time: const Duration(milliseconds: 300)),
+    );
+  }
+
+  // Stream subscriptions & state
+  StreamSubscription<List<double>>? _visualizerSubscription;
+  StreamSubscription<PlaybackState>? _playbackSubscription;
+  Timer? _decayTimer;
   bool _isDisposed = false;
+  bool _isPlaying = false;
 
   @override
   void onInit() {
     super.onInit();
+    _loadSettings();
+    _setupPersistenceListeners();
     _initialize();
   }
 
-  Future<void> _initialize() async {
+  void _initialize() {
     try {
       if (isInitialized.value) return;
-      // Initialize with empty data
       fftData.value = List.filled(barCount, 0.0);
-      peakData.value = List.filled(barCount, 0.0);
-
-      audify = AudifyController();
-
-      // Wait for audio session
-      _sessionSubscription = songHandler.sessionIdStream.listen((sessionId) {
-        if (sessionId != null && !isInitialized.value && !_isDisposed) {
-          _initializeWithSession(sessionId);
-        }
-      });
-
-      // Check if already has session
-      if (songHandler.sessionId != null) {
-        _initializeWithSession(songHandler.sessionId!);
-      }
-    } catch (e) {
-      log('Error initializing visualizer: $e');
-    }
-  }
-
-  Future<void> _initializeWithSession(int sessionId) async {
-    if (isInitialized.value || _isDisposed) return;
-
-    try {
-      await audify.initialize(audioSessionId: sessionId);
+      peakHoldData.value = List.filled(barCount, 0.0);
       isInitialized.value = true;
       _startCapture();
-      log('Visualizer initialized with session: $sessionId');
     } catch (e) {
-      log('Failed to initialize visualizer with session $sessionId: $e');
-      await Future.delayed(const Duration(seconds: 2));
-      if (songHandler.sessionId != null && !_isDisposed) {
-        _initializeWithSession(songHandler.sessionId!);
-      }
-    }
-  }
-
-  void updateSessionId(int newSessionId) {
-    if (isInitialized.value) {
-      _stopCapture();
-      isInitialized.value = false;
-      _initializeWithSession(newSessionId);
+      log('Error initializing visualizer controller: $e');
     }
   }
 
   void _startCapture() {
-    if (isCapturing.value || !isInitialized.value || _isDisposed) return;
+    if (isCapturing.value || _isDisposed) return;
 
     try {
-      audify.startCapture();
       isCapturing.value = true;
-
-      _fftSubscription = audify.fftStream.listen(
+      _visualizerSubscription?.cancel();
+      _visualizerSubscription = songHandler.visualizerStream.listen(
         _processFFTData,
         onError: (error) {
-          log('FFT stream error: $error');
-          _stopCapture();
+          log('Visualizer stream error: $error');
         },
       );
+
+      _playbackSubscription?.cancel();
+      _playbackSubscription = songHandler.playbackState.listen((state) {
+        _isPlaying = state.playing;
+        if (!_isPlaying) {
+          _startDecayTimer();
+        } else {
+          _decayTimer?.cancel();
+        }
+      });
     } catch (e) {
-      log('Error starting capture: $e');
+      log('Error starting visualizer stream capture: $e');
       isCapturing.value = false;
     }
   }
 
-  // Updated logic in visualizer_controller.dart
+  void _startDecayTimer() {
+    _decayTimer?.cancel();
+    _decayTimer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      if (_isDisposed || _isPlaying) {
+        timer.cancel();
+        return;
+      }
+      bool hasValue = false;
+      final List<double> decayed = List.filled(barCount, 0.0);
+      for (int i = 0; i < barCount; i++) {
+        final double current = (i < fftData.length) ? fftData[i] : 0.0;
+        if (current > 0.005) {
+          decayed[i] = current * 0.80;
+          hasValue = true;
+        } else {
+          decayed[i] = 0.0;
+        }
+      }
+      fftData.value = decayed;
+      bassValue.value = (bassValue.value * 0.80).clamp(0.0, 1.0);
+      if (!hasValue) {
+        timer.cancel();
+      }
+    });
+  }
+
   void _processFFTData(List<double> frequencies) {
-    if (frequencies.isEmpty || _isDisposed) return;
+    if (frequencies.isEmpty || _isDisposed || !_isPlaying) return;
 
-    List<double> processed = List.filled(barCount, 0.0);
+    final List<double> rawTarget = List.filled(barCount, 0.0);
+    final int len = frequencies.length;
+    final int half = barCount ~/ 2; // 32
 
-    // 1. Physical Constants for a "Real" feel
-    const double realAttack = 0.85; // Sharp, instant jump on kicks
-    const double realDecay = 0.75; // Faster drop for high-energy feel
+    final double gammaExp = sensitivityGamma.value / 1.5;
 
+    // 1. Direct symmetrical 1:1 mapping: each of the 32 bands maps to its own bar
     for (int i = 0; i < barCount; i++) {
-      // 2. Logarithmic bias: gives bass more "room"
-      double percent = i / barCount;
-      int logIndex = (pow(
-        frequencies.length,
-        pow(percent, 0.7),
-      )).toInt().clamp(0, frequencies.length - 1);
-
-      // 3. Spatial Smoothing with heavier center weight
-      double rawValue = frequencies[logIndex];
-      if (logIndex > 0 && logIndex < frequencies.length - 1) {
-        rawValue =
-            (frequencies[logIndex - 1] * 0.5) +
-            frequencies[logIndex] +
-            (frequencies[logIndex + 1] * 0.5);
-        rawValue /= 2.0;
+      final int band = (i < half) ? i : (barCount - 1 - i);
+      final int freqIdx = band.clamp(0, len - 1);
+      double val = frequencies[freqIdx];
+      if (val < noiseFloor) {
+        val = 0.0;
+      } else if (gammaExp != 1.0) {
+        val = pow(val, gammaExp).toDouble();
       }
+      rawTarget[i] = val.clamp(0.0, 1.0);
+    }
 
-      // 4. Frequency Sensitivity: Boost low-end kicks
-      double boost = 1.0 + (percent * 3.5);
-      if (i < barCount * 0.15) {
-        boost *= 1.4; // Extra punch for the kick drum area
+    // 2. Spatial smoothing: applied only for liquid mode to keep radial bars crisp & discrete
+    final bool isLiquid = currentStyle.value == VisualizerStyle.liquid;
+    List<double> targetData = rawTarget;
+
+    if (isLiquid) {
+      final List<double> smoothed = List.filled(barCount, 0.0);
+      for (int i = 0; i < barCount; i++) {
+        final double pMinus2 = rawTarget[(i - 2 + barCount) % barCount];
+        final double pMinus1 = rawTarget[(i - 1 + barCount) % barCount];
+        final double p0 = rawTarget[i];
+        final double pPlus1 = rawTarget[(i + 1) % barCount];
+        final double pPlus2 = rawTarget[(i + 2) % barCount];
+
+        smoothed[i] = (pMinus2 * 0.10) +
+            (pMinus1 * 0.20) +
+            (p0 * 0.40) +
+            (pPlus1 * 0.20) +
+            (pPlus2 * 0.10);
       }
+      targetData = smoothed;
+    }
 
-      double target = (rawValue * boost).clamp(0.0, 1.2);
-      if (target < noiseFloor) target = 0;
+    // 3. Fluid Ballistics (responsive attack + natural exponential recoil)
+    final double curAttack = attack.value;
+    final double curDecay = decay.value;
+    final List<double> processed = List.filled(barCount, 0.0);
+    for (int i = 0; i < barCount; i++) {
+      final double target = targetData[i];
+      final double previous = (i < fftData.length) ? fftData[i] : 0.0;
 
-      // 5. Physics-based smoothing
-      double previous = fftData[i];
       if (target > previous) {
-        processed[i] = previous + (target - previous) * realAttack;
+        processed[i] = previous + (target - previous) * curAttack;
       } else {
-        processed[i] = previous * realDecay;
+        processed[i] = previous * curDecay;
       }
     }
 
     fftData.value = processed;
+
+    // Peak-hold tracker with studio rack gravity falloff
+    final List<double> currentPeaks = List<double>.from(
+      peakHoldData.length == barCount ? peakHoldData : List.filled(barCount, 0.0),
+    );
+    for (int i = 0; i < barCount; i++) {
+      if (processed[i] >= currentPeaks[i]) {
+        currentPeaks[i] = processed[i];
+      } else {
+        currentPeaks[i] = max(0.0, currentPeaks[i] - 0.015);
+      }
+    }
+    peakHoldData.value = currentPeaks;
+
+    // 4. Spectral-Flux Beat & Kick Onset Detector (Sub-bass, punch kicks, 808s: bands 0-3)
+    final double b0 = frequencies.isNotEmpty ? frequencies[0] : 0.0;
+    final double b1 = frequencies.length > 1 ? frequencies[1] : b0;
+    final double b2 = frequencies.length > 2 ? frequencies[2] : b1;
+    final double b3 = frequencies.length > 3 ? frequencies[3] : b2;
+
+    // Weighted kick energy: punch kick (b1, b2) + deep sub-bass (b0)
+    final double kickEnergy = (b0 * 0.35 + b1 * 0.35 + b2 * 0.20 + b3 * 0.10).clamp(0.0, 1.0);
+
+    // Track running average energy for dynamic thresholding
+    _energyAvg = (_energyAvg * 0.85) + (kickEnergy * 0.15);
+    final double energyDelta = kickEnergy - _energyAvg;
+
+    // Dynamic proportional kick transient
+    if (energyDelta > 0.04 && kickEnergy > 0.12) {
+      // Scales proportionally with the actual loudness and suddenness of the beat
+      final double hitStrength = (kickEnergy * 0.75 + energyDelta * 1.5).clamp(0.0, 1.0);
+      _beatPulse = max(_beatPulse, hitStrength);
+    } else {
+      _beatPulse = _beatPulse * 0.70; // Natural exponential spring recoil
+    }
+
+    final double targetBass = max(_beatPulse, kickEnergy);
+    if (targetBass > bassValue.value) {
+      bassValue.value = bassValue.value + (targetBass - bassValue.value) * 0.80;
+    } else {
+      bassValue.value = (bassValue.value * 0.74).clamp(0.0, 1.0);
+    }
   }
 
   void _stopCapture() {
     isCapturing.value = false;
-    _fftSubscription?.cancel();
-    _fftSubscription = null;
-    try {
-      if (isInitialized.value) {
-        audify.stopCapture();
-      }
-    } catch (e) {
-      log('Error stopping capture: $e');
-    }
+    _visualizerSubscription?.cancel();
+    _visualizerSubscription = null;
+    _playbackSubscription?.cancel();
+    _playbackSubscription = null;
+    _decayTimer?.cancel();
   }
 
   void startVisualizer() {
-    if (isInitialized.value && !isCapturing.value) {
+    if (!isCapturing.value) {
       _startCapture();
     }
   }
@@ -181,9 +381,12 @@ class VisualizerController extends GetxController {
   @override
   void onClose() {
     _isDisposed = true;
+    for (final worker in _persistenceWorkers) {
+      worker.dispose();
+    }
+    _persistenceWorkers.clear();
+    _saveSettings();
     _stopCapture();
-    _sessionSubscription?.cancel();
-    audify.dispose();
     super.onClose();
   }
 }
