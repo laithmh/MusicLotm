@@ -33,9 +33,14 @@ class Neubox extends StatelessWidget {
         ],
       ),
       padding: const EdgeInsets.all(5),
-      height:height ,
-  width:width ,  
-    child: child,
+      height: height,
+      width: width,
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: borderRadius is BorderRadius ? borderRadius as BorderRadius : null,
+        clipBehavior: borderRadius != null ? Clip.antiAlias : Clip.none,
+        child: child,
+      ),
     );
   }
 }

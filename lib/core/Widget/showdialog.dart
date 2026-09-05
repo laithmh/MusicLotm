@@ -100,73 +100,78 @@ class CustomAlertDialog extends StatelessWidget {
                             width: 1,
                           ),
                         ),
-                        child: ListTile(
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.w,
-                            vertical: 8.h,
-                          ),
-                          leading: Container(
-                            width: 50.w,
-                            height: 50.w,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: isSelected
-                                  ? Theme.of(
-                                      context,
-                                    ).colorScheme.primary.withValues(alpha:  0.2)
-                                  : Colors.grey.shade200,
+                        child: Material(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(12),
+                          clipBehavior: Clip.antiAlias,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.w,
+                              vertical: 8.h,
                             ),
-                            child: Icon(
-                              Icons.queue_music,
-                              color: isSelected
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey.shade600,
-                              size: 24.w,
-                            ),
-                          ),
-                          title: Text(
-                            playlist.name,
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          subtitle: playlist.description!.isNotEmpty
-                              ? Text(
-                                  playlist.description!,
-                                  style: TextStyle(
-                                    fontSize: 12.sp,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.secondary,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )
-                              : null,
-                          trailing: Transform.scale(
-                            scale: 1.2,
-                            child: Checkbox(
-                              value: isSelected,
-                              onChanged: (selected) {
-                                // Update the selection
-                                controller.selectPlaylist(playlist.id);
-                              },
-                              activeColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              checkColor: Theme.of(
-                                context,
-                              ).colorScheme.inversePrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
+                            leading: Container(
+                              width: 50.w,
+                              height: 50.w,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: isSelected
+                                    ? Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withValues(alpha:  0.2)
+                                    : Colors.grey.shade200,
+                              ),
+                              child: Icon(
+                                Icons.queue_music,
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Colors.grey.shade600,
+                                size: 24.w,
                               ),
                             ),
+                            title: Text(
+                              playlist.name,
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                            subtitle: playlist.description!.isNotEmpty
+                                ? Text(
+                                    playlist.description!,
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.secondary,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                : null,
+                            trailing: Transform.scale(
+                              scale: 1.2,
+                              child: Checkbox(
+                                value: isSelected,
+                                onChanged: (selected) {
+                                  // Update the selection
+                                  controller.selectPlaylist(playlist.id);
+                                },
+                                activeColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                checkColor: Theme.of(
+                                  context,
+                                ).colorScheme.inversePrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                            ),
+                            onTap: () {
+                              // Update the selection
+                              controller.selectPlaylist(playlist.id);
+                            },
                           ),
-                          onTap: () {
-                            // Update the selection
-                            controller.selectPlaylist(playlist.id);
-                          },
                         ),
                       );
                     },
