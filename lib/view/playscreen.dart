@@ -86,10 +86,18 @@ class _PlayscreenState extends State<Playscreen> {
             actions: [
               IconButton(
                 onPressed: () {
-                  Get.toNamed(
-                    Approutes.tagEditor,
-                    parameters: {'songId': _currentSong!.id},
-                  );
+                  if (_currentSong != null) {
+                    Get.toNamed(
+                      Approutes.tagEditor,
+                      parameters: {'songId': _currentSong!.id},
+                    );
+                  } else {
+                    Get.snackbar(
+                      'Notice',
+                      'No song is currently selected',
+                      snackPosition: SnackPosition.BOTTOM,
+                    );
+                  }
                 },
                 icon: Icon(
                   Icons.edit_note_rounded,

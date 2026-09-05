@@ -1,65 +1,92 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
+# Miscellaneous
 *.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-# Dependencies
-.venv/
-venv/
-node_modules/
-dist/
-build/
-target/
-.gradle/
-.mypy_cache/
-.pytest_cache/
-.julia/
-zig*/
-# Logs and temp files
 *.log
-*.tmp
+*.pyc
 *.swp
-*.swo
-# Environment
-.env
-.env.local
-*.env.*
-# Editors
-.vscode/
-.idea/
-# Coverage
-coverage/
-htmlcov/
-.coverage
-# System files
 .DS_Store
-Thumbs.db
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code related
+.vscode/
+
+# Flutter repo-specific
+/bin/cache/
+/packages/flutter_tools/test/data/create_flutter_project_tool/flutter_project/
+
+# Flutter related
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbol processing
+app.*.symbols
+
+# Obfuscation
+app.*.map.json
+
+# Android Studio will place build artifacts in the Android module
+/android/app/debug
+/android/app/profile
+/android/app/release
+android/**/gradle-wrapper.jar
+.gradle/
+/android/.gradle
+/android/captures/
+/android/gradlew
+/android/gradlew.bat
+/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+android/app/.cxx/
+android/app/build/
+android/.cxx/
+
+# Keystore files
+*.jks
+*.keystore
+key.properties
+
+# iOS/macOS related
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Exceptions to above rules.
+!/packages/flutter_tools/test/data/create_flutter_project_tool/flutter_project/.dart_tool/package_config.json

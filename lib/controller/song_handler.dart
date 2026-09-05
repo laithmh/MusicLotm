@@ -307,16 +307,14 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   @override
   Future<void> skipToQueueItem(int index) async {
-    if (index < 0 || index >= _currentQueue.length) {
-      log('Invalid index: $index');
-      return;
-    }
+    if (_currentQueue.isEmpty) return;
+    final targetIndex = index.clamp(0, _currentQueue.length - 1);
 
     try {
       // Save current position before changing
       _saveCurrentPosition(audioPlayer.position);
 
-      await audioPlayer.seek(Duration.zero, index: index);
+      await audioPlayer.seek(Duration.zero, index: targetIndex);
       playlistcontroller.update();
     } catch (e) {
       log('Error skipping to queue item: $e');
@@ -380,32 +378,17 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   Future<void> handlePlayBackNext() async {
     try {
-      // Check if player is ready
-      if (audioPlayer.processingState != ProcessingState.ready) {
-        return;
-      }
+      if (_currentQueue.isEmpty) return;
 
-      // Save current position
       _saveCurrentPosition(audioPlayer.position);
 
-      if (isloop.isFalse) {
+      if (audioPlayer.hasNext) {
         await audioPlayer.seekToNext();
-      } else if (isloop.isTrue && _currentQueue.isNotEmpty) {
-        int currentIndex = audioPlayer.currentIndex ?? 0;
-        int nextIndex = currentIndex > 0
-            ? currentIndex + 1
-            : _currentQueue.length + 1;
-        await skipToQueueItem(nextIndex);
       } else {
-        log("No next song and loop is off - stop or pause ${isloop.value}");
-        await audioPlayer.pause();
-        playbackState.add(
-          playbackState.value.copyWith(
-            processingState: AudioProcessingState.completed,
-            playing: false,
-          ),
-        );
+        // Loop back to the first song in queue
+        await audioPlayer.seek(Duration.zero, index: 0);
       }
+      playlistcontroller.update();
     } catch (e) {
       log('Error in handlePlayBackNext: $e');
     }
@@ -413,29 +396,23 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
 
   Future<void> handlePlayBackPrevious() async {
     try {
-      if (audioPlayer.processingState != ProcessingState.ready) {
-        return;
-      }
+      if (_currentQueue.isEmpty) return;
 
-      // Save current position
       _saveCurrentPosition(audioPlayer.position);
 
-      // If less than 3 seconds into the song, go to previous song
-      // Otherwise, restart current song
+      // If more than 3 seconds into the song, restart it
       if (audioPlayer.position.inSeconds > 3) {
         await audioPlayer.seek(Duration.zero);
         _saveCurrentPosition(Duration.zero);
       } else {
-        if (isloop.value && _currentQueue.isNotEmpty) {
-          int currentIndex = audioPlayer.currentIndex ?? 0;
-          int previousIndex = currentIndex > 0
-              ? currentIndex - 1
-              : _currentQueue.length - 1;
-          await skipToQueueItem(previousIndex);
+        if (audioPlayer.hasPrevious) {
+          await audioPlayer.seekToPrevious();
         } else {
-          await skipToPrevious();
+          // Loop around to the last song in queue
+          await audioPlayer.seek(Duration.zero, index: _currentQueue.length - 1);
         }
       }
+      playlistcontroller.update();
     } catch (e) {
       log('Error in handlePlayBackPrevious: $e');
     }
@@ -445,7 +422,11 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   Future<void> skipToNext() async {
     try {
       _saveCurrentPosition(audioPlayer.position);
-      await audioPlayer.seekToNext();
+      if (audioPlayer.hasNext) {
+        await audioPlayer.seekToNext();
+      } else if (_currentQueue.isNotEmpty) {
+        await audioPlayer.seek(Duration.zero, index: 0);
+      }
     } catch (e) {
       log('Error skipping to next: $e');
     }
@@ -455,7 +436,13 @@ class SongHandler extends BaseAudioHandler with QueueHandler, SeekHandler {
   Future<void> skipToPrevious() async {
     try {
       _saveCurrentPosition(audioPlayer.position);
-      await audioPlayer.seekToPrevious();
+      if (audioPlayer.position.inSeconds > 3) {
+        await audioPlayer.seek(Duration.zero);
+      } else if (audioPlayer.hasPrevious) {
+        await audioPlayer.seekToPrevious();
+      } else if (_currentQueue.isNotEmpty) {
+        await audioPlayer.seek(Duration.zero, index: _currentQueue.length - 1);
+      }
     } catch (e) {
       log('Error skipping to previous: $e');
     }

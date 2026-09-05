@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_audio_waveforms/flutter_audio_waveforms.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:musiclotm/controller/song_handler.dart';
 import 'package:musiclotm/core/function/generaterandomnumber.dart';
 
@@ -14,16 +13,12 @@ class PolygonWaveformcustom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     GenerateRandomNumbers generateRandomNumbers = Get.find();
-    var box = Hive.box('music');
     SongHandler songHandler = Get.find<SongHandler>();
 
     return StreamBuilder<Duration>(
       stream: AudioService.position,
       builder: (context, snapshot) {
         Duration? position = snapshot.data;
-        int second = position?.inSeconds ?? 0;
-
-        box.put("position", second);
 
         return Stack(
           clipBehavior: Clip.none,

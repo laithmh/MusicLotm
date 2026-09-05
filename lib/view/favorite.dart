@@ -168,8 +168,7 @@ class Favorite extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         physics: const BouncingScrollPhysics(),
         itemCount: favorites.length,
-        onReorder: (oldIndex, newIndex) async {
-          if (oldIndex < newIndex) newIndex -= 1;
+        onReorderItem: (oldIndex, newIndex) async {
           await playlistcontroller.reorderFavorites(oldIndex, newIndex);
         },
         // ✅ CRITICAL: ReorderableListView requires stable widget identity

@@ -293,8 +293,7 @@ class _PlaylistpageState extends State<Playlistpage> {
       return ReorderableListView.builder(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
         physics: const BouncingScrollPhysics(),
-        onReorder: (oldIndex, newIndex) async {
-          if (oldIndex < newIndex) newIndex -= 1;
+        onReorderItem: (oldIndex, newIndex) async {
           await playlistcontroller.reorderPlaylistSongs(oldIndex, newIndex);
         },
         itemCount: songs.length,
